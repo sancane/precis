@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+	"precis-core",
+	"precis-profiles",
+	"precis-tools",
+]

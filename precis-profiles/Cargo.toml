@@ -1,0 +1,29 @@
+[package]
+name = "precis-profiles"
+version = "0.1.1"
+authors = ["Santiago Carot-Nemesio <sancane@gmail.com"]
+description = """
+Implementation of the PRECIS Framework: Preparation, Enforcement,
+and Comparison of Internationalized Strings Representing
+Usernames and Passwords as defined in rfc8265; and Nicknames as
+defined in rfc8266.
+"""
+documentation = "https://docs.rs/precis-profiles"
+homepage = "https://github.com/sancane/precis"
+repository = "https://github.com/sancane/precis"
+readme = "README.md"
+keywords = ["precis", "profiles", "rfc8264", "rfc8265", "rfc8266"]
+license = "MIT/Apache-2.0"
+categories = ["text-processing", "internationalization"]
+edition = "2018"
+
+[build-dependencies]
+precis-tools = { path = "../precis-tools", version = "0.1.1" }
+
+[dependencies]
+lazy_static = "1.4.0"
+precis-core = { path = "../precis-core", version = "0.1.1" }
+unicode-normalization = "0.1.19"
+
+[features]
+networking = ["precis-core/networking", "precis-tools/networking"]

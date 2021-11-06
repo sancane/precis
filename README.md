@@ -1,0 +1,115 @@
+# Rust PRECIS Framework libray
+
+PRECIS Framework: Preparation, Enforcement, and Comparison of
+Internationalized Strings in Application Protocols as described in
+[rfc8264](https://datatracker.ietf.org/doc/html/rfc8264)
+
+This workspace implements the next crates:
+
+## [precis-tools](precis-tools/README.md)
+
+This crate contains all the tools and parsers to generate PRECIS
+tables from the Unicode Character Database [UCD](https://unicode.org).
+This crate is only used to generate code required by `precis-core` and
+`precis-profiles`. It contains the main dependencies in order to download
+UCD files, parse them and generate Rust code.
+
+## [precis-core](precis-core/README.md)
+
+The core library of the PRECIS Framework. The base string classes `IdentifierClass`
+and `FreeFormClass` are implemented here as defined in 
+[rfc8264](https://datatracker.ietf.org/doc/html/rfc8264).
+This crate provides the APIs required for profiles to be implemented.
+You mostly won't require this crate unless you are implementing a new profile.
+
+## [precis-profiles](precis-profiles/README.md)
+
+This crate implements the next PRECIS profiles:
+ * [rfc8265](https://datatracker.ietf.org/doc/html/rfc8265).
+   Preparation, Enforcement, and Comparison of Internationalized Strings
+   Representing Usernames and Passwords.
+ * [rfc8266](https://datatracker.ietf.org/doc/html/rfc8266).
+   Preparation, Enforcement, and Comparison of Internationalized Strings
+   Representing Nicknames
+
+PRECIS profiles provides an API that allows application to prepare, enforce and compare
+internacionalized strings.
+
+### Example
+
+```rust
+use precis_core::Error;
+use precis_core::profile::Profile;
+use precis_profiles::OpaqueString;
+use std::borrow::Cow;
+
+// create OpaqueString profile
+let profile = OpaqueString::new();
+
+// prepare string
+assert_eq!(profile.prepare("I'm Guybrush Threepwood, Mighty Pirate ☠"),
+    Ok(Cow::from("I'm Guybrush Threepwood, Mighty Pirate ☠")));
+
+// enforce string
+assert_eq!(profile.enforce("Look behind you, a three-headed monkey!🐒"),
+    Ok(Cow::from("Look behind you, a three-headed monkey!🐒")));
+
+// compare strings
+assert_eq!(profile.compare("That’s the second biggest 🐵 I’ve ever seen!",
+    "That’s the second biggest 🐵 I’ve ever seen!"), Ok(true));
+```
+
+If you find yourself continuously creating and destroying profiles to perform 
+any of the operation described for internationalized string. You can make use 
+of the PrecisFastInvocation trait.
+Profiles implementing this crate will allow you to prepare, enforce or compare 
+string without having to instantiate a specific profile.
+Profiles usually use a static instance allocated with 
+[lazy_static](https://docs.rs/lazy_static/1.4.0/lazy_static/)
+
+### Example
+
+```rust
+extern crate precis_profiles;
+
+use precis_core::profile::PrecisFastInvocation;
+use precis_profiles::Nickname;
+use std::borrow::Cow;
+
+fn main() {
+   assert_eq!(Nickname::prepare("Guybrush Threepwood"),
+     Ok(Cow::from("Guybrush Threepwood")));
+   assert_eq!(Nickname::enforce("   Guybrush     Threepwood  "),
+     Ok(Cow::from("Guybrush Threepwood")));
+   assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
+     "guybrush threepwood"), Ok(true));
+}
+```
+
+## crates.io
+
+You can use this package in your project by adding the following
+to your `Cargo.toml`:
+
+```toml
+[dependencies]
+precis-profiles = "0.1.1"
+```
+# Common features
+
+* **networking** - Enables crates to download Unicode Character Database [UCD](https://unicode.org) files from the network. This is helpful for developing and testing new Unicode releases, but this feature can not be enabled to generate the library documentation when the crate is uploaded to [crates.io](https://crates.io). For security reasons, network access is no allowed to crates to avoid compromising the security of docs.rs itself.
+
+# Known limitations
+
+PRECIS recommends using toLowerCase() operation as defined in the Unicode Standard
+[Unicode](http://www.unicode.org/versions/latest/). This implementation uses the 
+one provided by Rust standard library 
+[to_lowercase](https://doc.rust-lang.org/std/primitive.str.html#method.to_lowercase).
+This operation performs an unconditional mapping without tailoring. That is, the 
+conversion is independent of context and language.
+
+# License
+
+This project is licensed under either of
+* Apache License, Version 2.0, (LICENSE-APACHE or https://www.apache.org/licenses/LICENSE-2.0)
+* MIT license (LICENSE-MIT or https://opensource.org/licenses/MIT) at your option.
