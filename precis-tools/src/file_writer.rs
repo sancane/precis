@@ -18,20 +18,6 @@ pub fn generate_file_header(file: &mut File) -> Result<(), Error> {
     Ok(writeln!(file)?)
 }
 
-pub fn generate_codepoints_struct(file: &mut File) -> Result<(), Error> {
-    writeln!(
-        file,
-        "/// A representation of either a single codepoint or a range of codepoints."
-    )?;
-    writeln!(file, "pub enum Codepoints {{")?;
-    writeln!(file, "/// A single codepoint.")?;
-    writeln!(file, "\tSingle(u32),")?;
-    writeln!(file, "/// A range of codepoints.")?;
-    writeln!(file, "\tRange(std::ops::RangeInclusive<u32>),")?;
-    writeln!(file, "}}")?;
-    Ok(writeln!(file)?)
-}
-
 pub fn generate_codepoint_str(c: &Codepoints) -> String {
     match c {
         Single(cp) => format!("Codepoints::Single({:#06x})", cp.value()),

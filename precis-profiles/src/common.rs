@@ -3,7 +3,6 @@ include!(concat!(env!("OUT_DIR"), "/space_separator.rs"));
 use precis_core::Codepoints;
 use precis_core::Error;
 use std::borrow::Cow;
-use std::cmp::Ordering;
 use unicode_normalization::UnicodeNormalization;
 
 pub const SPACE: char = '\u{0020}';
@@ -11,18 +10,7 @@ pub const SPACE: char = '\u{0020}';
 pub fn is_space_separator(c: char) -> bool {
     let cp = c as u32;
     SPACE_SEPARATOR
-        .binary_search_by(|cps| match cps {
-            Codepoints::Single(c) => c.cmp(&cp),
-            Codepoints::Range(r) => {
-                if r.contains(&cp) {
-                    Ordering::Equal
-                } else if cp < *r.start() {
-                    Ordering::Greater
-                } else {
-                    Ordering::Less
-                }
-            }
-        })
+        .binary_search_by(|cps| cps.partial_cmp(&cp).unwrap())
         .is_ok()
 }
 

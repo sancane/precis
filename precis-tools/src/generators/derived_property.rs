@@ -1,0 +1,111 @@
+use crate::error::Error;
+use crate::generators::CodeGen;
+use std::fs::File;
+use std::io::Write;
+
+/// Generates the derived property enum with the
+/// values described in the PRECIS
+/// [Code Point Properties](https://datatracker.ietf.org/doc/html/rfc8264#section-8)
+/// section.
+/// # Example:
+/// ```rust
+/// pub enum DerivedPropertyValue {
+///    PValid,
+///    SpecClassPval,
+///    SpecClassDis,
+///    ContextJ,
+///    ContextO,
+///    Disallowed,
+///    Unassigned,
+/// }
+/// ```
+pub struct DerivedPropertyValueGen {}
+
+impl DerivedPropertyValueGen {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl Default for DerivedPropertyValueGen {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CodeGen for DerivedPropertyValueGen {
+    fn generate_code(&mut self, file: &mut File) -> Result<(), Error> {
+        writeln!(file, "/// Derived property value")?;
+        writeln!(file, "/// # Notes")?;
+        writeln!(
+            file,
+            "/// * **SpecClassPVal** maps to those code points that are allowed"
+        )?;
+        writeln!(
+            file,
+            "/// to be used in specific string classes such as [`IdentifierClass`]"
+        )?;
+        writeln!(
+            file,
+            "/// and [`FreeformClass`]. PRECIS framework defines two allowed"
+        )?;
+        writeln!(
+            file,
+            "/// values for above classes (ID_PVAL adn FREE_PVAL). In practice,"
+        )?;
+        writeln!(
+            file,
+            "/// the derived property ID_PVAL is not used in this specification,"
+        )?;
+        writeln!(
+            file,
+            "/// because every ID_PVAL code point is PVALID, so only FREE_PVAL"
+        )?;
+        writeln!(file, "/// is actually mapped to SpecClassPVal.")?;
+        writeln!(
+            file,
+            "/// * **SpecClassDis** maps to those code points that are not to be"
+        )?;
+        writeln!(
+            file,
+            "/// included in one of the string classes but that might be permitted"
+        )?;
+        writeln!(
+            file,
+            "/// in others. PRECIS framework defines \"FREE_DIS\" for the"
+        )?;
+        writeln!(
+            file,
+            "/// [`FreeformClass`] and \"ID_DIS\" for the [`IdentifierClass`]."
+        )?;
+        writeln!(
+            file,
+            "/// In practice, the derived property FREE_DIS is not used in this"
+        )?;
+        writeln!(
+            file,
+            "/// specification, because every FREE_DIS code point is DISALLOWED,"
+        )?;
+        writeln!(file, "/// so only ID_DIS is mapped to SpecClassDis.")?;
+        writeln!(
+            file,
+            "/// Both SpecClassPVal and SpecClassDis values are used to ease"
+        )?;
+        writeln!(
+            file,
+            "/// extension if more classes are added beyond [`IdentifierClass`]"
+        )?;
+        writeln!(file, "/// and [`FreeformClass`] in the future.")?;
+        writeln!(file, "#[derive(Clone, Copy, Debug, PartialEq)]")?;
+        writeln!(file, "pub enum DerivedPropertyValue {{")?;
+        writeln!(file, "\tPValid,")?;
+        writeln!(file, "\tSpecClassPval,")?;
+        writeln!(file, "\tSpecClassDis,")?;
+        writeln!(file, "\tContextJ,")?;
+        writeln!(file, "\tContextO,")?;
+        writeln!(file, "\tDisallowed,")?;
+        writeln!(file, "\tUnassigned,")?;
+        writeln!(file, "}}")?;
+        Ok(writeln!(file)?)
+    }
+}

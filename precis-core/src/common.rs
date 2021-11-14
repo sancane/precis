@@ -1,99 +1,28 @@
 include!(concat!(env!("OUT_DIR"), "/precis_tables.rs"));
+include!(concat!(env!("OUT_DIR"), "/context_tables.rs"));
 
-use crate::stringclasses::DerivedPropertyValue;
 use crate::Codepoints;
-use phf::phf_map;
+use crate::DerivedPropertyValue;
 use std::char;
-use std::cmp::Ordering;
 use unicode_normalization::UnicodeNormalization;
 
-// 9.6.  Exceptions (F)
-// This category explicitly lists code points for which the category
-// cannot be assigned using only the core property values that exist in
-// the Unicode standard.  The values are according to the table below:
-static EXCEPTIONS: phf::Map<u32, DerivedPropertyValue> = phf_map! {
-    // PVALID -- Would otherwise have been DISALLOWED
-    0x00DFu32 => DerivedPropertyValue::PValid,     // LATIN SMALL LETTER SHARP S
-    0x03C2u32 => DerivedPropertyValue::PValid,     // GREEK SMALL LETTER FINAL SIGMA
-    0x06FDu32 => DerivedPropertyValue::PValid,     // ARABIC SIGN SINDHI AMPERSAND
-    0x06FEu32 => DerivedPropertyValue::PValid,     // ARABIC SIGN SINDHI POSTPOSITION MEN
-    0x0F0Bu32 => DerivedPropertyValue::PValid,     // TIBETAN MARK INTERSYLLABIC TSHEG
-    0x3007u32 => DerivedPropertyValue::PValid,     // IDEOGRAPHIC NUMBER ZERO
-
-    // CONTEXTO -- Would otherwise have been DISALLOWED
-    0x00B7u32 => DerivedPropertyValue::ContextO,   // MIDDLE DOT
-    0x0375u32 => DerivedPropertyValue::ContextO,   // GREEK LOWER NUMERAL SIGN (KERAIA)
-    0x05F3u32 => DerivedPropertyValue::ContextO,   // HEBREW PUNCTUATION GERESH
-    0x05F4u32 => DerivedPropertyValue::ContextO,   // HEBREW PUNCTUATION GERSHAYIM
-    0x30FBu32 => DerivedPropertyValue::ContextO,   // KATAKANA MIDDLE DOT
-
-    // CONTEXTO -- Would otherwise have been PVALID
-    0x0660u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT ZERO
-    0x0661u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT ONE
-    0x0662u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT TWO
-    0x0663u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT THREE
-    0x0664u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT FOUR
-    0x0665u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT FIVE
-    0x0666u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT SIX
-    0x0667u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT SEVEN
-    0x0668u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT EIGHT
-    0x0669u32 => DerivedPropertyValue::ContextO,   // ARABIC-INDIC DIGIT NINE
-    0x06F0u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT ZERO
-    0x06F1u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT ONE
-    0x06F2u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT TWO
-    0x06F3u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT THREE
-    0x06F4u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT FOUR
-    0x06F5u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT FIVE
-    0x06F6u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT SIX
-    0x06F7u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT SEVEN
-    0x06F8u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT EIGHT
-    0x06F9u32 => DerivedPropertyValue::ContextO,   // EXTENDED ARABIC-INDIC DIGIT NINE
-
-    // DISALLOWED -- Would otherwise have been PVALID
-    0x0640u32 => DerivedPropertyValue::Disallowed, // ARABIC TATWEEL
-    0x07FAu32 => DerivedPropertyValue::Disallowed, // NKO LAJANYALAN
-    0x302Eu32 => DerivedPropertyValue::Disallowed, // HANGUL SINGLE DOT TONE MARK
-    0x302Fu32 => DerivedPropertyValue::Disallowed, // HANGUL DOUBLE DOT TONE MARK
-    0x3031u32 => DerivedPropertyValue::Disallowed, // VERTICAL KANA REPEAT MARK
-    0x3032u32 => DerivedPropertyValue::Disallowed, // VERTICAL KANA REPEAT WITH VOICED SOUND MARK
-    0x3033u32 => DerivedPropertyValue::Disallowed, // VERTICAL KANA REPEAT MARK UPPER HALF
-    0x3034u32 => DerivedPropertyValue::Disallowed, // VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HA
-    0x3035u32 => DerivedPropertyValue::Disallowed, // VERTICAL KANA REPEAT MARK LOWER HALF
-    0x303Bu32 => DerivedPropertyValue::Disallowed, // VERTICAL IDEOGRAPHIC ITERATION MARK
-};
-
 pub fn get_exception_val(cp: u32) -> Option<&'static DerivedPropertyValue> {
-    EXCEPTIONS.get(&cp)
+    match EXCEPTIONS.binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap()) {
+        Ok(idx) => Some(&EXCEPTIONS[idx].1),
+        Err(_) => None,
+    }
 }
 
-// 9.7.  BackwardCompatible (G)
-// This category includes the code points that property values in
-// versions of Unicode after 5.2 have changed in such a way that the
-// derived property value would no longer be PVALID or DISALLOWED.  If
-// changes are made to future versions of Unicode so that code points
-// might change the property value from PVALID or DISALLOWED, then this
-// table can be updated and keep special exception values so that the
-// property values for code points stay stable.
-static BACKWARD_COMPATIBLE: phf::Map<u32, DerivedPropertyValue> = phf_map! {};
-
 pub fn get_backward_compatible_val(cp: u32) -> Option<&'static DerivedPropertyValue> {
-    BACKWARD_COMPATIBLE.get(&cp)
+    match BACKWARD_COMPATIBLE.binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap()) {
+        Ok(idx) => Some(&BACKWARD_COMPATIBLE[idx].1),
+        Err(_) => None,
+    }
 }
 
 fn is_in_table(cp: u32, table: &[Codepoints]) -> bool {
     table
-        .binary_search_by(|cps| match cps {
-            Codepoints::Single(c) => c.cmp(&cp),
-            Codepoints::Range(r) => {
-                if r.contains(&cp) {
-                    Ordering::Equal
-                } else if cp < *r.start() {
-                    Ordering::Greater
-                } else {
-                    Ordering::Less
-                }
-            }
-        })
+        .binary_search_by(|cps| cps.partial_cmp(&cp).unwrap())
         .is_ok()
 }
 

@@ -13,18 +13,16 @@
 //!
 //! ```toml
 //! [dependencies]
-//! precis = "0.1.1"
+//! precis-core = "0.1.2"
 //! ```
 
-include!(concat!(env!("OUT_DIR"), "/unicode_version.rs"));
-include!(concat!(env!("OUT_DIR"), "/precis_defs.rs"));
+include!(concat!(env!("OUT_DIR"), "/public.rs"));
 
 mod common;
 
 pub mod context;
 
 pub use crate::error::Error;
-pub use crate::stringclasses::DerivedPropertyValue;
 pub use crate::stringclasses::FreeformClass;
 pub use crate::stringclasses::IdentifierClass;
 pub use crate::stringclasses::StringClass;

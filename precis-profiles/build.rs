@@ -1,15 +1,41 @@
 // build.rs
-use precis_tools::{BidiClassGen, MappingTablesGen, SpaceSeparatorGen, UnicodeVersionGen};
+use precis_tools::{
+    BidiClassGen, GeneralCategoryGen, RustCodeGen, UCDFileGen, UCDTableGen, UnicodeVersionGen,
+    WidthMappingTableGen,
+};
 use std::env;
 use std::path::Path;
 
 const UNICODE_VERSION: &str = "14.0.0";
 
 fn generate_code(ucd: &Path, out: &Path) {
-    MappingTablesGen::generate_tables(ucd, out, "profile_tables.rs").unwrap();
-    BidiClassGen::generate_file(ucd, out, "bidi_class.rs").unwrap();
-    SpaceSeparatorGen::generate_tables(ucd, out, "space_separator.rs").unwrap();
-    UnicodeVersionGen::generate_code(out, UNICODE_VERSION, "unicode_version.rs").unwrap();
+    let mut gen = RustCodeGen::new(Path::new(&out).join("bidi_class.rs")).unwrap();
+    let mut ucd_gen = UCDFileGen::new(ucd);
+    let mut gc_gen = GeneralCategoryGen::new();
+    gc_gen.add(Box::new(BidiClassGen::new("Bidi_Class_Table")));
+    ucd_gen.add(Box::new(gc_gen));
+    gen.add(Box::new(ucd_gen));
+    gen.generate_code().unwrap();
+
+    let mut gen = RustCodeGen::new(Path::new(&out).join("unicode_version.rs")).unwrap();
+    gen.add(Box::new(UnicodeVersionGen::new(UNICODE_VERSION)));
+    gen.generate_code().unwrap();
+
+    let mut gen = RustCodeGen::new(Path::new(&out).join("space_separator.rs")).unwrap();
+    let mut ucd_gen = UCDFileGen::new(ucd);
+    let mut gc_gen = GeneralCategoryGen::new();
+    gc_gen.add(Box::new(UCDTableGen::new("Zs", "space_separator")));
+    ucd_gen.add(Box::new(gc_gen));
+    gen.add(Box::new(ucd_gen));
+    gen.generate_code().unwrap();
+
+    let mut gen = RustCodeGen::new(Path::new(&out).join("width_mapping.rs")).unwrap();
+    let mut ucd_gen = UCDFileGen::new(ucd);
+    let mut gc_gen = GeneralCategoryGen::new();
+    gc_gen.add(Box::new(WidthMappingTableGen::new("wide_narrow_mapping")));
+    ucd_gen.add(Box::new(gc_gen));
+    gen.add(Box::new(ucd_gen));
+    gen.generate_code().unwrap();
 }
 
 #[cfg(feature = "networking")]
@@ -48,7 +74,7 @@ fn main() {
     let base_dir = env::var_os("CARGO_MANIFEST_DIR").unwrap();
     let ucd_path = Path::new(&base_dir).join("resources/ucd");
 
-    generate_code(&ucd_path, &out_path);
+    generate_code(&ucd_path, out_path);
 
     println!("cargo:rerun-if-changed=build.rs");
 }

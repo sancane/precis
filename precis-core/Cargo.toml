@@ -1,6 +1,6 @@
 [package]
 name = "precis-core"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Santiago Carot-Nemesio <sancane@gmail.com>"]
 description = """
 PRECIS Framework: Preparation, Enforcement, and Comparison of
@@ -17,14 +17,14 @@ categories = ["text-processing", "internationalization"]
 edition = "2018"
 
 [dev-dependencies]
-precis-tools = { path = "../precis-tools", version = "0.1.1" }
+precis-tools = { path = "../precis-tools", version = "0.1.2" }
 ucd-parse = "0.1.8"
 
 [build-dependencies]
-precis-tools = { path = "../precis-tools", version = "0.1.1" }
+precis-tools = { path = "../precis-tools", version = "0.1.2" }
+ucd-parse = "0.1.8"
 
 [dependencies]
-phf = { version = "0.9", features = ["macros"] }
 unicode-normalization = "0.1.19"
 
 [features]

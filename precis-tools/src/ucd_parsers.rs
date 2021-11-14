@@ -3,7 +3,9 @@ use std::path::Path;
 use std::str::FromStr;
 use ucd_parse::UcdFile;
 
-// A single row in the `HangulSyllableType.txt` file.
+/// A single row in the
+/// [HangulSyllableType.txt](http://www.unicode.org/reports/tr44/#HangulSyllableType.txt)
+/// file.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct HangulSyllableType {
     pub prop: ucd_parse::Property,
@@ -30,7 +32,7 @@ impl FromStr for HangulSyllableType {
     }
 }
 
-// A single row in the `HangulSyllableType.txt` file.
+/// A single row in the `DerivedJoiningType.txt` file.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DerivedJoiningType {
     pub prop: ucd_parse::Property,
@@ -57,11 +59,14 @@ impl FromStr for DerivedJoiningType {
     }
 }
 
-/// Represents a single row in the `UnicodeData.txt` file.
-///
-/// These fields were taken from UAX44, Table 9, as part of the documentation
-/// for the
-/// [`UnicodeData.txt` file](https://www.unicode.org/reports/tr44/#UnicodeData.txt).
+/// Extension of the UnicodeData struct provided by the
+/// [ucd_parse](https://docs.rs/ucd-parse) crate. Unlike the
+/// original one, this struct does not represent a single line in the
+/// [UnicodeData.txt](https://www.unicode.org/reports/tr44/#UnicodeData.txt)
+/// file, but it could be the result of a whole parsing of several files
+/// to contain range of Unicode code points. Note that this file, unlike
+/// others in the Unicode data files, represents ranges split in different
+/// lines in order not to break parsers compatibility.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct UnicodeData {
     /// The codepoints corresponding to this row.

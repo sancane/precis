@@ -15,7 +15,7 @@ to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-precis-core = "0.1.1"
+precis-core = "0.1.2"
 ```
 
 # Documentation

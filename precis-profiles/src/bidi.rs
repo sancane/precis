@@ -1,21 +1,9 @@
 include!(concat!(env!("OUT_DIR"), "/bidi_class.rs"));
 
 use precis_core::Codepoints;
-use std::cmp::Ordering;
 
 fn bidi_class_cp(cp: u32) -> BidiClass {
-    match BIDI_CLASS_TABLE.binary_search_by(|(cps, _)| match cps {
-        Codepoints::Single(c) => c.cmp(&cp),
-        Codepoints::Range(r) => {
-            if r.contains(&cp) {
-                Ordering::Equal
-            } else if cp < *r.start() {
-                Ordering::Greater
-            } else {
-                Ordering::Less
-            }
-        }
-    }) {
+    match BIDI_CLASS_TABLE.binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap()) {
         Ok(idx) => BIDI_CLASS_TABLE[idx].1,
         // UCD/extracted/DerivedBidiClass.txt: "All code points not explicitly listed
         // for Bidi_Class have the value Left_To_Right (L)."

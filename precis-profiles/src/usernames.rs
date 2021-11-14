@@ -1,4 +1,4 @@
-include!(concat!(env!("OUT_DIR"), "/profile_tables.rs"));
+include!(concat!(env!("OUT_DIR"), "/width_mapping.rs"));
 
 use crate::bidi;
 use crate::common;
@@ -8,22 +8,10 @@ use precis_core::Codepoints;
 use precis_core::Error;
 use precis_core::{IdentifierClass, StringClass};
 use std::borrow::Cow;
-use std::cmp::Ordering;
 
 fn get_decomposition_mapping(cp: u32) -> Option<u32> {
     WIDE_NARROW_MAPPING
-        .binary_search_by(|cps| match &cps.0 {
-            Codepoints::Single(c) => c.cmp(&cp),
-            Codepoints::Range(r) => {
-                if r.contains(&cp) {
-                    Ordering::Equal
-                } else if cp < *r.start() {
-                    Ordering::Greater
-                } else {
-                    Ordering::Less
-                }
-            }
-        })
+        .binary_search_by(|cps| cps.0.partial_cmp(&cp).unwrap())
         .map(|x| WIDE_NARROW_MAPPING[x].1)
         .ok()
 }

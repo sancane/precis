@@ -1,8 +1,32 @@
+//! Tools and parsers to generate PRECIS tables from the Unicode Character Database (UCD)
+//! # crates.io
+//!
+//! You can use this package in your project by adding the following
+//! to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! precis-tools = "0.1.2"
+//! ```
+//! This crate is generally used to generate code to be used by other crates such as
+//! [precis-core](https://docs.rs/precis-core) or [precis-profiles](https://docs.rs/precis-profiles).
+//! Consider adding this in your [build-dependencies](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#build-dependencies) section instead.
+
+pub use crate::generators::ascii7::Ascii7Gen;
+pub use crate::generators::backward_compatible::BackwardCompatibleGen;
 pub use crate::generators::bidi_class::BidiClassGen;
-pub use crate::generators::generator::CodeGenerator;
-pub use crate::generators::space_separator::SpaceSeparatorGen;
+pub use crate::generators::codepoints::CodepointsGen;
+pub use crate::generators::derived_property::DerivedPropertyValueGen;
+pub use crate::generators::exceptions::ExceptionsGen;
+pub use crate::generators::ucd_generator::{
+    GeneralCategoryGen, UCDFileGen, UCDLineParser, UCDTableGen, UcdCodeGen, UnassignedTableGen,
+    UnicodeGen, ViramaTableGen, WidthMappingTableGen,
+};
 pub use crate::generators::unicode_version::UnicodeVersionGen;
-pub use crate::generators::width_mapping::MappingTablesGen;
+pub use crate::generators::{CodeGen, RustCodeGen};
+pub use crate::ucd_parsers::DerivedJoiningType;
+pub use crate::ucd_parsers::HangulSyllableType;
+pub use crate::ucd_parsers::UnicodeData;
 
 pub use crate::csv_parser::{
     CsvLineParser, DerivedProperties, DerivedProperty, PrecisDerivedProperty,

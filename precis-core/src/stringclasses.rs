@@ -1,34 +1,6 @@
 use crate::common;
 use crate::context;
-
-/// Derived property value
-/// # Notes
-/// **SpecClassPVal** maps to those code points that are allowed to
-/// be used in specific string classes such as [`IdentifierClass`] and
-/// [`FreeformClass`]. PRECIS framework defines two allowed values
-/// for above classes (ID_PVAL adn FREE_PVAL). In practice,
-/// the derived property ID_PVAL is not used in this specification, because
-/// every ID_PVAL code point is PVALID, so only FREE_PVAL is actually mapped
-/// to SpecClassPVal.\
-/// **SpecClassDis** maps to those code points that are not to be
-/// included in one of the string classes but that might be permitted
-/// in others. PRECIS framework defines "FREE_DIS" for the [`FreeformClass`]
-/// and "ID_DIS" for the [`IdentifierClass`]. In practice, the derived property
-/// FREE_DIS is not used in this specification, because every FREE_DIS code
-/// point is DISALLOWED, so only ID_DIS is mapped to SpecClassDis\
-/// Both SpecClassPVal and SpecClassDis values are used to ease extension if
-/// more classes are added beyond [`IdentifierClass`] and [`FreeformClass`] in
-/// the future.
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum DerivedPropertyValue {
-    PValid,
-    SpecClassPval,
-    SpecClassDis,
-    ContextJ,
-    ContextO,
-    Disallowed,
-    Unassigned,
-}
+use crate::DerivedPropertyValue;
 
 /// Interface for specific classes to deal with specific unicode
 /// code groups defined in RFC 8264.

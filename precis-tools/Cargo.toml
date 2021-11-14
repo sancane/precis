@@ -1,11 +1,11 @@
 [package]
 name = "precis-tools"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Santiago Carot-Nemesio <sancane@gmail.com>"]
 description = """
 Tools and parsers to generate PRECIS tables from the Unicode Character Database (UCD)
 """
-documentation = "https://github.com/sancane/precis"
+documentation = "https://docs.rs/precis-tools"
 homepage = "https://github.com/sancane/precis"
 repository = "https://github.com/sancane/precis"
 readme = "README.md"
