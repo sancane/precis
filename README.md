@@ -94,15 +94,6 @@ fn main() {
 }
 ```
 
-## crates.io
-
-You can use this package in your project by adding the following
-to your `Cargo.toml`:
-
-```toml
-[dependencies]
-precis-profiles = "0.1.1"
-```
 # Common features
 
 * **networking** - Enables crates to download Unicode Character Database [UCD](https://unicode.org) files from the network. This is helpful for developing and testing new Unicode releases, but this feature can not be enabled to generate the library documentation when the crate is uploaded to [crates.io](https://crates.io). For security reasons, network access is no allowed to crates to avoid compromising the security of docs.rs itself.
@@ -115,6 +106,14 @@ one provided by Rust standard library
 [to_lowercase](https://doc.rust-lang.org/std/primitive.str.html#method.to_lowercase).
 This operation performs an unconditional mapping without tailoring. That is, the 
 conversion is independent of context and language.
+
+# Donations
+
+If you find this project helpful, you may consider making a donation:
+
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/micro/bc1qx258lwvgzlg5zt2xsns2nr75dhvxuzk3wkqmnh)](https://en.cryptobadges.io/donate/bc1qx258lwvgzlg5zt2xsns2nr75dhvxuzk3wkqmnh)
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/micro/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)](https://en.cryptobadges.io/donate/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)
+
 
 # License
 
