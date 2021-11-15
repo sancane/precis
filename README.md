@@ -94,15 +94,6 @@ fn main() {
 }
 ```
 
-## crates.io
-
-You can use this package in your project by adding the following
-to your `Cargo.toml`:
-
-```toml
-[dependencies]
-precis-profiles = "0.1.1"
-```
 # Common features
 
 * **networking** - Enables crates to download Unicode Character Database [UCD](https://unicode.org) files from the network. This is helpful for developing and testing new Unicode releases, but this feature can not be enabled to generate the library documentation when the crate is uploaded to [crates.io](https://crates.io). For security reasons, network access is no allowed to crates to avoid compromising the security of docs.rs itself.
