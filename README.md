@@ -107,6 +107,14 @@ one provided by Rust standard library
 This operation performs an unconditional mapping without tailoring. That is, the 
 conversion is independent of context and language.
 
+# Donations
+
+If you find this project helpful, you may consider making a donation:
+
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/micro/bc1qx258lwvgzlg5zt2xsns2nr75dhvxuzk3wkqmnh)](https://en.cryptobadges.io/donate/bc1qx258lwvgzlg5zt2xsns2nr75dhvxuzk3wkqmnh)
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/micro/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)](https://en.cryptobadges.io/donate/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)
+
+
 # License
 
 This project is licensed under either of
