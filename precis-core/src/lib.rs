@@ -13,7 +13,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! precis-core = "0.1.2"
+//! precis-core = "0.1.3"
 //! ```
 
 include!(concat!(env!("OUT_DIR"), "/public.rs"));
