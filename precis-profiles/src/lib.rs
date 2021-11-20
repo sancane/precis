@@ -34,7 +34,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! precis-profiles = "0.1.2"
+//! precis-profiles = "0.1.3"
 //! ```
 
 include!(concat!(env!("OUT_DIR"), "/unicode_version.rs"));

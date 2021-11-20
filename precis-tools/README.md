@@ -11,7 +11,7 @@ to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-precis-tools = "0.1.2"
+precis-tools = "0.1.3"
 ```
 
 This crate is generally used to generate code to be used by other crates such as
