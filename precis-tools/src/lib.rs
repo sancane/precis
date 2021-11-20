@@ -19,7 +19,7 @@ pub use crate::generators::codepoints::CodepointsGen;
 pub use crate::generators::derived_property::DerivedPropertyValueGen;
 pub use crate::generators::exceptions::ExceptionsGen;
 pub use crate::generators::ucd_generator::{
-    GeneralCategoryGen, UCDFileGen, UCDLineParser, UCDTableGen, UcdCodeGen, UnassignedTableGen,
+    GeneralCategoryGen, UcdCodeGen, UcdFileGen, UcdLineParser, UcdTableGen, UnassignedTableGen,
     UnicodeGen, ViramaTableGen, WidthMappingTableGen,
 };
 pub use crate::generators::unicode_version::UnicodeVersionGen;

@@ -1,6 +1,6 @@
 // build.rs
 use precis_tools::{
-    BidiClassGen, GeneralCategoryGen, RustCodeGen, UCDFileGen, UCDTableGen, UnicodeVersionGen,
+    BidiClassGen, GeneralCategoryGen, RustCodeGen, UcdFileGen, UcdTableGen, UnicodeVersionGen,
     WidthMappingTableGen,
 };
 use std::env;
@@ -10,7 +10,7 @@ const UNICODE_VERSION: &str = "14.0.0";
 
 fn generate_code(ucd: &Path, out: &Path) {
     let mut gen = RustCodeGen::new(Path::new(&out).join("bidi_class.rs")).unwrap();
-    let mut ucd_gen = UCDFileGen::new(ucd);
+    let mut ucd_gen = UcdFileGen::new(ucd);
     let mut gc_gen = GeneralCategoryGen::new();
     gc_gen.add(Box::new(BidiClassGen::new("Bidi_Class_Table")));
     ucd_gen.add(Box::new(gc_gen));
@@ -22,15 +22,15 @@ fn generate_code(ucd: &Path, out: &Path) {
     gen.generate_code().unwrap();
 
     let mut gen = RustCodeGen::new(Path::new(&out).join("space_separator.rs")).unwrap();
-    let mut ucd_gen = UCDFileGen::new(ucd);
+    let mut ucd_gen = UcdFileGen::new(ucd);
     let mut gc_gen = GeneralCategoryGen::new();
-    gc_gen.add(Box::new(UCDTableGen::new("Zs", "space_separator")));
+    gc_gen.add(Box::new(UcdTableGen::new("Zs", "space_separator")));
     ucd_gen.add(Box::new(gc_gen));
     gen.add(Box::new(ucd_gen));
     gen.generate_code().unwrap();
 
     let mut gen = RustCodeGen::new(Path::new(&out).join("width_mapping.rs")).unwrap();
-    let mut ucd_gen = UCDFileGen::new(ucd);
+    let mut ucd_gen = UcdFileGen::new(ucd);
     let mut gc_gen = GeneralCategoryGen::new();
     gc_gen.add(Box::new(WidthMappingTableGen::new("wide_narrow_mapping")));
     ucd_gen.add(Box::new(gc_gen));

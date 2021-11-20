@@ -26,13 +26,13 @@ where
 }
 
 /// Generator that aggregates other [`UcdCodeGen`] elements.
-pub struct UCDFileGen {
+pub struct UcdFileGen {
     ucd_path: PathBuf,
     generators: Vec<Box<dyn UcdCodeGen>>,
 }
 
-impl UCDFileGen {
-    /// Creates a new UCDFileGen element.
+impl UcdFileGen {
+    /// Creates a new UcdFileGen element.
     /// # Arguments:
     /// `path` - path where UCD files are stored
     pub fn new<P: AsRef<Path>>(path: P) -> Self {
@@ -49,7 +49,7 @@ impl UCDFileGen {
     }
 }
 
-impl CodeGen for UCDFileGen {
+impl CodeGen for UcdFileGen {
     fn generate_code(&mut self, file: &mut File) -> Result<(), Error> {
         let it = self.generators.iter_mut();
         for gen in it {
@@ -69,7 +69,7 @@ pub trait UcdCodeGen: CodeGen {
 }
 
 /// Generic trait used by parsers to generate code.
-pub trait UCDLineParser<U>: CodeGen {
+pub trait UcdLineParser<U>: CodeGen {
     /// Process an entry in the UCD file.
     /// # Argument:
     /// `line` - Represents a line in the UCD file.
@@ -78,14 +78,14 @@ pub trait UCDLineParser<U>: CodeGen {
 
 /// Generator that crates tables of Unicode code points as a result
 /// of parsing properties in the UCD files.
-pub struct UCDTableGen {
+pub struct UcdTableGen {
     name: String,
     table_name: String,
     cps: HashSet<u32>,
 }
 
-impl UCDTableGen {
-    /// Creates a new [`UCDTableGen`]
+impl UcdTableGen {
+    /// Creates a new [`UcdTableGen`]
     pub fn new(name: &str, table_name: &str) -> Self {
         Self {
             name: String::from(name),
@@ -95,13 +95,13 @@ impl UCDTableGen {
     }
 }
 
-impl CodeGen for UCDTableGen {
+impl CodeGen for UcdTableGen {
     fn generate_code(&mut self, file: &mut File) -> Result<(), Error> {
         file_writer::generate_code_from_hashset(file, &self.table_name, &self.cps)
     }
 }
 
-impl UCDLineParser<ucd_parsers::UnicodeData> for UCDTableGen {
+impl UcdLineParser<ucd_parsers::UnicodeData> for UcdTableGen {
     fn process_entry(&mut self, udata: &ucd_parsers::UnicodeData) -> Result<(), Error> {
         if self.name == udata.general_category {
             match udata.codepoints {
@@ -113,7 +113,7 @@ impl UCDLineParser<ucd_parsers::UnicodeData> for UCDTableGen {
     }
 }
 
-impl UCDLineParser<HangulSyllableType> for UCDTableGen {
+impl UcdLineParser<HangulSyllableType> for UcdTableGen {
     fn process_entry(&mut self, line: &HangulSyllableType) -> Result<(), Error> {
         if self.name == line.prop.property {
             match line.prop.codepoints {
@@ -125,7 +125,7 @@ impl UCDLineParser<HangulSyllableType> for UCDTableGen {
     }
 }
 
-impl UCDLineParser<Property> for UCDTableGen {
+impl UcdLineParser<Property> for UcdTableGen {
     fn process_entry(&mut self, line: &Property) -> Result<(), Error> {
         if self.name == line.property {
             match line.codepoints {
@@ -137,7 +137,7 @@ impl UCDLineParser<Property> for UCDTableGen {
     }
 }
 
-impl UCDLineParser<CoreProperty> for UCDTableGen {
+impl UcdLineParser<CoreProperty> for UcdTableGen {
     fn process_entry(&mut self, line: &CoreProperty) -> Result<(), Error> {
         if self.name == line.property {
             match line.codepoints {
@@ -149,7 +149,7 @@ impl UCDLineParser<CoreProperty> for UCDTableGen {
     }
 }
 
-impl UCDLineParser<Script> for UCDTableGen {
+impl UcdLineParser<Script> for UcdTableGen {
     fn process_entry(&mut self, line: &Script) -> Result<(), Error> {
         if self.name == line.script {
             match line.codepoints {
@@ -161,7 +161,7 @@ impl UCDLineParser<Script> for UCDTableGen {
     }
 }
 
-impl UCDLineParser<DerivedJoiningType> for UCDTableGen {
+impl UcdLineParser<DerivedJoiningType> for UcdTableGen {
     fn process_entry(&mut self, line: &DerivedJoiningType) -> Result<(), Error> {
         if self.name == line.prop.property {
             match line.prop.codepoints {
@@ -173,9 +173,9 @@ impl UCDLineParser<DerivedJoiningType> for UCDTableGen {
     }
 }
 
-/// Aggregator of elements implementing the [`UCDLineParser`] trait.
+/// Aggregator of elements implementing the [`UcdLineParser`] trait.
 pub struct UnicodeGen<T: ucd_parse::UcdFile> {
-    generators: Vec<Box<dyn UCDLineParser<T>>>,
+    generators: Vec<Box<dyn UcdLineParser<T>>>,
 }
 
 impl<T: ucd_parse::UcdFile> UnicodeGen<T> {
@@ -185,7 +185,7 @@ impl<T: ucd_parse::UcdFile> UnicodeGen<T> {
         }
     }
 
-    pub fn add(&mut self, gen: Box<dyn UCDLineParser<T>>) {
+    pub fn add(&mut self, gen: Box<dyn UcdLineParser<T>>) {
         self.generators.push(gen);
     }
 }
@@ -221,7 +221,7 @@ impl<T: ucd_parse::UcdFile> CodeGen for UnicodeGen<T> {
 /// Generator that aggregates elements that are able to generate tables
 /// from the [UnicodeData.txt](http://www.unicode.org/reports/tr44/#UnicodeData.txt) file
 pub struct GeneralCategoryGen {
-    generators: Vec<Box<dyn UCDLineParser<ucd_parsers::UnicodeData>>>,
+    generators: Vec<Box<dyn UcdLineParser<ucd_parsers::UnicodeData>>>,
 }
 
 impl GeneralCategoryGen {
@@ -232,7 +232,7 @@ impl GeneralCategoryGen {
         }
     }
 
-    pub fn add(&mut self, gen: Box<dyn UCDLineParser<ucd_parsers::UnicodeData>>) {
+    pub fn add(&mut self, gen: Box<dyn UcdLineParser<ucd_parsers::UnicodeData>>) {
         self.generators.push(gen);
     }
 }
@@ -290,7 +290,7 @@ impl CodeGen for ViramaTableGen {
     }
 }
 
-impl UCDLineParser<ucd_parsers::UnicodeData> for ViramaTableGen {
+impl UcdLineParser<ucd_parsers::UnicodeData> for ViramaTableGen {
     fn process_entry(&mut self, udata: &ucd_parsers::UnicodeData) -> Result<(), Error> {
         match udata.codepoints {
             Codepoints::Range(ref r) => {
@@ -324,7 +324,7 @@ impl WidthMappingTableGen {
     }
 }
 
-impl UCDLineParser<ucd_parsers::UnicodeData> for WidthMappingTableGen {
+impl UcdLineParser<ucd_parsers::UnicodeData> for WidthMappingTableGen {
     fn process_entry(&mut self, udata: &ucd_parsers::UnicodeData) -> Result<(), Error> {
         if udata.decomposition.len == 0 {
             return err!("No decomposition mappings");
@@ -368,7 +368,7 @@ impl UnassignedTableGen {
     }
 }
 
-impl UCDLineParser<ucd_parsers::UnicodeData> for UnassignedTableGen {
+impl UcdLineParser<ucd_parsers::UnicodeData> for UnassignedTableGen {
     fn process_entry(&mut self, udata: &ucd_parsers::UnicodeData) -> Result<(), Error> {
         match udata.codepoints {
             Codepoints::Range(ref r) => {

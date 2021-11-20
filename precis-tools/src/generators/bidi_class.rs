@@ -1,7 +1,7 @@
 use crate::file_writer;
 use crate::ucd_parsers;
 use crate::Error;
-use crate::{CodeGen, UCDLineParser};
+use crate::{CodeGen, UcdLineParser};
 use std::fs::File;
 use std::io::Write;
 use ucd_parse::{CodepointRange, Codepoints};
@@ -33,7 +33,7 @@ impl CodeGen for BidiClassGen {
     }
 }
 
-impl UCDLineParser<ucd_parsers::UnicodeData> for BidiClassGen {
+impl UcdLineParser<ucd_parsers::UnicodeData> for BidiClassGen {
     fn process_entry(&mut self, udata: &ucd_parsers::UnicodeData) -> Result<(), Error> {
         self.vec.push((udata.codepoints, udata.bidi_class.clone()));
         Ok(())
