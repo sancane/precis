@@ -1,3 +1,5 @@
+[![Docs](https://docs.rs/precis-tools/badge.svg)](https://docs.rs/precis-tools)
+
 # precis-tools
 
 Tools and parsers to generate PRECIS tables from the Unicode Character Database (UCD)

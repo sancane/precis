@@ -14,16 +14,18 @@ This workspace implements the next crates:
 
 This crate contains all the tools and parsers to generate PRECIS
 tables from the Unicode Character Database [UCD](https://unicode.org).
-This crate is only used to generate code required by `precis-core` and
-`precis-profiles`. It contains the main dependencies in order to download
-UCD files, parse them and generate Rust code.
+This crate is only used to generate code required by
+[precis-core](https://docs.rs/precis-core) and
+[precis-profiles](https://docs.rs/precis-profiles) crates.
+It contains the main dependencies in order to downloada UCD files,
+parse them and generate Rust code.
 
 ## [precis-core](precis-core/README.md)
 
 [![Docs](https://docs.rs/precis-core/badge.svg)](https://docs.rs/precis-core)
 
 The core library of the PRECIS Framework. The base string classes `IdentifierClass`
-and `FreeFormClass` are implemented here as defined in 
+and `FreeFormClass` are implemented here as defined in
 [rfc8264](https://datatracker.ietf.org/doc/html/rfc8264).
 This crate provides the APIs required for profiles to be implemented.
 You mostly won't require this crate unless you are implementing a new profile.
@@ -67,13 +69,13 @@ assert_eq!(profile.compare("That’s the second biggest 🐵 I’ve ever seen!",
     "That’s the second biggest 🐵 I’ve ever seen!"), Ok(true));
 ```
 
-If you find yourself continuously creating and destroying profiles to perform 
-any of the operation described for internationalized string. You can make use 
+If you find yourself continuously creating and destroying profiles to perform
+any of the operation described for internationalized strings. You can make use
 of the PrecisFastInvocation trait.
-Profiles implementing this crate will allow you to prepare, enforce or compare 
-string without having to instantiate a specific profile.
-Profiles usually use a static instance allocated with 
-[lazy_static](https://docs.rs/lazy_static/1.4.0/lazy_static/)
+Profiles implementing this trait will allow you to prepare, enforce or compare
+internationalized strings without having to instantiate a specific profile.
+Profiles usually use a static instance allocated with
+[lazy_static](https://docs.rs/lazy_static/)
 
 ### Example
 
@@ -107,11 +109,15 @@ one provided by Rust standard library
 This operation performs an unconditional mapping without tailoring. That is, the 
 conversion is independent of context and language.
 
+# Contributing
+
+Patches and feedback are welcome.
+
 # Donations
 
 If you find this project helpful, you may consider making a donation:
 
-[![Donate with Bitcoin](https://en.cryptobadges.io/badge/micro/bc1qx258lwvgzlg5zt2xsns2nr75dhvxuzk3wkqmnh)](https://en.cryptobadges.io/donate/bc1qx258lwvgzlg5zt2xsns2nr75dhvxuzk3wkqmnh)
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/micro/1EK28M4ht6qu7xFahTxuquXPzZSjCSGVBM)](https://en.cryptobadges.io/donate/1EK28M4ht6qu7xFahTxuquXPzZSjCSGVBM)
 [![Donate with Ethereum](https://en.cryptobadges.io/badge/micro/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)](https://en.cryptobadges.io/donate/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)
 
 

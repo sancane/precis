@@ -1,3 +1,5 @@
+[![Docs](https://docs.rs/precis-core/badge.svg)](https://docs.rs/precis-core)
+
 # precis-core
 
 PRECIS Framework: Preparation, Enforcement, and Comparison of
