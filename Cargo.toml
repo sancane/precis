@@ -1,5 +1,5 @@
 [workspace]
-
+readme = "README.md"
 members = [
 	"precis-core",
 	"precis-profiles",

@@ -1,6 +1,6 @@
 ![Build](https://github.com/sancane/precis/actions/workflows/rust.yml/badge.svg)
 
-# Rust PRECIS Framework libray
+# Rust PRECIS Framework library
 
 PRECIS Framework: Preparation, Enforcement, and Comparison of
 Internationalized Strings in Application Protocols as described in
@@ -17,7 +17,7 @@ tables from the Unicode Character Database [UCD](https://unicode.org).
 This crate is only used to generate code required by
 [precis-core](https://docs.rs/precis-core) and
 [precis-profiles](https://docs.rs/precis-profiles) crates.
-It contains the main dependencies in order to downloada UCD files,
+It contains the main dependencies in order to download UCD files,
 parse them and generate Rust code.
 
 ## [precis-core](precis-core/README.md)
@@ -43,7 +43,7 @@ This crate implements the next PRECIS profiles:
    Representing Nicknames
 
 PRECIS profiles provides an API that allows application to prepare, enforce and compare
-internacionalized strings.
+internationalized strings.
 
 ### Example
 
