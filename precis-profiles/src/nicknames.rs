@@ -90,7 +90,7 @@ where
     }
 }
 
-/// [Nickname Profile](https://datatracker.ietf.org/doc/html/rfc8266#section-2).
+/// [`Nickname`](https://datatracker.ietf.org/doc/html/rfc8266#section-2).
 /// Nicknames or display names in messaging and text conferencing technologies;
 /// pet names for devices, accounts, and people; and other uses of nicknames,
 /// display names, or pet names. Look at the
@@ -122,6 +122,7 @@ pub struct Nickname {
 }
 
 impl Nickname {
+    /// Creates a [`Nickname`] profile.
     pub fn new() -> Self {
         Self {
             class: FreeformClass {},

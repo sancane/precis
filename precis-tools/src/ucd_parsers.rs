@@ -8,6 +8,7 @@ use ucd_parse::UcdFile;
 /// file.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct HangulSyllableType {
+    /// A single row in the `PropList.txt` file.
     pub prop: ucd_parse::Property,
 }
 
@@ -35,6 +36,7 @@ impl FromStr for HangulSyllableType {
 /// A single row in the `DerivedJoiningType` file.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DerivedJoiningType {
+    /// A single row in the `PropList.txt` file.
     pub prop: ucd_parse::Property,
 }
 
@@ -118,6 +120,7 @@ pub struct UnicodeData {
 }
 
 impl UnicodeData {
+    /// Parse a particular `UCD` file into a sequence of rows.
     pub fn parse(ucd_dir: &Path) -> Result<Vec<UnicodeData>, Error> {
         let mut xs = vec![];
 

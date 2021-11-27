@@ -1,3 +1,7 @@
+//! This module contains traits with operations and rules that profiles
+//! must implement such as it is defined by the PRECIS framework
+//! [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264#section-5)
+
 use crate::Error;
 use std::borrow::Cow;
 
@@ -112,8 +116,34 @@ pub trait Profile {
 /// a specific instance. This is usually achieved by using a static instance
 /// allocated with [`lazy_static`](https://docs.rs/lazy_static/1.4.0/lazy_static)
 pub trait PrecisFastInvocation {
+    /// Ensures that the code points in a single input string are allowed
+    /// by the underlying PRECIS string class, and sometimes also entails
+    /// applying one or more of the rules specified for a particular string
+    /// class or profile thereof.
+    /// # Arguments:
+    /// * `s`: String value
+    /// # Returns
+    /// The same string if no modification were required or a new allocated
+    /// string if `s` needed further modifications as a result of applying the
+    /// rules defined by this profile to prepare the string
     fn prepare(s: &str) -> Result<Cow<'_, str>, Error>;
+
+    /// Applies all rules specified for a particular string class,
+    /// or profile thereof, to a single input string, for the purpose of
+    /// checking whether the string conforms to all the rules and thus
+    /// determining if the string can be used in a given protocol slot.
+    /// # Arguments:
+    /// * `s`: String value
+    /// # Returns
+    /// The same string if no modification were required or a new allocated
+    /// string if `s` needed further modifications as a result of enforcing
+    /// the string according to the rules defined by this profile.
     fn enforce(s: &str) -> Result<Cow<'_, str>, Error>;
+
+    /// Comparison entails applying all the rules specified for a
+    /// particular string class, or profile thereof, to two separate input
+    /// strings, for the purpose of determining if the two strings are
+    /// equivalent.
     fn compare(s1: &str, s2: &str) -> Result<bool, Error>;
 }
 

@@ -12,6 +12,8 @@
 //! [precis-core](https://docs.rs/precis-core) or [precis-profiles](https://docs.rs/precis-profiles).
 //! Consider adding this in your [build-dependencies](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#build-dependencies) section instead.
 
+#![deny(missing_docs)]
+
 pub use crate::generators::ascii7::Ascii7Gen;
 pub use crate::generators::backward_compatible::BackwardCompatibleGen;
 pub use crate::generators::bidi_class::BidiClassGen;

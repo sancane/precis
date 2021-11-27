@@ -1,3 +1,7 @@
+//! This module contains the implementation and traits for the
+//! String classes such as it is defined by the PRECIS framework
+//! [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264#section-4)
+
 use crate::common;
 use crate::context;
 use crate::DerivedPropertyValue;

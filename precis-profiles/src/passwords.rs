@@ -5,7 +5,7 @@ use precis_core::Error;
 use precis_core::{FreeformClass, StringClass};
 use std::borrow::Cow;
 
-/// [`OpaqueString` Profile](<https://datatracker.ietf.org/doc/html/rfc8265#section-4.2>)
+/// [`OpaqueString`](<https://datatracker.ietf.org/doc/html/rfc8265#section-4.2>)
 /// Profile designed to deal with passwords and other opaque strings in security
 /// and application protocols.
 /// Replaces:  The `SASLprep` profile of `Stringprep`. Look at the
@@ -38,6 +38,7 @@ pub struct OpaqueString {
 }
 
 impl OpaqueString {
+    /// Creates a [`OpaqueString`] profile.
     pub fn new() -> Self {
         Self {
             class: FreeformClass {},

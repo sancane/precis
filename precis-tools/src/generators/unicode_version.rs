@@ -12,6 +12,7 @@ pub struct UnicodeVersionGen {
 }
 
 impl UnicodeVersionGen {
+    /// Creates a new generator for the Unicode version to generate tables
     pub fn new(version: &str) -> Self {
         Self {
             version: String::from(version),

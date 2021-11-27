@@ -8,6 +8,7 @@ use std::io::Write;
 pub struct BackwardCompatibleGen {}
 
 impl BackwardCompatibleGen {
+    /// Creates a new table generator for `BackwardCompatible` code points
     pub fn new() -> Self {
         Self {}
     }
