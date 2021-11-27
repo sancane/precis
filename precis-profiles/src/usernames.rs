@@ -55,10 +55,10 @@ where
     }
 }
 
-/// [UsernameCaseMapped Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3).
+/// [`UsernameCaseMapped` Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3).
 /// Profile designed to deal with usernames in security and application protocols.
-/// It replaces the SASLprep profile of Stringprep. Look at the
-/// [IANA Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.1)
+/// It replaces the `SASLprep` profile of `Stringprep`. Look at the
+/// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.1)
 /// section for more details.
 /// # Example
 /// ```rust
@@ -172,10 +172,10 @@ impl PrecisFastInvocation for UsernameCaseMapped {
     }
 }
 
-/// [UsernameCasePreserved Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4).
+/// [`UsernameCasePreserved` Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4).
 /// Profile designed to deal with usernames in security and application protocols.
-/// It replaces the SASLprep profile of Stringprep. Look at the
-/// [IANA Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.2)
+/// It replaces the `SASLprep` profile of `Stringprep`. Look at the
+/// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.2)
 /// section for more details.
 /// # Example
 /// ```rust
@@ -296,7 +296,7 @@ mod profile_rules {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "TestName");
 
-        // Mapping codepoint 0xff03 (＃) to 0x0023 (#)
+        // Mapping code point `U+FF03` (`＃`) to `U+0023` (`#`)
         let res = width_mapping_rule("\u{ff03}");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "\u{0023}");
@@ -320,17 +320,17 @@ mod profile_rules {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "");
 
-        // No RTL label
+        // No `RTL` label
         let res = directionality_rule("Hello");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Hello");
 
-        // RTL label
+        // `RTL` label
         let res = directionality_rule("\u{05be}");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "\u{05be}");
 
-        // LTR label
+        // `LTR` label
         let res = directionality_rule("\u{00aa}");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "\u{00aa}");
@@ -359,7 +359,7 @@ mod username_case_mapped {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Xx\u{0021}xX");
 
-        // The "at" sign ("@") is allowed in the PRECIS IdentifierClass
+        // The "at" sign ("@") is allowed in the PRECIS `IdentifierClass`
         let res = profile.prepare("juliet@example.com");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "juliet@example.com");
@@ -368,44 +368,44 @@ mod username_case_mapped {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fussaball");
 
-        // The third character is LATIN SMALL LETTER SHARP S (U+00DF)
+        // The third character is LATIN SMALL LETTER SHARP S `U+00DF`
         let res = profile.prepare("fußball");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fußball");
 
-        // A userpart of GREEK SMALL LETTER PI (U+03C0)
+        // A `userpart` of GREEK SMALL LETTER PI `U+03C0`
         let res = profile.prepare("π");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "π");
 
-        // A userpart of GREEK CAPITAL LETTER SIGMA (U+03A3)
+        // A `userpart` of GREEK CAPITAL LETTER SIGMA `U+03A3`
         let res = profile.prepare("Σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Σ");
 
-        // A userpart of GREEK SMALL LETTER SIGMA (U+03C3)
+        // A `userpart` of GREEK SMALL LETTER SIGMA `U+03C3`
         let res = profile.prepare("σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "σ");
 
-        // A userpart of GREEK SMALL LETTER FINAL SIGMA (U+03C2)
+        // A `userpart` of GREEK SMALL LETTER FINAL SIGMA `U+03C2`
         let res = profile.prepare("ς");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "ς");
 
-        // SPACE (U+0020) is disallowed in the userpart
+        // SPACE `U+0020` is disallowed in the `userpart`
         let res = profile.prepare("foo bar");
         assert_eq!(res.is_err(), true);
 
-        // Zero-length userpart
+        // Zero-length `userpart`
         let res = profile.prepare("");
         assert_eq!(res.is_err(), true);
 
-        // The sixth character is ROMAN NUMERAL FOUR (U+2163)
+        // The sixth character is ROMAN NUMERAL FOUR `U+2163`
         let res = profile.prepare("henry\u{2163}");
         assert_eq!(res.is_err(), true);
 
-        // A userpart of INFINITY (U+221E)
+        // A `userpart` of INFINITY `U+221E`
         let res = profile.prepare("∞");
         assert_eq!(res.is_err(), true);
     }
@@ -424,7 +424,7 @@ mod username_case_mapped {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "xx!xx");
 
-        // The "at" sign ("@") is allowed in the PRECIS IdentifierClass
+        // The "at" sign ("@") is allowed in the PRECIS `IdentifierClass`
         let res = profile.enforce("juliet@example.com");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "juliet@example.com");
@@ -433,44 +433,44 @@ mod username_case_mapped {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fussaball");
 
-        // The third character is LATIN SMALL LETTER SHARP S (U+00DF)
+        // The third character is LATIN SMALL LETTER SHARP S `U+00DF`
         let res = profile.enforce("fußball");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fußball");
 
-        // A userpart of GREEK SMALL LETTER PI (U+03C0)
+        // A `userpart` of GREEK SMALL LETTER PI `U+03C0`
         let res = profile.enforce("π");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "π");
 
-        // A userpart of GREEK CAPITAL LETTER SIGMA (U+03A3)
+        // A `userpart` of GREEK CAPITAL LETTER SIGMA `U+03A3`
         let res = profile.enforce("Σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "σ");
 
-        // A userpart of GREEK SMALL LETTER SIGMA (U+03C3)
+        // A `userpart` of GREEK SMALL LETTER SIGMA `U+03C3`
         let res = profile.prepare("σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "σ");
 
-        // A userpart of GREEK SMALL LETTER FINAL SIGMA (U+03C2)
+        // A `userpart` of GREEK SMALL LETTER FINAL SIGMA `U+03C2`
         let res = profile.prepare("ς");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "ς");
 
-        // SPACE (U+0020) is disallowed in the userpart
+        // SPACE `U+0020` is disallowed in the `userpart`
         let res = profile.prepare("foo bar");
         assert_eq!(res.is_err(), true);
 
-        // Zero-length userpart
+        // Zero-length `userpart`
         let res = profile.prepare("");
         assert_eq!(res.is_err(), true);
 
-        // The sixth character is ROMAN NUMERAL FOUR (U+2163)
+        // The sixth character is ROMAN NUMERAL FOUR `U+2163`
         let res = profile.prepare("henry\u{2163}");
         assert_eq!(res.is_err(), true);
 
-        // A userpart of INFINITY (U+221E)
+        // A `userpart` of INFINITY `U+221E`
         let res = profile.prepare("∞");
         assert_eq!(res.is_err(), true);
     }
@@ -520,7 +520,7 @@ mod username_case_preserved {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Xx\u{0021}xX");
 
-        // The "at" sign ("@") is allowed in the PRECIS IdentifierClass
+        // The "at" sign (`@`) is allowed in the PRECIS `IdentifierClass`
         let res = profile.prepare("juliet@example.com");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "juliet@example.com");
@@ -529,44 +529,44 @@ mod username_case_preserved {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fussaball");
 
-        // The third character is LATIN SMALL LETTER SHARP S (U+00DF)
+        // The third character is LATIN SMALL LETTER SHARP S `U+00DF`
         let res = profile.prepare("fußball");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fußball");
 
-        // A userpart of GREEK SMALL LETTER PI (U+03C0)
+        // A `userpart` of GREEK SMALL LETTER PI `U+03C0`
         let res = profile.prepare("π");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "π");
 
-        // A userpart of GREEK CAPITAL LETTER SIGMA (U+03A3)
+        // A `userpart` of GREEK CAPITAL LETTER SIGMA `U+03A3`
         let res = profile.prepare("Σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Σ");
 
-        // A userpart of GREEK SMALL LETTER SIGMA (U+03C3)
+        // A `userpart` of GREEK SMALL LETTER SIGMA `U+03C3`
         let res = profile.prepare("σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "σ");
 
-        // A userpart of GREEK SMALL LETTER FINAL SIGMA (U+03C2)
+        // A `userpart` of GREEK SMALL LETTER FINAL SIGMA `U+03C2`
         let res = profile.prepare("ς");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "ς");
 
-        // SPACE (U+0020) is disallowed in the userpart
+        // SPACE `U+0020` is disallowed in the `userpart`
         let res = profile.prepare("foo bar");
         assert_eq!(res.is_err(), true);
 
-        // Zero-length userpart
+        // Zero-length `userpart`
         let res = profile.prepare("");
         assert_eq!(res.is_err(), true);
 
-        // The sixth character is ROMAN NUMERAL FOUR (U+2163)
+        // The sixth character is ROMAN NUMERAL FOUR `U+2163`
         let res = profile.prepare("henry\u{2163}");
         assert_eq!(res.is_err(), true);
 
-        // A userpart of INFINITY (U+221E)
+        // A `userpart` of INFINITY `U+221E`
         let res = profile.prepare("∞");
         assert_eq!(res.is_err(), true);
     }
@@ -585,7 +585,7 @@ mod username_case_preserved {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Xx!xX");
 
-        // The "at" sign ("@") is allowed in the PRECIS IdentifierClass
+        // The "at" sign (`@`) is allowed in the PRECIS `IdentifierClass`
         let res = profile.enforce("juliet@example.com");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "juliet@example.com");
@@ -594,44 +594,44 @@ mod username_case_preserved {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fussaball");
 
-        // The third character is LATIN SMALL LETTER SHARP S (U+00DF)
+        // The third character is LATIN SMALL LETTER SHARP S `U+00DF`
         let res = profile.enforce("fußball");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "fußball");
 
-        // A userpart of GREEK SMALL LETTER PI (U+03C0)
+        // A `userpart` of GREEK SMALL LETTER PI `U+03C0`
         let res = profile.enforce("π");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "π");
 
-        // A userpart of GREEK CAPITAL LETTER SIGMA (U+03A3)
+        // A `userpart` of GREEK CAPITAL LETTER SIGMA `U+03A3`
         let res = profile.enforce("Σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Σ");
 
-        // A userpart of GREEK SMALL LETTER SIGMA (U+03C3)
+        // A `userpart` of GREEK SMALL LETTER SIGMA `U+03C3`
         let res = profile.prepare("σ");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "σ");
 
-        // A userpart of GREEK SMALL LETTER FINAL SIGMA (U+03C2)
+        // A `userpart` of GREEK SMALL LETTER FINAL SIGMA `U+03C2`
         let res = profile.prepare("ς");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "ς");
 
-        // SPACE (U+0020) is disallowed in the userpart
+        // SPACE `U+0020` is disallowed in the `userpart`
         let res = profile.prepare("foo bar");
         assert_eq!(res.is_err(), true);
 
-        // Zero-length userpart
+        // Zero-length `userpart`
         let res = profile.prepare("");
         assert_eq!(res.is_err(), true);
 
-        // The sixth character is ROMAN NUMERAL FOUR (U+2163)
+        // The sixth character is ROMAN NUMERAL FOUR `U+2163`
         let res = profile.prepare("henry\u{2163}");
         assert_eq!(res.is_err(), true);
 
-        // A userpart of INFINITY (U+221E)
+        // A `userpart` of INFINITY `U+221E`
         let res = profile.prepare("∞");
         assert_eq!(res.is_err(), true);
     }

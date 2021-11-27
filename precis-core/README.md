@@ -10,7 +10,7 @@ This crate implements the PRECIS base string classes and tables
 that profiles can use for their implementation. The crate `precis-profiles`
 provides a list of implemented profiles that applications can use.
 
-# crates.io
+# `crates.io`
 
 You can use this package in your project by adding the following
 to your `Cargo.toml`:

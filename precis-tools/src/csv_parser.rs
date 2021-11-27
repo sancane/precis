@@ -8,13 +8,13 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use ucd_parse::CodepointRange;
 
-/// A line oriented parser for a particular UCD file.
+/// A line oriented parser for a particular `UCD` file.
 ///
 /// Callers can build a line parser via the
 /// [`UcdFile::from_dir`](trait.UcdFile.html) method.
 ///
 /// The `R` type parameter refers to the underlying `io::Read` implementation
-/// from which the CSV data is read.
+/// from which the `CSV` data is read.
 ///
 /// The `D` type parameter refers to the type of the record parsed out of each
 /// line.
@@ -79,7 +79,7 @@ impl<R: io::Read, D: FromStr<Err = Error>> Iterator for CsvLineParser<R, D> {
             if n == 0 {
                 return None;
             }
-            // First line in the csv contains the column names. Skip
+            // First line in the CVS contains the column names. Skip
             if self.line_number > 1 {
                 break;
             }
@@ -217,9 +217,9 @@ impl FromStr for DerivedProperties {
 /// A single row in the `precis-tables.csv` file.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct PrecisDerivedProperty {
-    /// The codepoint or codepoint range for this entry.
+    /// The code point or code point range for this entry.
     pub codepoints: ucd_parse::Codepoints,
-    /// The derived properties assigned to the codepoints in this entry.
+    /// The derived properties assigned to the code points in this entry.
     pub properties: DerivedProperties,
     /// The property description
     pub description: String,

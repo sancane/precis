@@ -3,7 +3,7 @@ use crate::generators::CodeGen;
 use std::fs::File;
 use std::io::Write;
 
-/// Generates the derived property enum with the
+/// Generates the derived property `enum` with the
 /// values described in the PRECIS
 /// [Code Point Properties](https://datatracker.ietf.org/doc/html/rfc8264#section-8)
 /// section.

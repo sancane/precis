@@ -122,13 +122,13 @@ mod profile_rules {
 
     #[test]
     fn test_is_non_ascii_space() {
-        // Check ascii space
+        // Check ASCII space
         assert_eq!(is_non_ascii_space(SPACE), false);
 
-        // Check character not in Space_Separator general category
+        // Check character not in `Space_Separator` general category
         assert_eq!(is_non_ascii_space('a'), false);
 
-        // Check charcater in Space_Separator that is not 0x0020
+        // Check character in `Space_Separator` that is not `0x0020`
         assert_eq!(is_non_ascii_space('\u{205f}'), true);
     }
 }

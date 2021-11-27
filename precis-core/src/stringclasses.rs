@@ -2,25 +2,25 @@ use crate::common;
 use crate::context;
 use crate::DerivedPropertyValue;
 
-/// Interface for specific classes to deal with specific unicode
+/// Interface for specific classes to deal with specific Unicode
 /// code groups defined in RFC 8264.
 /// Next callbacks will be invoked to calculate the derived property
 /// value in the order defined in [`get_derived_property_value`]
 pub trait SpecificDerivedPropertyValue {
-    /// Callback invoked when the unicode code point belongs to
+    /// Callback invoked when the Unicode code point belongs to
     /// [Spaces](https://datatracker.ietf.org/doc/html/rfc8264#section-9.14)
     fn on_spaces(&self) -> DerivedPropertyValue;
-    /// Callback invoked when the unicode code point belongs to
+    /// Callback invoked when the Unicode code point belongs to
     /// [Symbols](https://datatracker.ietf.org/doc/html/rfc8264#section-9.15)
     fn on_symbols(&self) -> DerivedPropertyValue;
-    /// Callback invoked when the unicode code point belongs to
+    /// Callback invoked when the Unicode code point belongs to
     /// [Punctuation](https://datatracker.ietf.org/doc/html/rfc8264#section-9.16)
     fn on_punctuation(&self) -> DerivedPropertyValue;
-    /// Callback invoked when the unicode code point belongs to
-    /// [HasCompat](https://datatracker.ietf.org/doc/html/rfc8264#section-9.17)
+    /// Callback invoked when the Unicode code point belongs to
+    /// [`HasCompat`](https://datatracker.ietf.org/doc/html/rfc8264#section-9.17)
     fn on_has_compat(&self) -> DerivedPropertyValue;
-    /// Callback invoked when the unicode code point belongs to
-    /// [OtherLetterDigits](https://datatracker.ietf.org/doc/html/rfc8264#section-9.18)
+    /// Callback invoked when the Unicode code point belongs to
+    /// [`OtherLetterDigits`](https://datatracker.ietf.org/doc/html/rfc8264#section-9.18)
     fn on_other_letter_digits(&self) -> DerivedPropertyValue;
 }
 
@@ -29,25 +29,25 @@ pub trait SpecificDerivedPropertyValue {
 /// of operations within this algorithm, because doing so would cause
 /// inconsistent results across implementations):
 ///
-/// > If .cp. .in. Exceptions Then Exceptions(cp);\
-/// > Else If .cp. .in. BackwardCompatible Then BackwardCompatible(cp);\
-/// > Else If .cp. .in. Unassigned Then UNASSIGNED;\
-/// > Else If .cp. .in. ASCII7 Then PVALID;\
-/// > Else If .cp. .in. JoinControl Then CONTEXTJ;\
-/// > Else If .cp. .in. OldHangulJamo Then DISALLOWED;\
-/// > Else If .cp. .in. PrecisIgnorableProperties Then DISALLOWED;\
-/// > Else If .cp. .in. Controls Then DISALLOWED;\
-/// > Else If .cp. .in. HasCompat Then ID_DIS or FREE_PVAL;\
-/// > Else If .cp. .in. LetterDigits Then PVALID;\
-/// > Else If .cp. .in. OtherLetterDigits Then ID_DIS or FREE_PVAL;\
-/// > Else If .cp. .in. Spaces Then ID_DIS or FREE_PVAL;\
-/// > Else If .cp. .in. Symbols Then ID_DIS or FREE_PVAL;\
-/// > Else If .cp. .in. Punctuation Then ID_DIS or FREE_PVAL;\
+/// > If .`cp`. .in. `Exceptions` Then `Exceptions`(`cp`);\
+/// > Else If .`cp`. .in. `BackwardCompatible` Then `BackwardCompatible`(`cp`);\
+/// > Else If .`cp`. .in. `Unassigned` Then `UNASSIGNED`;\
+/// > Else If .`cp`. .in. `ASCII7` Then `PVALID`;\
+/// > Else If .`cp`. .in. `JoinControl` Then `CONTEXTJ`;\
+/// > Else If .`cp`. .in. `OldHangulJamo` Then `DISALLOWED`;\
+/// > Else If .`cp`. .in. `PrecisIgnorableProperties` Then `DISALLOWED`;\
+/// > Else If .`cp`. .in. `Controls` Then `DISALLOWED`;\
+/// > Else If .`cp`. .in. `HasCompat` Then `ID_DIS` or `FREE_PVAL`;\
+/// > Else If .`cp`. .in. `LetterDigits` Then `PVALID`;\
+/// > Else If .`cp`. .in. `OtherLetterDigits` Then `ID_DIS` or `FREE_PVAL`;\
+/// > Else If .`cp`. .in. `Spaces` Then `ID_DIS` or `FREE_PVAL`;\
+/// > Else If .`cp`. .in. `Symbols` Then `ID_DIS` or `FREE_PVAL`;\
+/// > Else If .`cp`. .in. `Punctuation` Then `ID_DIS` or `FREE_PVAL`;\
 /// > Else DISALLOWED;\
 ///
 /// # Arguments
 /// * `cp` - Unicode code point
-/// * `obj` - Object implementing the SpecificDerivedPropertyValue trait.
+/// * `obj` - Object implementing the [`SpecificDerivedPropertyValue`] trait.
 ///
 /// # Return
 /// This function returns the derived property value as defined in
@@ -116,19 +116,19 @@ fn allowed_by_context_rule(s: &str, cp: u32, offset: usize) -> bool {
 /// Base interface for all String classes in PRECIS framework.
 pub trait StringClass {
     /// Gets the derived property value according to the algorithm defined
-    /// in [``get_derived_property_value`]
+    /// in [`get_derived_property_value`]
     /// # Arguments
-    /// * `c`- unicode character
+    /// * `c`- Unicode character
     /// # Return
-    /// This method returns the derived property value associated to a unicode character
+    /// This method returns the derived property value associated to a Unicode character
     fn get_value_from_char(&self, c: char) -> DerivedPropertyValue;
 
     /// Gets the derived property value according to the algorithm defined
-    /// in [``get_derived_property_value`]
+    /// in [`get_derived_property_value`]
     /// # Arguments:
-    /// * `cp`- unicode codepoint
+    /// * `cp`- Unicode code point
     /// # Return
-    /// This method returns the derived property value associated to a unicode character
+    /// This method returns the derived property value associated to a Unicode character
     fn get_value_from_codepoint(&self, cp: u32) -> DerivedPropertyValue;
 
     /// Ensures that the string consists only of Unicode code points that
@@ -159,7 +159,7 @@ pub trait StringClass {
     }
 }
 
-/// Concrete class representing PRECIS IdentifierClass from
+/// Concrete class representing PRECIS `IdentifierClass` from
 /// [RFC 8264](https://datatracker.ietf.org/doc/html/rfc8264#section-4.2).
 /// # Example
 /// ```rust
@@ -176,7 +176,7 @@ pub trait StringClass {
 pub struct IdentifierClass {}
 
 impl SpecificDerivedPropertyValue for IdentifierClass {
-    // ID_DIS mapped to SPEC_CLASS_DIS
+    // `ID_DIS` mapped to `SPEC_CLASS_DIS`
     fn on_has_compat(&self) -> DerivedPropertyValue {
         DerivedPropertyValue::SpecClassDis
     }
@@ -204,7 +204,7 @@ impl StringClass for IdentifierClass {
     }
 }
 
-/// Concrete class representing PRECIS FreeformClass from
+/// Concrete class representing PRECIS `FreeformClass` from
 /// [RFC 8264](https://datatracker.ietf.org/doc/html/rfc8264#section-4.3).
 /// # Example
 /// ```rust

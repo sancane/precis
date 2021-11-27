@@ -3,7 +3,7 @@ use crate::generators::CodeGen;
 use std::fs::File;
 use std::io::Write;
 
-/// Generates the [BackwardCompatible](https://datatracker.ietf.org/doc/html/rfc8264#section-9.7)
+/// Generates the [`BackwardCompatible`](https://datatracker.ietf.org/doc/html/rfc8264#section-9.7)
 /// table required by the PRECIS framework.
 pub struct BackwardCompatibleGen {}
 

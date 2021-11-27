@@ -1,5 +1,5 @@
-//! Tools and parsers to generate PRECIS tables from the Unicode Character Database (UCD)
-//! # crates.io
+//! Tools and parsers to generate PRECIS tables from the Unicode Character Database (`UCD`)
+//! # `crates.io`
 //!
 //! You can use this package in your project by adding the following
 //! to your `Cargo.toml`:
