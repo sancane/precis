@@ -24,6 +24,13 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Run tests
       run: cargo test --verbose
-    - name: Spellcheck
+
+  spellcheck:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cargo-spellcheck
       run: cargo install --locked cargo-spellcheck
     - run: cargo spellcheck -m 99 --cfg=.github/workflows/spellchecker.cfg
