@@ -1,6 +1,6 @@
 ![Build](https://github.com/sancane/precis/actions/workflows/rust.yml/badge.svg)
 
-# Rust PRECIS Framework libray
+# Rust PRECIS Framework library
 
 PRECIS Framework: Preparation, Enforcement, and Comparison of
 Internationalized Strings in Application Protocols as described in
@@ -13,11 +13,11 @@ This workspace implements the next crates:
 [![Docs](https://docs.rs/precis-tools/badge.svg)](https://docs.rs/precis-tools)
 
 This crate contains all the tools and parsers to generate PRECIS
-tables from the Unicode Character Database [UCD](https://unicode.org).
+tables from the Unicode Character Database [`UCD`](https://unicode.org).
 This crate is only used to generate code required by
 [precis-core](https://docs.rs/precis-core) and
 [precis-profiles](https://docs.rs/precis-profiles) crates.
-It contains the main dependencies in order to downloada UCD files,
+It contains the main dependencies in order to download `UCD` files,
 parse them and generate Rust code.
 
 ## [precis-core](precis-core/README.md)
@@ -27,7 +27,7 @@ parse them and generate Rust code.
 The core library of the PRECIS Framework. The base string classes `IdentifierClass`
 and `FreeFormClass` are implemented here as defined in
 [rfc8264](https://datatracker.ietf.org/doc/html/rfc8264).
-This crate provides the APIs required for profiles to be implemented.
+This crate provides the `APIs` required for profiles to be implemented.
 You mostly won't require this crate unless you are implementing a new profile.
 
 ## [precis-profiles](precis-profiles/README.md)
@@ -43,7 +43,7 @@ This crate implements the next PRECIS profiles:
    Representing Nicknames
 
 PRECIS profiles provides an API that allows application to prepare, enforce and compare
-internacionalized strings.
+internationalized strings.
 
 ### Example
 
@@ -71,11 +71,11 @@ assert_eq!(profile.compare("That’s the second biggest 🐵 I’ve ever seen!",
 
 If you find yourself continuously creating and destroying profiles to perform
 any of the operation described for internationalized strings. You can make use
-of the PrecisFastInvocation trait.
+of the `PrecisFastInvocation` trait.
 Profiles implementing this trait will allow you to prepare, enforce or compare
 internationalized strings without having to instantiate a specific profile.
 Profiles usually use a static instance allocated with
-[lazy_static](https://docs.rs/lazy_static/)
+[`lazy_static`](https://docs.rs/lazy_static/)
 
 ### Example
 
@@ -98,14 +98,14 @@ fn main() {
 
 # Common features
 
-* **networking** - Enables crates to download Unicode Character Database [UCD](https://unicode.org) files from the network. This is helpful for developing and testing new Unicode releases, but this feature can not be enabled to generate the library documentation when the crate is uploaded to [crates.io](https://crates.io). For security reasons, network access is no allowed to crates to avoid compromising the security of docs.rs itself.
+* **networking** - Enables crates to download Unicode Character Database [`UCD`](https://unicode.org) files from the network. This is helpful for developing and testing new Unicode releases, but this feature can not be enabled to generate the library documentation when the crate is uploaded to [`crates.io`](https://crates.io). For security reasons, network access is not allowed to crates to avoid compromising the security of docs.rs itself.
 
 # Known limitations
 
-PRECIS recommends using toLowerCase() operation as defined in the Unicode Standard
+PRECIS recommends using `toLowerCase`() operation as defined in the Unicode Standard
 [Unicode](http://www.unicode.org/versions/latest/). This implementation uses the 
 one provided by Rust standard library 
-[to_lowercase](https://doc.rust-lang.org/std/primitive.str.html#method.to_lowercase).
+[`to_lowercase`](https://doc.rust-lang.org/std/primitive.str.html#method.to_lowercase).
 This operation performs an unconditional mapping without tailoring. That is, the 
 conversion is independent of context and language.
 
