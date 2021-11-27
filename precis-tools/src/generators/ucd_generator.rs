@@ -173,18 +173,20 @@ impl UcdLineParser<DerivedJoiningType> for UcdTableGen {
     }
 }
 
-/// Aggregator of elements implementing the [`UcdLineParser`] trait.
+/// Aggregator of elements that implement the [`UcdLineParser`] trait.
 pub struct UnicodeGen<T: ucd_parse::UcdFile> {
     generators: Vec<Box<dyn UcdLineParser<T>>>,
 }
 
 impl<T: ucd_parse::UcdFile> UnicodeGen<T> {
+    /// Creates a new Generator for `UCD` files
     pub fn new() -> Self {
         Self {
             generators: Vec::new(),
         }
     }
 
+    /// Add a new `UCD` line parser
     pub fn add(&mut self, gen: Box<dyn UcdLineParser<T>>) {
         self.generators.push(gen);
     }
@@ -232,6 +234,7 @@ impl GeneralCategoryGen {
         }
     }
 
+    /// Add a new `UCD` line parser
     pub fn add(&mut self, gen: Box<dyn UcdLineParser<ucd_parsers::UnicodeData>>) {
         self.generators.push(gen);
     }
@@ -276,6 +279,7 @@ pub struct ViramaTableGen {
 }
 
 impl ViramaTableGen {
+    /// Creates a new table generator for code points with the `Virama` combining class
     pub fn new(table_name: &str) -> Self {
         Self {
             table_name: String::from(table_name),
@@ -316,6 +320,7 @@ pub struct WidthMappingTableGen {
 }
 
 impl WidthMappingTableGen {
+    /// Creates a new width mapping table generator
     pub fn new(name: &str) -> Self {
         Self {
             name: String::from(name),
@@ -356,6 +361,7 @@ pub struct UnassignedTableGen {
 }
 
 impl UnassignedTableGen {
+    /// Creates a new table generator for unassigned code points
     pub fn new(table_name: &str) -> Self {
         Self {
             name: String::from(table_name),

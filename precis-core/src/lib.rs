@@ -16,6 +16,8 @@
 //! precis-core = "0.1.3"
 //! ```
 
+#![deny(missing_docs)]
+
 include!(concat!(env!("OUT_DIR"), "/public.rs"));
 
 mod common;
@@ -27,6 +29,6 @@ pub use crate::stringclasses::FreeformClass;
 pub use crate::stringclasses::IdentifierClass;
 pub use crate::stringclasses::StringClass;
 
-pub mod error;
+mod error;
 pub mod profile;
 pub mod stringclasses;

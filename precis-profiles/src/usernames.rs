@@ -55,7 +55,7 @@ where
     }
 }
 
-/// [`UsernameCaseMapped` Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3).
+/// [`UsernameCaseMapped`](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3).
 /// Profile designed to deal with usernames in security and application protocols.
 /// It replaces the `SASLprep` profile of `Stringprep`. Look at the
 /// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.1)
@@ -88,6 +88,7 @@ pub struct UsernameCaseMapped {
 }
 
 impl UsernameCaseMapped {
+    /// Creates a [`UsernameCaseMapped`] profile.
     pub fn new() -> Self {
         Self {
             class: IdentifierClass {},
@@ -172,7 +173,7 @@ impl PrecisFastInvocation for UsernameCaseMapped {
     }
 }
 
-/// [`UsernameCasePreserved` Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4).
+/// [`UsernameCasePreserved`](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4).
 /// Profile designed to deal with usernames in security and application protocols.
 /// It replaces the `SASLprep` profile of `Stringprep`. Look at the
 /// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.2)
@@ -205,6 +206,7 @@ pub struct UsernameCasePreserved {
 }
 
 impl UsernameCasePreserved {
+    /// Creates a [`UsernameCasePreserved`] profile.
     pub fn new() -> Self {
         Self {
             class: IdentifierClass {},

@@ -37,6 +37,8 @@
 //! precis-profiles = "0.1.3"
 //! ```
 
+#![deny(missing_docs)]
+
 include!(concat!(env!("OUT_DIR"), "/unicode_version.rs"));
 
 mod bidi;

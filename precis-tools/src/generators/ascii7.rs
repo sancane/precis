@@ -13,6 +13,7 @@ const ASCII7: std::ops::Range<u32> = std::ops::Range {
 pub struct Ascii7Gen {}
 
 impl Ascii7Gen {
+    /// Creates a new table generator for `ASCII7`
     pub fn new() -> Self {
         Self {}
     }

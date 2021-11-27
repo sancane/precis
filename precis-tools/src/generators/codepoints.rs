@@ -15,6 +15,7 @@ use std::io::Write;
 pub struct CodepointsGen {}
 
 impl CodepointsGen {
+    /// Creates a new generator for the `Codepoints` `enum`
     pub fn new() -> Self {
         Self {}
     }

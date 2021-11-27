@@ -92,14 +92,28 @@ impl<R: io::Read, D: FromStr<Err = Error>> Iterator for CsvLineParser<R, D> {
     }
 }
 
+/// Represents the derived property value assigned
+/// to an Unicode code point. This value is parsed
+/// from the `CSV` maintained in the `IANA` registry.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DerivedProperty {
+    /// Those code points that are allowed to be used in any PRECIS string class.
     PValid,
+    /// Those code points that are allowed to be used in the `FreeformClass`.
+    /// In practice, the derived property `ID_PVAL` is not used in this
+    /// specification, because every `ID_PVAL` code point is `PVALID`.
     FreePVal,
+    /// Contextual rule required for `Join_controls` Unicode code points.
     ContextJ,
+    /// Contextual rule required for Others Unicode code points.
     ContextO,
+    /// Those code points that are not permitted in any PRECIS string class.
     Disallowed,
+    /// Those code points that are not allowed to be used in the `IdentifierClass`.
+    /// In practice, the derived property `FREE_DIS` is not used in this
+    /// specification, because every `FREE_DIS` code point is `DISALLOWED`.
     IdDis,
+    /// Those code points that are not designated in the Unicode Standard.
     Unassigned,
 }
 
@@ -200,9 +214,14 @@ fn parse_precis_table_line(
     Ok((cps, props, desc))
 }
 
+/// Second column in the `precis-tables.csv` file.
+/// Values could be made up of a single derived property
+/// value, or two combined with the `or` word
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DerivedProperties {
+    /// Column with a single derived property value
     Single(DerivedProperty),
+    /// Column with two derived property value
     Tuple((DerivedProperty, DerivedProperty)),
 }
 

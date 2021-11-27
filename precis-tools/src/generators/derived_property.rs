@@ -22,6 +22,7 @@ use std::io::Write;
 pub struct DerivedPropertyValueGen {}
 
 impl DerivedPropertyValueGen {
+    /// Creates a new generator for the `DerivedPropertyValue` `enum`.
     pub fn new() -> Self {
         Self {}
     }
@@ -98,12 +99,31 @@ impl CodeGen for DerivedPropertyValueGen {
         writeln!(file, "/// and [`FreeformClass`] in the future.")?;
         writeln!(file, "#[derive(Clone, Copy, Debug, PartialEq)]")?;
         writeln!(file, "pub enum DerivedPropertyValue {{")?;
+        writeln!(file, "\t/// Value assigned to all those code points that are allowed to be used in any PRECIS string class.")?;
         writeln!(file, "\tPValid,")?;
+        writeln!(file, "\t/// Value assigned to all those code points that are allowed to be used in an specific PRECIS string class.")?;
         writeln!(file, "\tSpecClassPval,")?;
+        writeln!(file, "\t/// Value assigned to all those code points that are disallowed by a specific PRECIS string class.")?;
         writeln!(file, "\tSpecClassDis,")?;
+        writeln!(
+            file,
+            "\t/// Contextual rule required for Join_controls Unicode codepoints."
+        )?;
         writeln!(file, "\tContextJ,")?;
+        writeln!(
+            file,
+            "\t/// Contextual rule required for Others Unicode codepoints."
+        )?;
         writeln!(file, "\tContextO,")?;
+        writeln!(
+            file,
+            "\t/// Those code points that are not permitted in any PRECIS string class."
+        )?;
         writeln!(file, "\tDisallowed,")?;
+        writeln!(
+            file,
+            "\t/// Those code points that are not designated in the Unicode Standard."
+        )?;
         writeln!(file, "\tUnassigned,")?;
         writeln!(file, "}}")?;
         Ok(writeln!(file)?)

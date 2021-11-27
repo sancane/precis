@@ -8,6 +8,7 @@ use std::io::Write;
 pub struct ExceptionsGen {}
 
 impl ExceptionsGen {
+    /// Creates a new table generator for code points in the Exceptions group
     pub fn new() -> Self {
         Self {}
     }
