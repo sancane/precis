@@ -9,7 +9,7 @@ use crate::DerivedPropertyValue;
 /// Interface for specific classes to deal with specific Unicode
 /// code groups defined in RFC 8264.
 /// Next callbacks will be invoked to calculate the derived property
-/// value in the order defined in [`get_derived_property_value`]
+/// according to the algorithm defined in [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264#section-8)
 pub trait SpecificDerivedPropertyValue {
     /// Callback invoked when the Unicode code point belongs to
     /// [Spaces](https://datatracker.ietf.org/doc/html/rfc8264#section-9.14)
@@ -57,7 +57,7 @@ pub trait SpecificDerivedPropertyValue {
 /// This function returns the derived property value as defined in
 /// [RFC 8264](https://datatracker.ietf.org/doc/html/rfc8264#section-8)
 #[allow(clippy::if_same_then_else)]
-pub fn get_derived_property_value(
+fn get_derived_property_value(
     cp: u32,
     obj: &dyn SpecificDerivedPropertyValue,
 ) -> DerivedPropertyValue {
@@ -120,7 +120,7 @@ fn allowed_by_context_rule(s: &str, cp: u32, offset: usize) -> bool {
 /// Base interface for all String classes in PRECIS framework.
 pub trait StringClass {
     /// Gets the derived property value according to the algorithm defined
-    /// in [`get_derived_property_value`]
+    /// in [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264#section-8)
     /// # Arguments
     /// * `c`- Unicode character
     /// # Return
@@ -128,7 +128,7 @@ pub trait StringClass {
     fn get_value_from_char(&self, c: char) -> DerivedPropertyValue;
 
     /// Gets the derived property value according to the algorithm defined
-    /// in [`get_derived_property_value`]
+    /// in [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264#section-8)
     /// # Arguments:
     /// * `cp`- Unicode code point
     /// # Return
