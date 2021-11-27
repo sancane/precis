@@ -4,9 +4,9 @@ use std::borrow::Cow;
 /// Rules that any profile of a PRECIS string class MUST define
 /// to proper manage the handling of right-to-left code points as
 /// well as various mapping operations such as case preservation
-/// or lowercasing, Unicode normalization, mapping of certain code
-/// points to other code points or to nothing, and mapping of fullwidth
-/// and halfwidth code points.
+/// or lower casing, Unicode normalization, mapping of certain code
+/// points to other code points or to nothing, and mapping of full width
+/// and half width code points.
 pub trait Rules {
     /// Applies the width mapping rule of a profile to an input string.
     /// # Arguments:
@@ -21,7 +21,7 @@ pub trait Rules {
         Err(Error::NotApplicable)
     }
 
-    /// Appies the additional mapping rule of a profile to an input string.
+    /// Applies the additional mapping rule of a profile to an input string.
     /// # Arguments:
     /// * `s`: String value
     /// # Returns
@@ -89,9 +89,9 @@ pub trait Profile {
     /// rules defined by this profile to prepare the string
     fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error>;
 
-    /// Applies all of the rules specified for a particular string class,
+    /// Applies all the rules specified for a particular string class,
     /// or profile thereof, to a single input string, for the purpose of
-    /// checking whether the string conforms to all of the rules and thus
+    /// checking whether the string conforms to all the rules and thus
     /// determining if the string can be used in a given protocol slot.
     /// # Arguments:
     /// * `s`: String value
@@ -101,23 +101,23 @@ pub trait Profile {
     /// the string according to the rules defined by this profile.
     fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error>;
 
-    /// Comparison entails applying all of the rules specified for a
+    /// Comparison entails applying all the rules specified for a
     /// particular string class, or profile thereof, to two separate input
     /// strings, for the purpose of determining if the two strings are
     /// equivalent.
     fn compare(&self, s1: &str, s2: &str) -> Result<bool, Error>;
 }
 
-/// Fast invokation trait that allows profiles to be used without providing
+/// Fast invocation trait that allows profiles to be used without providing
 /// a specific instance. This is usually achieved by using a static instance
-/// allocated with [lazy_static](https://docs.rs/lazy_static/1.4.0/lazy_static)
+/// allocated with [`lazy_static`](https://docs.rs/lazy_static/1.4.0/lazy_static)
 pub trait PrecisFastInvocation {
     fn prepare(s: &str) -> Result<Cow<'_, str>, Error>;
     fn enforce(s: &str) -> Result<Cow<'_, str>, Error>;
     fn compare(s1: &str, s2: &str) -> Result<bool, Error>;
 }
 
-/// Apply rules until the string is estable. Some profiles, especially those
+/// Apply rules until the string is stable. Some profiles, especially those
 /// that the result of applying these rules does not result in an idempotent
 /// operation for all code points SHOULD apply the rules repeatedly until
 /// the output string is stable.

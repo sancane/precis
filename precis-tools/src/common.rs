@@ -28,7 +28,7 @@ fn add_range(range: &Option<CodepointRange>, out: &mut Vec<Codepoints>) {
     match range {
         Some(r) => {
             if r.start == r.end {
-                // Add single codepoint
+                // Add single code point
                 out.push(Single(r.start));
             } else {
                 // Add range
@@ -55,7 +55,7 @@ pub fn get_codepoints_vector(codepoints: &HashSet<u32>) -> Vec<Codepoints> {
                 if **cp - r.end.value() == 1 {
                     r.end = Codepoint::from_u32(**cp).unwrap();
                 } else {
-                    // there is a gap, non consecutive numbers
+                    // there is a gap, non-consecutive numbers
                     add_range(&range, &mut out);
                     // Start a new range
                     range = Some(CodepointRange {

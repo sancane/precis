@@ -1,12 +1,12 @@
 //! PRECIS Framework: Preparation, Enforcement, and Comparison of
 //! Internationalized Strings in Application Protocols as described in
-//! [rfc8264](https://datatracker.ietf.org/doc/html/rfc8264)
+//! [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264)
 //!
 //! This crate implements the next PRECIS profiles:
-//! * [rfc8265](https://datatracker.ietf.org/doc/html/rfc8265).
+//! * [`rfc8265`](https://datatracker.ietf.org/doc/html/rfc8265).
 //!   Preparation, Enforcement, and Comparison of Internationalized Strings
 //!   Representing Usernames and Passwords.
-//! * [rfc8266](https://datatracker.ietf.org/doc/html/rfc8266).
+//! * [`rfc8266`](https://datatracker.ietf.org/doc/html/rfc8266).
 //!   Preparation, Enforcement, and Comparison of Internationalized Strings
 //!   Representing Nicknames
 //!
@@ -27,7 +27,7 @@
 //! }
 //! ```
 //!
-//! # crates.io
+//! # `crates.io`
 //!
 //! You can use this package in your project by adding the following
 //! to your `Cargo.toml`:

@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::Write;
 
 /// Generates the [Exceptions](https://datatracker.ietf.org/doc/html/rfc8264#section-9.6)
-/// table requried by the PRECIS framework.
+/// table required by the PRECIS framework.
 pub struct ExceptionsGen {}
 
 impl ExceptionsGen {

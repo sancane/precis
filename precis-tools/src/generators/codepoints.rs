@@ -3,7 +3,7 @@ use crate::generators::CodeGen;
 use std::fs::File;
 use std::io::Write;
 
-/// Generate the Codepoints struct used by all tables created by all
+/// Generate the `Codepoints` `struct` used by all tables created by all
 /// generators.
 /// # Example:
 /// ```rust

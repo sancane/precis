@@ -92,9 +92,9 @@ where
 
 /// [Nickname Profile](https://datatracker.ietf.org/doc/html/rfc8266#section-2).
 /// Nicknames or display names in messaging and text conferencing technologies;
-/// petnames for devices, accounts, and people; and other uses of nicknames,
-/// display names, or petnames
-/// [IANA Considerations](https://datatracker.ietf.org/doc/html/rfc8266#section-5)
+/// pet names for devices, accounts, and people; and other uses of nicknames,
+/// display names, or pet names. Look at the
+/// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8266#section-5)
 /// section for more details.
 /// # Example
 /// ```rust
@@ -232,14 +232,14 @@ mod nickname {
         assert_eq!(find_disallowed_space(""), None);
         assert_eq!(find_disallowed_space("test"), None);
 
-        // Two ascii spaces in a row
+        // Two ASCII spaces in a row
         assert_eq!(find_disallowed_space("  test"), Some(0));
         assert_eq!(find_disallowed_space("t  est"), Some(2));
 
-        // Starts with ascii space
+        // Starts with ASCII space
         assert_eq!(find_disallowed_space(" test"), Some(0));
 
-        // Non asci separator
+        // Non ASCII separator
         assert_eq!(find_disallowed_space("te\u{00a0}st"), Some(2));
         assert_eq!(find_disallowed_space("test\u{00a0}"), Some(4));
     }
@@ -307,7 +307,7 @@ mod nickname {
         let res = profile.prepare("Richard \u{2163}");
         assert_eq!(res, Ok(Cow::from("Richard \u{2163}")));
 
-        // Control characters like TAB (U+0009) are disallowed
+        // Control characters like TAB `U+0009` are disallowed
         let res = profile.prepare("simple;\u{0009} test");
         assert_eq!(res, Err(Error::Disallowed));
     }
@@ -349,7 +349,7 @@ mod nickname {
         let res = profile.enforce("Richard \u{2163}");
         assert_eq!(res, Ok(Cow::from("Richard IV")));
 
-        // Control characters like TAB (U+0009) are disallowed
+        // Control characters like TAB `U+0009` are disallowed
         let res = profile.enforce("simple;\u{0009} test");
         assert_eq!(res, Err(Error::Disallowed));
     }
@@ -397,7 +397,7 @@ mod nickname {
         let res = profile.compare("Richard \u{2163}", "richard iv");
         assert_eq!(res, Ok(true));
 
-        // Control characters like TAB (U+0009) are disallowed
+        // Control characters like TAB `U+0009` are disallowed
         let res = profile.compare("simple;\u{0009} test", "simple;\u{0009} test");
         assert_eq!(res, Err(Error::Disallowed));
     }

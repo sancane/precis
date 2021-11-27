@@ -100,7 +100,7 @@ pub fn has_compat(cp: u32) -> bool {
     // decomposed and recomposed into something other than itself under
     // Unicode Normalization Form KC.
     // Typically, this category is true of code points that are
-    // "compatibility decomposable characters" as defined in the Unicode
+    // "compatibility `decomposable` characters" as defined in the Unicode
     // Standard.
 
     let cs = c.to_string();

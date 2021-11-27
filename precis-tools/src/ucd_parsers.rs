@@ -4,7 +4,7 @@ use std::str::FromStr;
 use ucd_parse::UcdFile;
 
 /// A single row in the
-/// [HangulSyllableType.txt](http://www.unicode.org/reports/tr44/#HangulSyllableType.txt)
+/// [`HangulSyllableType`](http://www.unicode.org/reports/tr44/#HangulSyllableType.txt)
 /// file.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct HangulSyllableType {
@@ -32,7 +32,7 @@ impl FromStr for HangulSyllableType {
     }
 }
 
-/// A single row in the `DerivedJoiningType.txt` file.
+/// A single row in the `DerivedJoiningType` file.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DerivedJoiningType {
     pub prop: ucd_parse::Property,
@@ -59,61 +59,61 @@ impl FromStr for DerivedJoiningType {
     }
 }
 
-/// Extension of the UnicodeData struct provided by the
-/// [ucd_parse](https://docs.rs/ucd-parse) crate. Unlike the
-/// original one, this struct does not represent a single line in the
-/// [UnicodeData.txt](https://www.unicode.org/reports/tr44/#UnicodeData.txt)
+/// Extension of the `UnicodeData` `struct` provided by the
+/// [`ucd_parse`](https://docs.rs/ucd-parse) crate. Unlike the
+/// original one, this `struct` does not represent a single line in the
+/// [`UnicodeData`](https://www.unicode.org/reports/tr44/#UnicodeData.txt)
 /// file, but it could be the result of a whole parsing of several files
 /// to contain range of Unicode code points. Note that this file, unlike
 /// others in the Unicode data files, represents ranges split in different
 /// lines in order not to break parsers compatibility.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct UnicodeData {
-    /// The codepoints corresponding to this row.
+    /// The code points corresponding to this row.
     pub codepoints: ucd_parse::Codepoints,
-    /// The name of this codepoint.
+    /// The name of this code point.
     pub name: String,
-    /// The "general category" of this codepoint.
+    /// The "general category" of this code point.
     pub general_category: String,
-    /// The class of this codepoint used in the Canonical Ordering Algorithm.
+    /// The class of this code point used in the Canonical Ordering Algorithm.
     ///
     /// Note that some classes map to a particular symbol. See
-    /// [UAX44, Table 15](https://www.unicode.org/reports/tr44/#Canonical_Combining_Class_Values).
+    /// [`UAX44`, Table 15](https://www.unicode.org/reports/tr44/#Canonical_Combining_Class_Values).
     pub canonical_combining_class: u8,
-    /// The bidirectional class of this codepoint.
+    /// The bidirectional class of this code point.
     ///
     /// Possible values are listed in
-    /// [UAX44, Table 13](https://www.unicode.org/reports/tr44/#Bidi_Class_Values).
+    /// [`UAX44`, Table 13](https://www.unicode.org/reports/tr44/#Bidi_Class_Values).
     pub bidi_class: String,
-    /// The decomposition mapping for this codepoint. This includes its
+    /// The decomposition mapping for this code point. This includes its
     /// formatting tag (if present).
     pub decomposition: ucd_parse::UnicodeDataDecomposition,
-    /// A decimal numeric representation of this codepoint, if it has the
+    /// A decimal numeric representation of this code point, if it has the
     /// property `Numeric_Type=Decimal`.
     pub numeric_type_decimal: Option<u8>,
-    /// A decimal numeric representation of this codepoint, if it has the
+    /// A decimal numeric representation of this code point, if it has the
     /// property `Numeric_Type=Digit`. Note that while this field is still
-    /// populated for existing codepoints, no new codepoints will have this
+    /// populated for existing code points, no new code points will have this
     /// field populated.
     pub numeric_type_digit: Option<u8>,
-    /// A decimal or rational numeric representation of this codepoint, if it
+    /// A decimal or rational numeric representation of this code point, if it
     /// has the property `Numeric_Type=Numeric`.
     pub numeric_type_numeric: Option<ucd_parse::UnicodeDataNumeric>,
-    /// A boolean indicating whether this codepoint is "mirrored" in
+    /// A Boolean indicating whether this code point is "mirrored" in
     /// bidirectional text.
     pub bidi_mirrored: bool,
-    /// The "old" Unicode 1.0 or ISO 6429 name of this codepoint. Note that
+    /// The "old" Unicode 1.0 or ISO 6429 name of this code point. Note that
     /// this field is empty unless it is significantly different from
     /// the `name` field.
     pub unicode1_name: String,
-    /// The ISO 10464 comment field. This no longer contains any non-NULL
+    /// The ISO 10464 comment field. This field no longer contains any non-NULL
     /// values.
     pub iso_comment: String,
-    /// This codepoint's simple uppercase mapping, if it exists.
+    /// This code point's simple uppercase mapping, if it exists.
     pub simple_uppercase_mapping: Option<ucd_parse::Codepoint>,
-    /// This codepoint's simple lowercase mapping, if it exists.
+    /// This code point's simple lowercase mapping, if it exists.
     pub simple_lowercase_mapping: Option<ucd_parse::Codepoint>,
-    /// This codepoint's simple titlecase mapping, if it exists.
+    /// This code point's simple title case mapping, if it exists.
     pub simple_titlecase_mapping: Option<ucd_parse::Codepoint>,
 }
 

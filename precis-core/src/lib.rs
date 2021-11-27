@@ -1,12 +1,12 @@
 //! PRECIS Framework: Preparation, Enforcement, and Comparison of
 //! Internationalized Strings in Application Protocols as described in
-//! [rfc8264](https://datatracker.ietf.org/doc/html/rfc8264)
+//! [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264)
 //!
 //! This crate implements the PRECIS base string classes and tables
 //! that profiles can use for their implementation. The crate `precis-profiles`
 //! provides a list of implemented profiles that applications can use.
 //!
-//! # crates.io
+//! # `crates.io`
 //!
 //! You can use this package in your project by adding the following
 //! to your `Cargo.toml`:

@@ -5,11 +5,11 @@ use precis_core::Error;
 use precis_core::{FreeformClass, StringClass};
 use std::borrow::Cow;
 
-/// [OpaqueString Profile](<https://datatracker.ietf.org/doc/html/rfc8265#section-4.2>)
+/// [`OpaqueString` Profile](<https://datatracker.ietf.org/doc/html/rfc8265#section-4.2>)
 /// Profile designed to deal with passwords and other opaque strings in security
 /// and application protocols.
-/// Replaces:  The SASLprep profile of Stringprep. Look at the
-/// [IANA Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.3)
+/// Replaces:  The `SASLprep` profile of `Stringprep`. Look at the
+/// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.3)
 /// section for more details.
 /// # Example
 /// ```rust
@@ -132,7 +132,7 @@ mod opaque_string {
     fn prepare() {
         let profile = OpaqueString::new();
 
-        // SPACE (U+0020) is allowed
+        // SPACE `U+0020` is allowed
         let res = profile.prepare("correct horse battery staple");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "correct horse battery staple");
@@ -143,12 +143,12 @@ mod opaque_string {
         assert_eq!(res.unwrap(), "Correct Horse Battery Staple");
 
         // Non-ASCII letters are OK (e.g., GREEK SMALL LETTER
-        // PI (U+03C0))
+        // PI `U+03C0`)
         let res = profile.prepare("πßå");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "πßå");
 
-        // Symbols are OK (e.g., BLACK DIAMOND SUIT (U+2666))
+        // Symbols are OK (e.g., BLACK DIAMOND SUIT `U+2666`)
         let res = profile.prepare("Jack of ♦s");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Jack of ♦s");
@@ -157,7 +157,7 @@ mod opaque_string {
         let res = profile.prepare("");
         assert_eq!(res.is_err(), true);
 
-        // Control characters like TAB (U+0009) are disallowed
+        // Control characters like TAB `U+0009` are disallowed
         let res = profile.prepare("simple;\u{0009} test");
         assert_eq!(res.is_err(), true);
     }
@@ -166,7 +166,7 @@ mod opaque_string {
     fn enforce() {
         let profile = OpaqueString::new();
 
-        // SPACE (U+0020) is allowed
+        // SPACE `U+0020` is allowed
         let res = profile.enforce("correct horse battery staple");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "correct horse battery staple");
@@ -177,23 +177,23 @@ mod opaque_string {
         assert_eq!(res.unwrap(), "Correct Horse Battery Staple");
 
         // Non-ASCII letters are OK (e.g., GREEK SMALL LETTER
-        // PI (U+03C0))
+        // PI `U+03C0`)
         let res = profile.enforce("πßå");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "πßå");
 
-        // Symbols are OK (e.g., BLACK DIAMOND SUIT (U+2666))
+        // Symbols are OK (e.g., BLACK DIAMOND SUIT `U+2666`)
         let res = profile.enforce("Jack of ♦s");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Jack of ♦s");
 
-        // OGHAM SPACE MARK (U+1680) is mapped to SPACE (U+0020);
+        // `OGHAM` SPACE MARK `U+1680` is mapped to SPACE `U+0020`;
         // thus, the full string is mapped to <foo bar>
         let res = profile.enforce("foo bar");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "foo bar");
 
-        // Symbols are OK (e.g., BLACK DIAMOND SUIT (U+2666))
+        // Symbols are OK (e.g., BLACK DIAMOND SUIT `U+2666`)
         let res = profile.enforce("Jack of ♦s");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), "Jack of ♦s");
@@ -202,7 +202,7 @@ mod opaque_string {
         let res = profile.enforce("");
         assert_eq!(res.is_err(), true);
 
-        // Control characters like TAB (U+0009) are disallowed
+        // Control characters like TAB `U+0009` are disallowed
         let res = profile.enforce("simple;\u{0009} test");
         assert_eq!(res.is_err(), true);
     }
@@ -217,7 +217,7 @@ mod opaque_string {
         let res = profile.compare("", "𝄞💝♦💣東💯 Secret");
         assert_eq!(res.is_err(), true);
 
-        // Same string. OGHAM SPACE MARK (U+1680) is mapped to SPACE (U+0020)
+        // Same string. `OGHAM` SPACE MARK `U+1680` is mapped to SPACE `U+0020`
         let res = profile.compare("𝄞💝♦💣東💯 Secret", "𝄞💝♦💣東💯 Secret");
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), true);

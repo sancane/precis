@@ -2,9 +2,9 @@
 
 # precis-tools
 
-Tools and parsers to generate PRECIS tables from the Unicode Character Database (UCD)
+Tools and parsers to generate PRECIS tables from the Unicode Character Database (`UCD`)
 
-# crates.io
+# `crates.io`
 
 You can use this package in your project by adding the following
 to your `Cargo.toml`:

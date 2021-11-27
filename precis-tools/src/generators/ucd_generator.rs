@@ -32,9 +32,9 @@ pub struct UcdFileGen {
 }
 
 impl UcdFileGen {
-    /// Creates a new UcdFileGen element.
+    /// Creates a new `UcdFileGen` element.
     /// # Arguments:
-    /// `path` - path where UCD files are stored
+    /// `path` - path where `UCD` files are stored
     pub fn new<P: AsRef<Path>>(path: P) -> Self {
         let path = path.as_ref();
         Self {
@@ -60,24 +60,24 @@ impl CodeGen for UcdFileGen {
     }
 }
 
-/// Trait implemented by all elements that are able to parse UCD files.
+/// Trait implemented by all elements that are able to parse `UCD` files.
 pub trait UcdCodeGen: CodeGen {
-    /// Parses a UCD file.
+    /// Parses a `UCD` file.
     /// # Arguments:
-    /// `ucd_path` - Path where UCD file is stored.
+    /// `ucd_path` - Path where `UCD` file is stored.
     fn parse_unicode_file(&mut self, ucd_path: &Path) -> Result<(), Error>;
 }
 
 /// Generic trait used by parsers to generate code.
 pub trait UcdLineParser<U>: CodeGen {
-    /// Process an entry in the UCD file.
+    /// Process an entry in the `UCD` file.
     /// # Argument:
-    /// `line` - Represents a line in the UCD file.
+    /// `line` - Represents a line in the `UCD` file.
     fn process_entry(&mut self, line: &U) -> Result<(), Error>;
 }
 
 /// Generator that crates tables of Unicode code points as a result
-/// of parsing properties in the UCD files.
+/// of parsing properties in the `UCD` files.
 pub struct UcdTableGen {
     name: String,
     table_name: String,
@@ -219,13 +219,13 @@ impl<T: ucd_parse::UcdFile> CodeGen for UnicodeGen<T> {
 }
 
 /// Generator that aggregates elements that are able to generate tables
-/// from the [UnicodeData.txt](http://www.unicode.org/reports/tr44/#UnicodeData.txt) file
+/// from the [`UnicodeData`](http://www.unicode.org/reports/tr44/#UnicodeData.txt) file
 pub struct GeneralCategoryGen {
     generators: Vec<Box<dyn UcdLineParser<ucd_parsers::UnicodeData>>>,
 }
 
 impl GeneralCategoryGen {
-    /// Creates a new GeneralCategoryGen element.
+    /// Creates a new `GeneralCategoryGen` element.
     pub fn new() -> Self {
         Self {
             generators: Vec::new(),
@@ -269,7 +269,7 @@ impl CodeGen for GeneralCategoryGen {
 const CANONICAL_COMBINING_CLASS_VIRAMA: u8 = 9;
 
 /// Generator that creates a table of Unicode code points
-/// with the Virama canonical combining class.
+/// with the `Virama` canonical combining class.
 pub struct ViramaTableGen {
     table_name: String,
     cps: HashSet<u32>,
