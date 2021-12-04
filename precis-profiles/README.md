@@ -38,7 +38,7 @@ to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-precis-profiles = "0.1.3"
+precis-profiles = "0.1.4"
 ```
 
 # Documentation

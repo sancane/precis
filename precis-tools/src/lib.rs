@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! precis-tools = "0.1.3"
+//! precis-tools = "0.1.4"
 //! ```
 //! This crate is generally used to generate code to be used by other crates such as
 //! [precis-core](https://docs.rs/precis-core) or [precis-profiles](https://docs.rs/precis-profiles).

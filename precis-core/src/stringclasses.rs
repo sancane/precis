@@ -5,6 +5,7 @@
 use crate::common;
 use crate::context;
 use crate::DerivedPropertyValue;
+use crate::{CodepointInfo, Error, UnexpectedError};
 
 /// Interface for specific classes to deal with specific Unicode
 /// code groups defined in RFC 8264.
@@ -98,23 +99,34 @@ fn get_derived_property_value(
     }
 }
 
-fn allowed_by_context_rule(s: &str, cp: u32, offset: usize) -> bool {
-    let val = context::get_context_rule(cp);
-
-    debug_assert!(
-        val.is_some(),
-        "No context rule found for Unicode code point: {:#04x}",
-        cp
-    );
-
-    let mut allowed = false;
-    if let Some(rule) = val {
-        if let Ok(ret) = rule(s, offset) {
-            allowed = ret;
-        };
+fn allowed_by_context_rule(
+    label: &str,
+    val: DerivedPropertyValue,
+    cp: u32,
+    offset: usize,
+) -> Result<(), Error> {
+    match context::get_context_rule(cp) {
+        None => Err(Error::Unexpected(UnexpectedError::MissingContextRule(
+            CodepointInfo::new(cp, offset, val),
+        ))),
+        Some(rule) => match rule(label, offset) {
+            Ok(allowed) => {
+                if allowed {
+                    Ok(())
+                } else {
+                    Err(Error::BadCodepoint(CodepointInfo::new(cp, offset, val)))
+                }
+            }
+            Err(e) => match e {
+                context::ContextRuleError::NotApplicable => Err(Error::Unexpected(
+                    UnexpectedError::ContextRuleNotApplicable(CodepointInfo::new(cp, offset, val)),
+                )),
+                context::ContextRuleError::Undefined => {
+                    Err(Error::Unexpected(UnexpectedError::Undefined))
+                }
+            },
+        },
     }
-
-    allowed
 }
 
 /// Base interface for all String classes in PRECIS framework.
@@ -142,24 +154,24 @@ pub trait StringClass {
     /// * `label` - string to check
     /// # Returns
     /// true if all character of `label` are allowed by the String Class.
-    fn allows(&self, label: &str) -> bool {
+    fn allows(&self, label: &str) -> Result<(), Error> {
         for (offset, c) in label.chars().enumerate() {
             let val = self.get_value_from_char(c);
 
             match val {
-                DerivedPropertyValue::PValid | DerivedPropertyValue::SpecClassPval => {}
+                DerivedPropertyValue::PValid | DerivedPropertyValue::SpecClassPval => Ok(()),
                 DerivedPropertyValue::SpecClassDis
                 | DerivedPropertyValue::Disallowed
-                | DerivedPropertyValue::Unassigned => return false,
+                | DerivedPropertyValue::Unassigned => Err(Error::BadCodepoint(CodepointInfo::new(
+                    c as u32, offset, val,
+                ))),
                 DerivedPropertyValue::ContextJ | DerivedPropertyValue::ContextO => {
-                    if !allowed_by_context_rule(label, c as u32, offset) {
-                        return false;
-                    }
+                    allowed_by_context_rule(label, val, c as u32, offset)
                 }
-            }
+            }?
         }
 
-        true
+        Ok(())
     }
 }
 
@@ -249,133 +261,5 @@ impl StringClass for FreeformClass {
 
     fn get_value_from_codepoint(&self, cp: u32) -> DerivedPropertyValue {
         get_derived_property_value(cp, self)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::*;
-    use precis_tools::*;
-    use std::env;
-    use std::fs::File;
-    use std::path::Path;
-    use std::path::PathBuf;
-
-    fn validate_result(
-        cp: u32,
-        expected: precis_tools::DerivedProperty,
-        id: &IdentifierClass,
-        ff: &FreeformClass,
-    ) {
-        match expected {
-            precis_tools::DerivedProperty::PValid => {
-                let id_prop = id.get_value_from_codepoint(cp);
-                let ff_prop = ff.get_value_from_codepoint(cp);
-
-                assert_eq!(id_prop, DerivedPropertyValue::PValid);
-                assert_eq!(ff_prop, DerivedPropertyValue::PValid);
-            }
-            precis_tools::DerivedProperty::FreePVal => {
-                let ff_prop = ff.get_value_from_codepoint(cp);
-
-                assert_eq!(ff_prop, DerivedPropertyValue::SpecClassPval)
-            }
-            precis_tools::DerivedProperty::ContextJ => {
-                let id_prop = id.get_value_from_codepoint(cp);
-                let ff_prop = ff.get_value_from_codepoint(cp);
-
-                assert_eq!(id_prop, DerivedPropertyValue::ContextJ);
-                assert_eq!(ff_prop, DerivedPropertyValue::ContextJ);
-            }
-            precis_tools::DerivedProperty::ContextO => {
-                let id_prop = id.get_value_from_codepoint(cp);
-                let ff_prop = ff.get_value_from_codepoint(cp);
-
-                assert_eq!(id_prop, DerivedPropertyValue::ContextO);
-                assert_eq!(ff_prop, DerivedPropertyValue::ContextO);
-            }
-            precis_tools::DerivedProperty::Disallowed => {
-                let id_prop = id.get_value_from_codepoint(cp);
-                let ff_prop = ff.get_value_from_codepoint(cp);
-
-                assert_eq!(id_prop, DerivedPropertyValue::Disallowed);
-                assert_eq!(ff_prop, DerivedPropertyValue::Disallowed);
-            }
-            precis_tools::DerivedProperty::IdDis => {
-                let id_prop = id.get_value_from_codepoint(cp);
-                assert_eq!(id_prop, DerivedPropertyValue::SpecClassDis);
-            }
-            precis_tools::DerivedProperty::Unassigned => {
-                let id_prop = id.get_value_from_codepoint(cp);
-                let ff_prop = ff.get_value_from_codepoint(cp);
-
-                assert!(
-                    id_prop == DerivedPropertyValue::Unassigned,
-                    "failed check for unicode point: {:#06x}. Expected: {:?}, Got: {:?}",
-                    cp,
-                    expected,
-                    id_prop
-                );
-                assert!(
-                    ff_prop == DerivedPropertyValue::Unassigned,
-                    "failed check for unicode point: {:#06x}. Expected: {:?}, Got: {:?}",
-                    cp,
-                    expected,
-                    ff_prop
-                );
-            }
-        }
-    }
-
-    fn check_derived_property(
-        cp: u32,
-        props: &DerivedProperties,
-        id: &IdentifierClass,
-        ff: &FreeformClass,
-    ) {
-        match props {
-            precis_tools::DerivedProperties::Single(p) => validate_result(cp, *p, &id, &ff),
-            precis_tools::DerivedProperties::Tuple((p1, p2)) => {
-                validate_result(cp, *p1, &id, &ff);
-                validate_result(cp, *p2, &id, &ff);
-            }
-        }
-    }
-
-    #[cfg(feature = "networking")]
-    fn get_csv_path() -> PathBuf {
-        let out_dir = env::var_os("OUT_DIR").unwrap();
-        Path::new(&out_dir).join("csv/precis-tables-6.3.0.csv")
-    }
-
-    #[cfg(not(feature = "networking"))]
-    fn get_csv_path() -> PathBuf {
-        let base_dir = env::var_os("CARGO_MANIFEST_DIR").unwrap();
-        Path::new(&base_dir).join("resources/csv/precis-tables-6.3.0.csv")
-    }
-
-    #[test]
-    fn check_derived_properties() {
-        let id = IdentifierClass {};
-        let ff = FreeformClass {};
-
-        let csv_path = get_csv_path();
-
-        let parser: precis_tools::CsvLineParser<File, precis_tools::PrecisDerivedProperty> =
-            precis_tools::CsvLineParser::from_path(csv_path).unwrap();
-
-        for result in parser {
-            let prop = result.unwrap();
-            match prop.codepoints {
-                ucd_parse::Codepoints::Single(cp) => {
-                    check_derived_property(cp.value(), &prop.properties, &id, &ff)
-                }
-                ucd_parse::Codepoints::Range(r) => {
-                    for cp in r {
-                        check_derived_property(cp.value(), &prop.properties, &id, &ff)
-                    }
-                }
-            }
-        }
     }
 }

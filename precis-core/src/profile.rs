@@ -2,7 +2,7 @@
 //! must implement such as it is defined by the PRECIS framework
 //! [`rfc8264`](https://datatracker.ietf.org/doc/html/rfc8264#section-5)
 
-use crate::Error;
+use crate::{Error, UnexpectedError};
 use std::borrow::Cow;
 
 /// Rules that any profile of a PRECIS string class MUST define
@@ -22,7 +22,7 @@ pub trait Rules {
     where
         T: Into<Cow<'a, str>>,
     {
-        Err(Error::NotApplicable)
+        Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
     }
 
     /// Applies the additional mapping rule of a profile to an input string.
@@ -35,7 +35,7 @@ pub trait Rules {
     where
         T: Into<Cow<'a, str>>,
     {
-        Err(Error::NotApplicable)
+        Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
     }
 
     /// Applies the case mapping rule of a profile to an input string
@@ -48,7 +48,7 @@ pub trait Rules {
     where
         T: Into<Cow<'a, str>>,
     {
-        Err(Error::NotApplicable)
+        Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
     }
 
     /// Applies the normalization rule of a profile to an input string
@@ -61,7 +61,7 @@ pub trait Rules {
     where
         T: Into<Cow<'a, str>>,
     {
-        Err(Error::NotApplicable)
+        Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
     }
 
     /// Applies the directionality rule of a profile to an input string
@@ -74,7 +74,7 @@ pub trait Rules {
     where
         T: Into<Cow<'a, str>>,
     {
-        Err(Error::NotApplicable)
+        Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
     }
 }
 
@@ -176,5 +176,5 @@ where
     }
 
     // The string did not stabilized after applying the rules three times.
-    Err(Error::Disallowed)
+    Err(Error::Invalid)
 }

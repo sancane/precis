@@ -77,47 +77,37 @@ mod profile_rules {
     #[test]
     fn test_normalization_rule() {
         let res = normalization_form_nfc("");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "");
+        assert_eq!(res, Ok(Cow::from("")));
 
         let res = normalization_form_nfc("\u{212b}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{00c5}");
+        assert_eq!(res, Ok(Cow::from("\u{00c5}")));
 
         let res = normalization_form_nfc("a\u{212b}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "a\u{00c5}");
+        assert_eq!(res, Ok(Cow::from("a\u{00c5}")));
 
         let res = normalization_form_nfc("\u{212b}a");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{00c5}a");
+        assert_eq!(res, Ok(Cow::from("\u{00c5}a")));
 
         let res = normalization_form_nfc("\u{212b}\u{2126}\u{1e0b}\u{0323}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{00c5}\u{03a9}\u{1e0d}\u{0307}");
+        assert_eq!(res, Ok(Cow::from("\u{00c5}\u{03a9}\u{1e0d}\u{0307}")));
     }
 
     #[test]
     fn test_case_mapping_rule() {
         let res = case_mapping_rule("");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "");
+        assert_eq!(res, Ok(Cow::from("")));
 
         let res = case_mapping_rule("T");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "t");
+        assert_eq!(res, Ok(Cow::from("t")));
 
         let res = case_mapping_rule("aT");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "at");
+        assert_eq!(res, Ok(Cow::from("at")));
 
         let res = case_mapping_rule("Ta");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "ta");
+        assert_eq!(res, Ok(Cow::from("ta")));
 
         let res = case_mapping_rule("TestUserName");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "testusername");
+        assert_eq!(res, Ok(Cow::from("testusername")));
     }
 
     #[test]

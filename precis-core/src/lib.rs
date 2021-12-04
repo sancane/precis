@@ -13,7 +13,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! precis-core = "0.1.3"
+//! precis-core = "0.1.4"
 //! ```
 
 #![deny(missing_docs)]
@@ -24,7 +24,9 @@ mod common;
 
 pub mod context;
 
+pub use crate::error::CodepointInfo;
 pub use crate::error::Error;
+pub use crate::error::UnexpectedError;
 pub use crate::stringclasses::FreeformClass;
 pub use crate::stringclasses::IdentifierClass;
 pub use crate::stringclasses::StringClass;
