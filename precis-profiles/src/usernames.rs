@@ -294,55 +294,45 @@ mod profile_rules {
     #[test]
     fn test_width_mapping_rule() {
         let res = width_mapping_rule("");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "");
+        assert_eq!(res, Ok(Cow::from("")));
 
         // Valid username with no modifications
         let res = width_mapping_rule("TestName");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "TestName");
+        assert_eq!(res, Ok(Cow::from("TestName")));
 
         // Mapping code point `U+FF03` (`＃`) to `U+0023` (`#`)
         let res = width_mapping_rule("\u{ff03}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{0023}");
+        assert_eq!(res, Ok(Cow::from("\u{0023}")));
 
         let res = width_mapping_rule("a\u{ff03}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "a\u{0023}");
+        assert_eq!(res, Ok(Cow::from("a\u{0023}")));
 
         let res = width_mapping_rule("\u{ff03}a");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{0023}a");
+        assert_eq!(res, Ok(Cow::from("\u{0023}a")));
 
         let res = width_mapping_rule("\u{ff03}\u{ff03}\u{ff03}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{0023}\u{0023}\u{0023}");
+        assert_eq!(res, Ok(Cow::from("\u{0023}\u{0023}\u{0023}")));
     }
 
     #[test]
     fn test_directionality_rule() {
         let res = directionality_rule("");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "");
+        assert_eq!(res, Ok(Cow::from("")));
 
         // No `RTL` label
         let res = directionality_rule("Hello");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "Hello");
+        assert_eq!(res, Ok(Cow::from("Hello")));
 
         // `RTL` label
         let res = directionality_rule("\u{05be}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{05be}");
+        assert_eq!(res, Ok(Cow::from("\u{05be}")));
 
         // `LTR` label
         let res = directionality_rule("\u{00aa}");
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), "\u{00aa}");
+        assert_eq!(res, Ok(Cow::from("\u{00aa}")));
 
         // Invalid label
         let res = directionality_rule("\u{05be}Hello");
-        assert_eq!(res.is_ok(), false);
+        assert_eq!(res, Err(Error::Invalid));
     }
 }
