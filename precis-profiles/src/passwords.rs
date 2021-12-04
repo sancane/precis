@@ -54,18 +54,16 @@ impl Default for OpaqueString {
 
 impl Profile for OpaqueString {
     fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
-        let s = (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)?;
-        self.class
-            .allows(s)
-            .then(|| s.into())
-            .ok_or(Error::Disallowed)
+        let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
+        self.class.allows(s)?;
+        Ok(s.into())
     }
 
     fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
         let s = self.prepare(s)?;
         let s = self.additional_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)
+        (!s.is_empty()).then(|| s).ok_or(Error::Invalid)
     }
 
     fn compare(&self, s1: &str, s2: &str) -> Result<bool, Error> {

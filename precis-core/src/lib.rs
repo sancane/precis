@@ -24,7 +24,9 @@ mod common;
 
 pub mod context;
 
+pub use crate::error::CodepointInfo;
 pub use crate::error::Error;
+pub use crate::error::UnexpectedError;
 pub use crate::stringclasses::FreeformClass;
 pub use crate::stringclasses::IdentifierClass;
 pub use crate::stringclasses::StringClass;

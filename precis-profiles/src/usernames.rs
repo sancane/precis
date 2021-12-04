@@ -5,7 +5,7 @@ use crate::common;
 use lazy_static::lazy_static;
 use precis_core::profile::{PrecisFastInvocation, Profile, Rules};
 use precis_core::Codepoints;
-use precis_core::Error;
+use precis_core::{Error, UnexpectedError};
 use precis_core::{IdentifierClass, StringClass};
 use std::borrow::Cow;
 
@@ -32,7 +32,9 @@ where
             res.reserve(s.len() - res.len());
             for c in s[pos..].chars() {
                 res.push(match get_decomposition_mapping(c as u32) {
-                    Some(d) => char::from_u32(d).ok_or(Error::Unexpected)?,
+                    Some(d) => {
+                        char::from_u32(d).ok_or(Error::Unexpected(UnexpectedError::Undefined))?
+                    }
                     None => c,
                 });
             }
@@ -47,9 +49,7 @@ where
 {
     let s = s.into();
     if bidi::has_rtl(&s) {
-        bidi::satisfy_bidi_rule(&s)
-            .then(|| s)
-            .ok_or(Error::Disallowed)
+        bidi::satisfy_bidi_rule(&s).then(|| s).ok_or(Error::Invalid)
     } else {
         Ok(s)
     }
@@ -63,6 +63,7 @@ where
 /// # Example
 /// ```rust
 /// use precis_core::Error;
+/// use precis_core::{CodepointInfo, DerivedPropertyValue};
 /// use precis_core::profile::Profile;
 /// use precis_profiles::UsernameCaseMapped;
 /// use std::borrow::Cow;
@@ -73,9 +74,9 @@ where
 /// // prepare string
 /// assert_eq!(profile.prepare("Guybrush"), Ok(Cow::from("Guybrush")));
 ///
-/// // UsernameCaseMapped does not accept spaces
+/// // UsernameCaseMapped does not accept spaces. Unicode code point 0x0020
 /// assert_eq!(profile.prepare("Guybrush Threepwood"),
-///    Err(Error::Disallowed));
+///    Err(Error::BadCodepoint(CodepointInfo { cp: 0x0020, position: 8, property: DerivedPropertyValue::SpecClassDis })));
 ///
 /// // enforce string
 /// assert_eq!(profile.enforce("Guybrush"), Ok(Cow::from("guybrush")));
@@ -105,15 +106,16 @@ impl Default for UsernameCaseMapped {
 impl Profile for UsernameCaseMapped {
     fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
         let s = self.width_mapping_rule(s)?;
-        let s = (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)?;
-        self.class.allows(&s).then(|| s).ok_or(Error::Disallowed)
+        let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
+        self.class.allows(&s)?;
+        Ok(s)
     }
 
     fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
         let s = self.prepare(s)?;
         let s = self.case_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        let s = (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)?;
+        let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
         directionality_rule(s)
     }
 
@@ -181,6 +183,7 @@ impl PrecisFastInvocation for UsernameCaseMapped {
 /// # Example
 /// ```rust
 /// use precis_core::Error;
+/// use precis_core::{CodepointInfo, DerivedPropertyValue};
 /// use precis_core::profile::Profile;
 /// use precis_profiles::UsernameCasePreserved;
 /// use std::borrow::Cow;
@@ -191,9 +194,9 @@ impl PrecisFastInvocation for UsernameCaseMapped {
 /// // prepare string
 /// assert_eq!(profile.prepare("Guybrush"), Ok(Cow::from("Guybrush")));
 ///
-/// // UsernameCaseMapped does not accept spaces
+/// // UsernameCaseMapped does not accept spaces. Unicode code point 0x0020
 /// assert_eq!(profile.prepare("Guybrush Threepwood"),
-///    Err(Error::Disallowed));
+///    Err(Error::BadCodepoint(CodepointInfo { cp: 0x0020, position: 8, property: DerivedPropertyValue::SpecClassDis })));
 ///
 /// // enforce string
 /// assert_eq!(profile.enforce("Guybrush"), Ok(Cow::from("Guybrush")));
@@ -223,14 +226,15 @@ impl Default for UsernameCasePreserved {
 impl Profile for UsernameCasePreserved {
     fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
         let s = self.width_mapping_rule(s)?;
-        let s = (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)?;
-        self.class.allows(&s).then(|| s).ok_or(Error::Disallowed)
+        let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
+        self.class.allows(&s)?;
+        Ok(s)
     }
 
     fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
         let s = self.prepare(s)?;
         let s = self.normalization_rule(s)?;
-        let s = (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)?;
+        let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
         self.directionality_rule(s)
     }
 

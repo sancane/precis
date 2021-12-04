@@ -5,6 +5,7 @@
 use crate::common;
 use crate::context;
 use crate::DerivedPropertyValue;
+use crate::{CodepointInfo, Error, UnexpectedError};
 
 /// Interface for specific classes to deal with specific Unicode
 /// code groups defined in RFC 8264.
@@ -98,23 +99,34 @@ fn get_derived_property_value(
     }
 }
 
-fn allowed_by_context_rule(s: &str, cp: u32, offset: usize) -> bool {
-    let val = context::get_context_rule(cp);
-
-    debug_assert!(
-        val.is_some(),
-        "No context rule found for Unicode code point: {:#04x}",
-        cp
-    );
-
-    let mut allowed = false;
-    if let Some(rule) = val {
-        if let Ok(ret) = rule(s, offset) {
-            allowed = ret;
-        };
+fn allowed_by_context_rule(
+    label: &str,
+    val: DerivedPropertyValue,
+    cp: u32,
+    offset: usize,
+) -> Result<(), Error> {
+    match context::get_context_rule(cp) {
+        None => Err(Error::Unexpected(UnexpectedError::MissingContextRule(
+            CodepointInfo::new(cp, offset, val),
+        ))),
+        Some(rule) => match rule(label, offset) {
+            Ok(allowed) => {
+                if allowed {
+                    Ok(())
+                } else {
+                    Err(Error::BadCodepoint(CodepointInfo::new(cp, offset, val)))
+                }
+            }
+            Err(e) => match e {
+                context::ContextRuleError::NotApplicable => Err(Error::Unexpected(
+                    UnexpectedError::ContextRuleNotApplicable(CodepointInfo::new(cp, offset, val)),
+                )),
+                context::ContextRuleError::Undefined => {
+                    Err(Error::Unexpected(UnexpectedError::Undefined))
+                }
+            },
+        },
     }
-
-    allowed
 }
 
 /// Base interface for all String classes in PRECIS framework.
@@ -142,24 +154,24 @@ pub trait StringClass {
     /// * `label` - string to check
     /// # Returns
     /// true if all character of `label` are allowed by the String Class.
-    fn allows(&self, label: &str) -> bool {
+    fn allows(&self, label: &str) -> Result<(), Error> {
         for (offset, c) in label.chars().enumerate() {
             let val = self.get_value_from_char(c);
 
             match val {
-                DerivedPropertyValue::PValid | DerivedPropertyValue::SpecClassPval => {}
+                DerivedPropertyValue::PValid | DerivedPropertyValue::SpecClassPval => Ok(()),
                 DerivedPropertyValue::SpecClassDis
                 | DerivedPropertyValue::Disallowed
-                | DerivedPropertyValue::Unassigned => return false,
+                | DerivedPropertyValue::Unassigned => Err(Error::BadCodepoint(CodepointInfo::new(
+                    c as u32, offset, val,
+                ))),
                 DerivedPropertyValue::ContextJ | DerivedPropertyValue::ContextO => {
-                    if !allowed_by_context_rule(label, c as u32, offset) {
-                        return false;
-                    }
+                    allowed_by_context_rule(label, val, c as u32, offset)
                 }
-            }
+            }?
         }
 
-        true
+        Ok(())
     }
 }
 

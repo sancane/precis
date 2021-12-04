@@ -14,7 +14,6 @@
 //! terminates, as the result value of the rule will itself be Undefined.
 
 use crate::common;
-use crate::error::Error;
 
 /// Gets the next character
 /// # Arguments
@@ -44,6 +43,16 @@ fn before(s: &str, offset: usize) -> Option<char> {
     }
 }
 
+/// Error associated to the application of any context rule.
+#[derive(Debug, PartialEq)]
+pub enum ContextRuleError {
+    /// Context rule is not applicable
+    NotApplicable,
+    /// Special value used to deal with any error conditions, such as an attempt to test
+    /// a character before the start of a label or after the end of a label.
+    Undefined,
+}
+
 /// [Appendix A.1](https://datatracker.ietf.org/doc/html/rfc5892#appendix-A.1).
 /// ZERO WIDTH NON-JOINER `U+200C`
 /// This may occur in a formally cursive script (such as Arabic) in a
@@ -57,12 +66,12 @@ fn before(s: &str, offset: usize) -> Option<char> {
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// True if context permits a ZERO WIDTH NON-JOINER `U+200C`.
-pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, Error> {
-    if 0x200c != s.chars().nth(offset).ok_or(Error::Undefined)? as u32 {
-        return Err(Error::NotApplicable);
+pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+    if 0x200c != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+        return Err(ContextRuleError::NotApplicable);
     }
 
-    let mut prev = before(s, offset).ok_or(Error::Undefined)?;
+    let mut prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
     let mut cp = prev as u32;
     if common::is_virama(cp) {
         return Ok(true);
@@ -74,7 +83,7 @@ pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, Error> 
     // Check all transparent joining type code points before `U+200C` (0 or more)
     let mut i = offset - 1;
     while common::is_transparent(cp) {
-        prev = before(s, i).ok_or(Error::Undefined)?;
+        prev = before(s, i).ok_or(ContextRuleError::Undefined)?;
         cp = prev as u32;
         i -= 1;
     }
@@ -85,11 +94,11 @@ pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, Error> 
     }
 
     // Check all transparent joining type code points following `U+200C` (0 or more)
-    let mut next = after(s, offset).ok_or(Error::Undefined)?;
+    let mut next = after(s, offset).ok_or(ContextRuleError::Undefined)?;
     cp = next as u32;
     i = offset + 1;
     while common::is_transparent(cp) {
-        next = after(s, i).ok_or(Error::Undefined)?;
+        next = after(s, i).ok_or(ContextRuleError::Undefined)?;
         cp = next as u32;
         i += 1;
     }
@@ -108,11 +117,11 @@ pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, Error> 
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits a ZERO WIDTH JOINER `U+200D`.
-pub fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, Error> {
-    if 0x200d != s.chars().nth(offset).ok_or(Error::Undefined)? as u32 {
-        return Err(Error::NotApplicable);
+pub fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+    if 0x200d != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+        return Err(ContextRuleError::NotApplicable);
     }
-    let prev = before(s, offset).ok_or(Error::Undefined)?;
+    let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(common::is_virama(prev as u32))
 }
 
@@ -125,12 +134,12 @@ pub fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, Error> {
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits a MIDDLE DOT `U+00B7`.
-pub fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, Error> {
-    if 0x00b7 != s.chars().nth(offset).ok_or(Error::Undefined)? as u32 {
-        return Err(Error::NotApplicable);
+pub fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+    if 0x00b7 != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+        return Err(ContextRuleError::NotApplicable);
     }
-    let prev = before(s, offset).ok_or(Error::Undefined)?;
-    let next = after(s, offset).ok_or(Error::Undefined)?;
+    let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
+    let next = after(s, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(prev as u32 == 0x006c && next as u32 == 0x006c)
 }
 
@@ -142,11 +151,14 @@ pub fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, Error> {
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits GREEK LOWER NUMERAL SIGN `U+0375`.
-pub fn rule_greek_lower_numeral_sign_keraia(s: &str, offset: usize) -> Result<bool, Error> {
-    if 0x0375 != s.chars().nth(offset).ok_or(Error::Undefined)? as u32 {
-        return Err(Error::NotApplicable);
+pub fn rule_greek_lower_numeral_sign_keraia(
+    s: &str,
+    offset: usize,
+) -> Result<bool, ContextRuleError> {
+    if 0x0375 != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+        return Err(ContextRuleError::NotApplicable);
     }
-    let after = after(s, offset).ok_or(Error::Undefined)?;
+    let after = after(s, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(common::is_greek(after as u32))
 }
 
@@ -159,12 +171,12 @@ pub fn rule_greek_lower_numeral_sign_keraia(s: &str, offset: usize) -> Result<bo
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits HEBREW PUNCTUATION `GERESH` or `GERSHAYIM` (`U+05F3`, `U+05F4`).
-pub fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, Error> {
-    let cp = s.chars().nth(offset).ok_or(Error::Undefined)? as u32;
+pub fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
     if cp != 0x05f3 && cp != 0x05f4 {
-        return Err(Error::NotApplicable);
+        return Err(ContextRuleError::NotApplicable);
     }
-    let prev = before(s, offset).ok_or(Error::Undefined)?;
+    let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(common::is_hebrew(prev as u32))
 }
 
@@ -178,9 +190,9 @@ pub fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, Error> {
 /// * `s`: String value to check
 /// # Returns
 /// Return true if context permits KATAKANA MIDDLE DOT `U+30FB`.
-pub fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, Error> {
-    if 0x30fb != s.chars().nth(offset).ok_or(Error::Undefined)? as u32 {
-        return Err(Error::NotApplicable);
+pub fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+    if 0x30fb != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+        return Err(ContextRuleError::NotApplicable);
     }
     for c in s.chars() {
         let cp = c as u32;
@@ -199,10 +211,10 @@ pub fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, Error> {
 /// * `s`: String value to check
 /// # Returns
 /// Return true if context permits ARABIC-INDIC DIGITS (`U+0660`..`U+0669`).
-pub fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, Error> {
-    let cp = s.chars().nth(offset).ok_or(Error::Undefined)? as u32;
+pub fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
     if !(0x0660..=0x0669).contains(&cp) {
-        return Err(Error::NotApplicable);
+        return Err(ContextRuleError::NotApplicable);
     }
     let range = 0x06f0..=0x06f9;
     for c in s.chars() {
@@ -221,10 +233,10 @@ pub fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, Error> {
 /// * `s`: String value to check
 /// # Returns
 /// Return true if context permits EXTENDED ARABIC-INDIC DIGITS (`U+06F0`..`U+06F9`).
-pub fn rule_extended_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, Error> {
-    let cp = s.chars().nth(offset).ok_or(Error::Undefined)? as u32;
+pub fn rule_extended_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
     if !(0x06f0..=0x06f9).contains(&cp) {
-        return Err(Error::NotApplicable);
+        return Err(ContextRuleError::NotApplicable);
     }
     let range = 0x0660..=0x0669;
     for c in s.chars() {
@@ -237,7 +249,7 @@ pub fn rule_extended_arabic_indic_digits(s: &str, offset: usize) -> Result<bool,
 }
 
 /// Describes a context rule function
-pub type ContextRule = fn(s: &str, offset: usize) -> Result<bool, Error>;
+pub type ContextRule = fn(s: &str, offset: usize) -> Result<bool, ContextRuleError>;
 
 /// Gets the context rule associated to an Unicode code point.
 /// Arguments
@@ -291,18 +303,18 @@ mod tests {
         let label = "A";
         let res = rule_zero_width_nonjoiner(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "";
         let res = rule_zero_width_nonjoiner(label, 2);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Before(`FirstChar`) evaluates to Undefined.
         let label = "\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Before(`cp`) equal to `Virama` then true
         let label = "\u{94d}\u{200c}";
@@ -322,12 +334,12 @@ mod tests {
         assert_eq!(res.is_ok(), true);
         assert_eq!(res.unwrap(), false);
 
-        // Miss `Joining_Type`:`{L,D}` before Transparent then Error(Undefined)
+        // Miss `Joining_Type`:`{L,D}` before Transparent then undefined error
         // "(`Joining_Type`:T)`U+200C`"
         let label = "\u{5bf}\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 1);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // No `Joining_Type`:`{L,D}` before Transparent then false
         // 'A'(`Joining_Type`:T)`U+200C`
@@ -341,14 +353,14 @@ mod tests {
         let label = "\u{a872}\u{5bf}\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 2);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // First part of the `regExp` is complete but fails to meet the second one
         // (`Joining_Type`:L)(`Joining_Type`:T)`U+200C`(`Joining_Type`:T)
         let label = "\u{a872}\u{5bf}\u{200c}\u{5bf}";
         let res = rule_zero_width_nonjoiner(label, 2);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Label matches `RegExp`
         // (`Joining_Type`:L)(`Joining_Type`:T)`U+200C`(`Joining_Type`:T)(`Joining_Type`:R)
@@ -403,22 +415,22 @@ mod tests {
         let label = "";
         let res = rule_zero_width_joiner(label, 3);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_zero_width_joiner(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{200d}";
         let res = rule_zero_width_joiner(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{200d}A";
         let res = rule_zero_width_joiner(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // `Canonical_Combining_Class`(Before(`cp`)) .`eq`.  `Virama` Then True
         let label = "\u{94d}\u{200d}";
@@ -444,22 +456,22 @@ mod tests {
         let label = "";
         let res = rule_middle_dot(label, 3);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_middle_dot(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{00b7}";
         let res = rule_middle_dot(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{006c}\u{00b7}";
         let res = rule_middle_dot(label, 1);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{006c}\u{00b7}\u{006c}";
         let res = rule_middle_dot(label, 1);
@@ -482,17 +494,17 @@ mod tests {
         let label = "";
         let res = rule_greek_lower_numeral_sign_keraia(label, 3);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_greek_lower_numeral_sign_keraia(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{0375}";
         let res = rule_greek_lower_numeral_sign_keraia(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Script(After(`cp`)) .`eq`.  Greek Then True
         let label = "\u{0375}\u{0384}";
@@ -517,17 +529,17 @@ mod tests {
         let label = "";
         let res = rule_hebrew_punctuation(label, 3);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_hebrew_punctuation(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{05F3}";
         let res = rule_hebrew_punctuation(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // [`GERESH`] Script(Before(`cp`)) .`eq`.  Hebrew Then True;
         let label = "\u{5f0}\u{05F3}";
@@ -559,12 +571,12 @@ mod tests {
         let label = "";
         let res = rule_katakana_middle_dot(label, 3);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_katakana_middle_dot(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{30fb}";
         let res = rule_katakana_middle_dot(label, 0);
@@ -600,17 +612,17 @@ mod tests {
         let label = "";
         let res = rule_arabic_indic_digits(label, 3);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{065f}";
         let res = rule_arabic_indic_digits(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{066a}";
         let res = rule_arabic_indic_digits(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         // Check values in range [`0x0660`..`0x0669`]
         let label = "\u{0660}";
@@ -661,17 +673,17 @@ mod tests {
         let label = "";
         let res = rule_extended_arabic_indic_digits(label, 3);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::Undefined);
+        assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{06ef}";
         let res = rule_extended_arabic_indic_digits(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{06fa}";
         let res = rule_extended_arabic_indic_digits(label, 0);
         assert_eq!(res.is_err(), true);
-        assert_eq!(res.unwrap_err(), Error::NotApplicable);
+        assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         // Check values in range [`0x06f0`..`0x06f9`]
         let label = "\u{06f0}";

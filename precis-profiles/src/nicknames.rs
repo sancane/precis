@@ -134,8 +134,9 @@ impl Nickname {
         T: Into<Cow<'a, str>>,
     {
         let s = s.into();
-        let s = (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)?;
-        self.class.allows(&s).then(|| s).ok_or(Error::Disallowed)
+        let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
+        self.class.allows(&s)?;
+        Ok(s)
     }
 
     fn apply_enforce_rules<'a, T>(&self, s: T) -> Result<Cow<'a, str>, Error>
@@ -145,7 +146,7 @@ impl Nickname {
         let s = self.apply_prepare_rules(s)?;
         let s = self.additional_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        (!s.is_empty()).then(|| s).ok_or(Error::Disallowed)
+        (!s.is_empty()).then(|| s).ok_or(Error::Invalid)
     }
 
     fn apply_compare_rules<'a, T>(&self, s: T) -> Result<Cow<'a, str>, Error>
@@ -227,6 +228,7 @@ impl PrecisFastInvocation for Nickname {
 #[cfg(test)]
 mod nickname {
     use crate::nicknames::*;
+    use precis_core::{CodepointInfo, DerivedPropertyValue};
 
     #[test]
     fn test_find_disallowed_space() {
@@ -276,7 +278,7 @@ mod nickname {
         let profile = Nickname::new();
 
         let res = profile.prepare("");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(res, Err(Error::Invalid));
 
         let res = profile.prepare("Foo");
         assert_eq!(res, Ok(Cow::from("Foo")));
@@ -310,7 +312,14 @@ mod nickname {
 
         // Control characters like TAB `U+0009` are disallowed
         let res = profile.prepare("simple;\u{0009} test");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(
+            res,
+            Err(Error::BadCodepoint(CodepointInfo::new(
+                0x0009,
+                7,
+                DerivedPropertyValue::Disallowed
+            )))
+        );
     }
 
     #[test]
@@ -318,7 +327,7 @@ mod nickname {
         let profile = Nickname::new();
 
         let res = profile.enforce("");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(res, Err(Error::Invalid));
 
         let res = profile.enforce("Foo");
         assert_eq!(res, Ok(Cow::from("Foo")));
@@ -352,7 +361,14 @@ mod nickname {
 
         // Control characters like TAB `U+0009` are disallowed
         let res = profile.enforce("simple;\u{0009} test");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(
+            res,
+            Err(Error::BadCodepoint(CodepointInfo::new(
+                0x0009,
+                7,
+                DerivedPropertyValue::Disallowed
+            )))
+        );
     }
 
     #[test]
@@ -360,13 +376,13 @@ mod nickname {
         let profile = Nickname::new();
 
         let res = profile.compare("", "");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(res, Err(Error::Invalid));
 
         let res = profile.compare("Foo", "");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(res, Err(Error::Invalid));
 
         let res = profile.compare("", "foo");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(res, Err(Error::Invalid));
 
         let res = profile.compare("Foo", "foo");
         assert_eq!(res, Ok(true));
@@ -400,6 +416,13 @@ mod nickname {
 
         // Control characters like TAB `U+0009` are disallowed
         let res = profile.compare("simple;\u{0009} test", "simple;\u{0009} test");
-        assert_eq!(res, Err(Error::Disallowed));
+        assert_eq!(
+            res,
+            Err(Error::BadCodepoint(CodepointInfo::new(
+                0x0009,
+                7,
+                DerivedPropertyValue::Disallowed
+            )))
+        );
     }
 }
