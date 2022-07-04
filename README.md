@@ -48,11 +48,6 @@ internationalized strings.
 ### Example
 
 ```rust
-use precis_core::Error;
-use precis_core::profile::Profile;
-use precis_profiles::OpaqueString;
-use std::borrow::Cow;
-
 // create OpaqueString profile
 let profile = OpaqueString::new();
 
@@ -80,20 +75,12 @@ Profiles usually use a static instance allocated with
 ### Example
 
 ```rust
-extern crate precis_profiles;
-
-use precis_core::profile::PrecisFastInvocation;
-use precis_profiles::Nickname;
-use std::borrow::Cow;
-
-fn main() {
-   assert_eq!(Nickname::prepare("Guybrush Threepwood"),
-     Ok(Cow::from("Guybrush Threepwood")));
-   assert_eq!(Nickname::enforce("   Guybrush     Threepwood  "),
-     Ok(Cow::from("Guybrush Threepwood")));
-   assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
-     "guybrush threepwood"), Ok(true));
-}
+assert_eq!(Nickname::prepare("Guybrush Threepwood"),
+  Ok(Cow::from("Guybrush Threepwood")));
+assert_eq!(Nickname::enforce("   Guybrush     Threepwood  "),
+  Ok(Cow::from("Guybrush Threepwood")));
+assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
+  "guybrush threepwood"), Ok(true));
 ```
 
 # Common features

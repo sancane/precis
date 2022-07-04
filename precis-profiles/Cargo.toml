@@ -1,6 +1,6 @@
 [package]
 name = "precis-profiles"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Santiago Carot-Nemesio <sancane@gmail.com"]
 description = """
 Implementation of the PRECIS Framework: Preparation, Enforcement,
@@ -22,7 +22,7 @@ precis-tools = { path = "../precis-tools", version = "0.1.4" }
 
 [dependencies]
 lazy_static = "1.4.0"
-precis-core = { path = "../precis-core", version = "0.1.4" }
+precis-core = { path = "../precis-core", version = "0.1.5" }
 unicode-normalization = "0.1.19"
 
 [features]

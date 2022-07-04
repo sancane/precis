@@ -13,11 +13,10 @@ use std::borrow::Cow;
 /// section for more details.
 /// # Example
 /// ```rust
-/// use precis_core::Error;
-/// use precis_core::profile::Profile;
-/// use precis_profiles::OpaqueString;
-/// use std::borrow::Cow;
-///
+/// # use precis_core::Error;
+/// # use precis_core::profile::Profile;
+/// # use precis_profiles::OpaqueString;
+/// # use std::borrow::Cow;
 /// // create OpaqueString profile
 /// let profile = OpaqueString::new();
 ///
@@ -53,21 +52,31 @@ impl Default for OpaqueString {
 }
 
 impl Profile for OpaqueString {
-    fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn prepare<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
+        let s = s.into();
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(s)?;
-        Ok(s.into())
+        self.class.allows(s.as_ref())?;
+        Ok(s)
     }
 
-    fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn enforce<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         let s = self.prepare(s)?;
         let s = self.additional_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
         (!s.is_empty()).then(|| s).ok_or(Error::Invalid)
     }
 
-    fn compare(&self, s1: &str, s2: &str) -> Result<bool, Error> {
-        Ok(self.enforce(s1)? == self.enforce(s2)?)
+    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
+        Ok(self.enforce(s1.as_ref())? == self.enforce(s2.as_ref())?)
     }
 }
 
@@ -110,15 +119,24 @@ fn get_opaque_string_profile() -> &'static OpaqueString {
 }
 
 impl PrecisFastInvocation for OpaqueString {
-    fn prepare(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn prepare<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_opaque_string_profile().prepare(s)
     }
 
-    fn enforce<'a>(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn enforce<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_opaque_string_profile().enforce(s)
     }
 
-    fn compare(s1: &str, s2: &str) -> Result<bool, Error> {
+    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
         get_opaque_string_profile().compare(s1, s2)
     }
 }

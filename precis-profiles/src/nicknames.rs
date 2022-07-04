@@ -98,10 +98,9 @@ where
 /// section for more details.
 /// # Example
 /// ```rust
-/// use precis_core::profile::Profile;
-/// use precis_profiles::Nickname;
-/// use std::borrow::Cow;
-///
+/// # use precis_core::profile::Profile;
+/// # use precis_profiles::Nickname;
+/// # use std::borrow::Cow;
 /// // create Nickname profile
 /// let profile = Nickname::new();
 ///
@@ -167,17 +166,26 @@ impl Default for Nickname {
 }
 
 impl Profile for Nickname {
-    fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn prepare<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         self.apply_prepare_rules(s)
     }
 
-    fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn enforce<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         stabilize(s, |s| self.apply_enforce_rules(s))
     }
 
-    fn compare(&self, s1: &str, s2: &str) -> Result<bool, Error> {
-        Ok(stabilize(s1, |s| self.apply_compare_rules(s))?
-            == stabilize(s2, |s| self.apply_compare_rules(s))?)
+    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
+        Ok(stabilize(s1.as_ref(), |s| self.apply_compare_rules(s))?
+            == stabilize(s2.as_ref(), |s| self.apply_compare_rules(s))?)
     }
 }
 
@@ -212,15 +220,24 @@ fn get_nickname_profile() -> &'static Nickname {
 }
 
 impl PrecisFastInvocation for Nickname {
-    fn prepare(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn prepare<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_nickname_profile().prepare(s)
     }
 
-    fn enforce(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn enforce<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_nickname_profile().enforce(s)
     }
 
-    fn compare(s1: &str, s2: &str) -> Result<bool, Error> {
+    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
         get_nickname_profile().compare(s1, s2)
     }
 }
