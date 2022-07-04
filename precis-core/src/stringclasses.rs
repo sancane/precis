@@ -179,8 +179,7 @@ pub trait StringClass {
 /// [RFC 8264](https://datatracker.ietf.org/doc/html/rfc8264#section-4.2).
 /// # Example
 /// ```rust
-/// use precis_core::{DerivedPropertyValue,IdentifierClass,StringClass};
-///
+/// # use precis_core::{DerivedPropertyValue,IdentifierClass,StringClass};
 /// let id = IdentifierClass {};
 /// // character 𐍁 is OtherLetterDigits (R)
 /// assert_eq!(id.get_value_from_char('𐍁'), DerivedPropertyValue::SpecClassDis);
@@ -224,8 +223,7 @@ impl StringClass for IdentifierClass {
 /// [RFC 8264](https://datatracker.ietf.org/doc/html/rfc8264#section-4.3).
 /// # Example
 /// ```rust
-/// use precis_core::{DerivedPropertyValue,FreeformClass,StringClass};
-///
+/// # use precis_core::{DerivedPropertyValue,FreeformClass,StringClass};
 /// let ff = FreeformClass {};
 /// // character 𐍁 is OtherLetterDigits (R)
 /// assert_eq!(ff.get_value_from_char('𐍁'), DerivedPropertyValue::SpecClassPval);

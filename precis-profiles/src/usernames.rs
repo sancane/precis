@@ -62,12 +62,10 @@ where
 /// section for more details.
 /// # Example
 /// ```rust
-/// use precis_core::Error;
-/// use precis_core::{CodepointInfo, DerivedPropertyValue};
-/// use precis_core::profile::Profile;
-/// use precis_profiles::UsernameCaseMapped;
-/// use std::borrow::Cow;
-///
+/// # use precis_core::{CodepointInfo, DerivedPropertyValue, Error};
+/// # use precis_core::profile::Profile;
+/// # use precis_profiles::UsernameCaseMapped;
+/// # use std::borrow::Cow;
 /// // create UsernameCaseMapped profile
 /// let profile = UsernameCaseMapped::new();
 ///
@@ -182,12 +180,10 @@ impl PrecisFastInvocation for UsernameCaseMapped {
 /// section for more details.
 /// # Example
 /// ```rust
-/// use precis_core::Error;
-/// use precis_core::{CodepointInfo, DerivedPropertyValue};
-/// use precis_core::profile::Profile;
-/// use precis_profiles::UsernameCasePreserved;
-/// use std::borrow::Cow;
-///
+/// # use precis_core::{CodepointInfo, DerivedPropertyValue, Error};
+/// # use precis_core::profile::Profile;
+/// # use precis_profiles::UsernameCasePreserved;
+/// # use std::borrow::Cow;
 /// // create UsernameCasePreserved profile
 /// let profile = UsernameCasePreserved::new();
 ///

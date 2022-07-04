@@ -98,10 +98,9 @@ where
 /// section for more details.
 /// # Example
 /// ```rust
-/// use precis_core::profile::Profile;
-/// use precis_profiles::Nickname;
-/// use std::borrow::Cow;
-///
+/// # use precis_core::profile::Profile;
+/// # use precis_profiles::Nickname;
+/// # use std::borrow::Cow;
 /// // create Nickname profile
 /// let profile = Nickname::new();
 ///

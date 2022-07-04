@@ -13,11 +13,10 @@ use std::borrow::Cow;
 /// section for more details.
 /// # Example
 /// ```rust
-/// use precis_core::Error;
-/// use precis_core::profile::Profile;
-/// use precis_profiles::OpaqueString;
-/// use std::borrow::Cow;
-///
+/// # use precis_core::Error;
+/// # use precis_core::profile::Profile;
+/// # use precis_profiles::OpaqueString;
+/// # use std::borrow::Cow;
 /// // create OpaqueString profile
 /// let profile = OpaqueString::new();
 ///
