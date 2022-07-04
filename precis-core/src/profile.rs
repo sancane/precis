@@ -91,7 +91,9 @@ pub trait Profile {
     /// The same string if no modification were required or a new allocated
     /// string if `s` needed further modifications as a result of applying the
     /// rules defined by this profile to prepare the string
-    fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error>;
+    fn prepare<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>;
 
     /// Applies all the rules specified for a particular string class,
     /// or profile thereof, to a single input string, for the purpose of
@@ -103,13 +105,17 @@ pub trait Profile {
     /// The same string if no modification were required or a new allocated
     /// string if `s` needed further modifications as a result of enforcing
     /// the string according to the rules defined by this profile.
-    fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error>;
+    fn enforce<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>;
 
     /// Comparison entails applying all the rules specified for a
     /// particular string class, or profile thereof, to two separate input
     /// strings, for the purpose of determining if the two strings are
     /// equivalent.
-    fn compare(&self, s1: &str, s2: &str) -> Result<bool, Error>;
+    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>;
 }
 
 /// Fast invocation trait that allows profiles to be used without providing
@@ -126,7 +132,9 @@ pub trait PrecisFastInvocation {
     /// The same string if no modification were required or a new allocated
     /// string if `s` needed further modifications as a result of applying the
     /// rules defined by this profile to prepare the string
-    fn prepare(s: &str) -> Result<Cow<'_, str>, Error>;
+    fn prepare<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>;
 
     /// Applies all rules specified for a particular string class,
     /// or profile thereof, to a single input string, for the purpose of
@@ -138,13 +146,17 @@ pub trait PrecisFastInvocation {
     /// The same string if no modification were required or a new allocated
     /// string if `s` needed further modifications as a result of enforcing
     /// the string according to the rules defined by this profile.
-    fn enforce(s: &str) -> Result<Cow<'_, str>, Error>;
+    fn enforce<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>;
 
     /// Comparison entails applying all the rules specified for a
     /// particular string class, or profile thereof, to two separate input
     /// strings, for the purpose of determining if the two strings are
     /// equivalent.
-    fn compare(s1: &str, s2: &str) -> Result<bool, Error>;
+    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>;
 }
 
 /// Apply rules until the string is stable. Some profiles, especially those
@@ -158,11 +170,12 @@ pub trait PrecisFastInvocation {
 /// The stable string after applying the rules; if the output string
 /// does not stabilize after reapplying the rules three (3) additional times
 /// after the first application, the string is rejected as invalid.
-pub fn stabilize<'a, F>(s: &'a str, f: F) -> Result<Cow<'a, str>, Error>
+pub fn stabilize<'a, F, S>(s: S, f: F) -> Result<Cow<'a, str>, Error>
 where
+    S: Into<Cow<'a, str>>,
     F: for<'b> Fn(&'b str) -> Result<Cow<'b, str>, Error>,
 {
-    let mut c = Cow::from(s);
+    let mut c = s.into();
     for _i in 0..=2 {
         let tmp = f(&c)?;
         if tmp == c {

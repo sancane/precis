@@ -154,8 +154,11 @@ pub trait StringClass {
     /// * `label` - string to check
     /// # Returns
     /// true if all character of `label` are allowed by the String Class.
-    fn allows(&self, label: &str) -> Result<(), Error> {
-        for (offset, c) in label.chars().enumerate() {
+    fn allows<S>(&self, label: S) -> Result<(), Error>
+    where
+        S: AsRef<str>,
+    {
+        for (offset, c) in label.as_ref().chars().enumerate() {
             let val = self.get_value_from_char(c);
 
             match val {
@@ -166,7 +169,7 @@ pub trait StringClass {
                     c as u32, offset, val,
                 ))),
                 DerivedPropertyValue::ContextJ | DerivedPropertyValue::ContextO => {
-                    allowed_by_context_rule(label, val, c as u32, offset)
+                    allowed_by_context_rule(label.as_ref(), val, c as u32, offset)
                 }
             }?
         }

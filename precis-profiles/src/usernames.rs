@@ -102,14 +102,20 @@ impl Default for UsernameCaseMapped {
 }
 
 impl Profile for UsernameCaseMapped {
-    fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn prepare<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         let s = self.width_mapping_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
         self.class.allows(&s)?;
         Ok(s)
     }
 
-    fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn enforce<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         let s = self.prepare(s)?;
         let s = self.case_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
@@ -117,8 +123,11 @@ impl Profile for UsernameCaseMapped {
         directionality_rule(s)
     }
 
-    fn compare(&self, s1: &str, s2: &str) -> Result<bool, Error> {
-        Ok(self.enforce(s1)? == self.enforce(s2)?)
+    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
+        Ok(self.enforce(s1.as_ref())? == self.enforce(s2.as_ref())?)
     }
 }
 
@@ -160,15 +169,24 @@ fn get_username_case_mapped_profile() -> &'static UsernameCaseMapped {
 }
 
 impl PrecisFastInvocation for UsernameCaseMapped {
-    fn prepare(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn prepare<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_username_case_mapped_profile().prepare(s)
     }
 
-    fn enforce(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn enforce<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_username_case_mapped_profile().enforce(s)
     }
 
-    fn compare(s1: &str, s2: &str) -> Result<bool, Error> {
+    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
         get_username_case_mapped_profile().compare(s1, s2)
     }
 }
@@ -220,22 +238,31 @@ impl Default for UsernameCasePreserved {
 }
 
 impl Profile for UsernameCasePreserved {
-    fn prepare<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn prepare<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         let s = self.width_mapping_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
         self.class.allows(&s)?;
         Ok(s)
     }
 
-    fn enforce<'a>(&self, s: &'a str) -> Result<Cow<'a, str>, Error> {
+    fn enforce<'a, S>(&self, s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         let s = self.prepare(s)?;
         let s = self.normalization_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
         self.directionality_rule(s)
     }
 
-    fn compare(&self, s1: &str, s2: &str) -> Result<bool, Error> {
-        Ok(self.enforce(s1)? == self.enforce(s2)?)
+    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
+        Ok(self.enforce(s1.as_ref())? == self.enforce(s2.as_ref())?)
     }
 }
 
@@ -270,15 +297,24 @@ fn get_username_case_preserved_profile() -> &'static UsernameCasePreserved {
 }
 
 impl PrecisFastInvocation for UsernameCasePreserved {
-    fn prepare(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn prepare<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_username_case_preserved_profile().prepare(s)
     }
 
-    fn enforce(s: &str) -> Result<Cow<'_, str>, Error> {
+    fn enforce<'a, S>(s: S) -> Result<Cow<'a, str>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
         get_username_case_preserved_profile().enforce(s)
     }
 
-    fn compare(s1: &str, s2: &str) -> Result<bool, Error> {
+    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    where
+        S: AsRef<str>,
+    {
         get_username_case_preserved_profile().compare(s1, s2)
     }
 }
