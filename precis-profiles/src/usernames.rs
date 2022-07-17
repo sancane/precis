@@ -123,9 +123,10 @@ impl Profile for UsernameCaseMapped {
         directionality_rule(s)
     }
 
-    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         Ok(self.enforce(s1.as_ref())? == self.enforce(s2.as_ref())?)
     }
@@ -183,9 +184,10 @@ impl PrecisFastInvocation for UsernameCaseMapped {
         get_username_case_mapped_profile().enforce(s)
     }
 
-    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         get_username_case_mapped_profile().compare(s1, s2)
     }
@@ -258,9 +260,10 @@ impl Profile for UsernameCasePreserved {
         self.directionality_rule(s)
     }
 
-    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         Ok(self.enforce(s1.as_ref())? == self.enforce(s2.as_ref())?)
     }
@@ -311,9 +314,10 @@ impl PrecisFastInvocation for UsernameCasePreserved {
         get_username_case_preserved_profile().enforce(s)
     }
 
-    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         get_username_case_preserved_profile().compare(s1, s2)
     }

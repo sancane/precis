@@ -113,9 +113,10 @@ pub trait Profile {
     /// particular string class, or profile thereof, to two separate input
     /// strings, for the purpose of determining if the two strings are
     /// equivalent.
-    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>;
+        A: AsRef<str>,
+        B: AsRef<str>;
 }
 
 /// Fast invocation trait that allows profiles to be used without providing
@@ -154,9 +155,10 @@ pub trait PrecisFastInvocation {
     /// particular string class, or profile thereof, to two separate input
     /// strings, for the purpose of determining if the two strings are
     /// equivalent.
-    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>;
+        A: AsRef<str>,
+        B: AsRef<str>;
 }
 
 /// Apply rules until the string is stable. Some profiles, especially those
