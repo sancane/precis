@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! precis-profiles = "0.1.5"
+//! precis-profiles = "0.1.6"
 //! ```
 
 #![deny(missing_docs)]

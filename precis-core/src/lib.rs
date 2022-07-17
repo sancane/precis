@@ -13,7 +13,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! precis-core = "0.1.5"
+//! precis-core = "0.1.6"
 //! ```
 
 #![deny(missing_docs)]
