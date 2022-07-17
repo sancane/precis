@@ -72,9 +72,10 @@ impl Profile for OpaqueString {
         (!s.is_empty()).then(|| s).ok_or(Error::Invalid)
     }
 
-    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         Ok(self.enforce(s1.as_ref())? == self.enforce(s2.as_ref())?)
     }
@@ -133,9 +134,10 @@ impl PrecisFastInvocation for OpaqueString {
         get_opaque_string_profile().enforce(s)
     }
 
-    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         get_opaque_string_profile().compare(s1, s2)
     }

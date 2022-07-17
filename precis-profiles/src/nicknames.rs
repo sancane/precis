@@ -180,9 +180,10 @@ impl Profile for Nickname {
         stabilize(s, |s| self.apply_enforce_rules(s))
     }
 
-    fn compare<S>(&self, s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         Ok(stabilize(s1.as_ref(), |s| self.apply_compare_rules(s))?
             == stabilize(s2.as_ref(), |s| self.apply_compare_rules(s))?)
@@ -234,9 +235,10 @@ impl PrecisFastInvocation for Nickname {
         get_nickname_profile().enforce(s)
     }
 
-    fn compare<S>(s1: S, s2: S) -> Result<bool, Error>
+    fn compare<A, B>(s1: A, s2: B) -> Result<bool, Error>
     where
-        S: AsRef<str>,
+        A: AsRef<str>,
+        B: AsRef<str>,
     {
         get_nickname_profile().compare(s1, s2)
     }
