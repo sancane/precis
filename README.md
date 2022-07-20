@@ -1,4 +1,5 @@
 ![Build](https://github.com/sancane/precis/actions/workflows/rust.yml/badge.svg)
+[![codecov](https://codecov.io/gh/sancane/precis/branch/main/graph/badge.svg?token=EZM6KCSLZC)](https://codecov.io/gh/sancane/precis)
 
 # Rust PRECIS Framework library
 
