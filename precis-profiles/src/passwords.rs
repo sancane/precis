@@ -58,7 +58,7 @@ impl Profile for OpaqueString {
     {
         let s = s.into();
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(s.as_ref())?;
+        self.class.allows(&s)?;
         Ok(s)
     }
 
@@ -114,7 +114,7 @@ impl Rules for OpaqueString {
 
 fn get_opaque_string_profile() -> &'static OpaqueString {
     lazy_static! {
-        static ref OPAQUE_STRING: OpaqueString = OpaqueString::new();
+        static ref OPAQUE_STRING: OpaqueString = OpaqueString::default();
     }
     &OPAQUE_STRING
 }
@@ -140,5 +140,24 @@ impl PrecisFastInvocation for OpaqueString {
         B: AsRef<str>,
     {
         get_opaque_string_profile().compare(s1, s2)
+    }
+}
+
+#[cfg(test)]
+mod nickname {
+    use crate::passwords::*;
+
+    #[test]
+    fn opaque_string_profile() {
+        let profile = OpaqueString::new();
+
+        let res = profile.prepare("πßå");
+        assert_eq!(res, Ok(Cow::from("πßå")));
+
+        let res = profile.enforce("πßå");
+        assert_eq!(res, Ok(Cow::from("πßå")));
+
+        let res = profile.compare("Secret", "Secret");
+        assert_eq!(res, Ok(true));
     }
 }

@@ -1,5 +1,6 @@
 ![Build](https://github.com/sancane/precis/actions/workflows/rust.yml/badge.svg)
 [![codecov](https://codecov.io/gh/sancane/precis/branch/main/graph/badge.svg?token=EZM6KCSLZC)](https://codecov.io/gh/sancane/precis)
+[![Rust Report Card](https://rust-reportcard.xuri.me/badge/github.com/sancane/precis)](https://rust-reportcard.xuri.me/report/github.com/sancane/precis)
 
 # Rust PRECIS Framework library
 
@@ -12,6 +13,7 @@ This workspace implements the next crates:
 ## [precis-tools](precis-tools/README.md)
 
 [![Docs](https://docs.rs/precis-tools/badge.svg)](https://docs.rs/precis-tools)
+[![Crates.io](https://img.shields.io/crates/v/precis-tools)](https://crates.io/crates/precis-tools)
 
 This crate contains all the tools and parsers to generate PRECIS
 tables from the Unicode Character Database [`UCD`](https://unicode.org).
@@ -24,6 +26,7 @@ parse them and generate Rust code.
 ## [precis-core](precis-core/README.md)
 
 [![Docs](https://docs.rs/precis-core/badge.svg)](https://docs.rs/precis-core)
+[![Crates.io](https://img.shields.io/crates/v/precis-core)](https://crates.io/crates/precis-core)
 
 The core library of the PRECIS Framework. The base string classes `IdentifierClass`
 and `FreeFormClass` are implemented here as defined in
@@ -34,6 +37,7 @@ You mostly won't require this crate unless you are implementing a new profile.
 ## [precis-profiles](precis-profiles/README.md)
 
 [![Docs](https://docs.rs/precis-profiles/badge.svg)](https://docs.rs/precis-profiles)
+[![Crates.io](https://img.shields.io/crates/v/precis-profiles)](https://crates.io/crates/precis-profiles)
 
 This crate implements the next PRECIS profiles:
  * [rfc8265](https://datatracker.ietf.org/doc/html/rfc8265).
