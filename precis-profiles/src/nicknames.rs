@@ -6,6 +6,16 @@ use precis_core::Error;
 use precis_core::{FreeformClass, StringClass};
 use std::borrow::Cow;
 
+// This function is used to check whether the input label will require any
+// modifications to apply the additional mapping rule for Nickname profile or not.
+// It makes a quick check to see if we can avoid making a copy of the input label,
+// for such purpose, it processes characters starting from the beginning of
+// the label looking for spaces characters. It stops processing characters
+// as soon as a non-ASCII character is found and returns its index. If it is a
+// ASCII character, it processes the next character and if it is a space separator
+// stops processing more characters returning the position of the next separator,
+// otherwise it continues iterating over the label. If not modifications will be
+// required, then the function will return None
 fn find_disallowed_space(label: &str) -> Option<usize> {
     let mut begin = true;
     let mut prev_space = false;
@@ -40,14 +50,31 @@ fn find_disallowed_space(label: &str) -> Option<usize> {
         }
     }
 
-    // last character is a space
     if let Some(common::SPACE) = last_c {
-        return Some(offset - 1);
+        // last character is a space
+        Some(offset)
+    } else {
+        // The string might have ASCII separators, but it does not contain
+        // more than one spaces in a row and it does not ends with a space
+        None
     }
-
-    None
 }
 
+// Additional Mapping Rule: The additional mapping rule consists of
+// the following sub-rules.
+//  a. Map any instances of non-ASCII space to SPACE (`U+0020`); a
+//     non-ASCII space is any Unicode code point having a general
+//     category of "Zs", naturally with the exception of SPACE
+//     (`U+0020`).  (The inclusion of only ASCII space prevents
+//     confusion with various non-ASCII space code points, many of
+//     which are difficult to reproduce across different input
+//     methods.)
+//
+//  b. Remove any instances of the ASCII space character at the
+//     beginning or end of a nickname.
+//
+//  c. Map interior sequences of more than one ASCII space character
+//     to a single ASCII space character.
 fn trim_spaces<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
@@ -215,7 +242,7 @@ impl Rules for Nickname {
 
 fn get_nickname_profile() -> &'static Nickname {
     lazy_static! {
-        static ref NICKNAME: Nickname = Nickname::new();
+        static ref NICKNAME: Nickname = Nickname::default();
     }
     &NICKNAME
 }
@@ -252,6 +279,8 @@ mod nickname {
     fn test_find_disallowed_space() {
         assert_eq!(find_disallowed_space(""), None);
         assert_eq!(find_disallowed_space("test"), None);
+        assert_eq!(find_disallowed_space("test "), Some(4));
+        assert_eq!(find_disallowed_space("test good"), None);
 
         // Two ASCII spaces in a row
         assert_eq!(find_disallowed_space("  test"), Some(0));
@@ -261,6 +290,7 @@ mod nickname {
         assert_eq!(find_disallowed_space(" test"), Some(0));
 
         // Non ASCII separator
+        assert_eq!(find_disallowed_space("\u{00a0}test"), Some(0));
         assert_eq!(find_disallowed_space("te\u{00a0}st"), Some(2));
         assert_eq!(find_disallowed_space("test\u{00a0}"), Some(4));
     }
@@ -268,6 +298,12 @@ mod nickname {
     #[test]
     fn test_trim_spaces() {
         // Check ASCII spaces
+        assert_eq!(trim_spaces("  "), Ok(Cow::from("")));
+        assert_eq!(trim_spaces(" test"), Ok(Cow::from("test")));
+        assert_eq!(trim_spaces("test "), Ok(Cow::from("test")));
+
+        assert_eq!(trim_spaces("hello  world"), Ok(Cow::from("hello world")));
+
         assert_eq!(trim_spaces(""), Ok(Cow::from("")));
         assert_eq!(trim_spaces(" test"), Ok(Cow::from("test")));
         assert_eq!(trim_spaces("test "), Ok(Cow::from("test")));
@@ -289,5 +325,19 @@ mod nickname {
             trim_spaces("\u{205f} hello \u{205f} world \u{205f} "),
             Ok(Cow::from("hello world"))
         );
+    }
+
+    #[test]
+    fn nick_name_profile() {
+        let profile = Nickname::new();
+
+        let res = profile.prepare("Foo Bar");
+        assert_eq!(res, Ok(Cow::from("Foo Bar")));
+
+        let res = profile.enforce("Foo Bar");
+        assert_eq!(res, Ok(Cow::from("Foo Bar")));
+
+        let res = profile.compare("Foo Bar", "foo bar");
+        assert_eq!(res, Ok(true));
     }
 }

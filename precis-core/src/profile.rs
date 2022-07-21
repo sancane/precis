@@ -193,3 +193,42 @@ where
     // The string did not stabilized after applying the rules three times.
     Err(Error::Invalid)
 }
+
+#[cfg(test)]
+mod profiles {
+    use super::*;
+
+    #[derive(Default, Debug)]
+    struct TestDefaultRule {}
+    impl Rules for TestDefaultRule {}
+
+    #[test]
+    fn test_default_rule() {
+        let rule = TestDefaultRule::default();
+
+        assert_eq!(
+            rule.width_mapping_rule("Test"),
+            Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
+        );
+
+        assert_eq!(
+            rule.additional_mapping_rule("Test"),
+            Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
+        );
+
+        assert_eq!(
+            rule.case_mapping_rule("Test"),
+            Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
+        );
+
+        assert_eq!(
+            rule.normalization_rule("Test"),
+            Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
+        );
+
+        assert_eq!(
+            rule.directionality_rule("Test"),
+            Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
+        );
+    }
+}

@@ -120,7 +120,7 @@ impl Profile for UsernameCaseMapped {
         let s = self.case_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        directionality_rule(s)
+        self.directionality_rule(s)
     }
 
     fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
@@ -164,7 +164,7 @@ impl Rules for UsernameCaseMapped {
 
 fn get_username_case_mapped_profile() -> &'static UsernameCaseMapped {
     lazy_static! {
-        static ref USERNAME_CASE_MAPPED: UsernameCaseMapped = UsernameCaseMapped::new();
+        static ref USERNAME_CASE_MAPPED: UsernameCaseMapped = UsernameCaseMapped::default();
     }
     &USERNAME_CASE_MAPPED
 }
@@ -294,7 +294,8 @@ impl Rules for UsernameCasePreserved {
 
 fn get_username_case_preserved_profile() -> &'static UsernameCasePreserved {
     lazy_static! {
-        static ref USERNAME_CASE_PRESERVED: UsernameCasePreserved = UsernameCasePreserved::new();
+        static ref USERNAME_CASE_PRESERVED: UsernameCasePreserved =
+            UsernameCasePreserved::default();
     }
     &USERNAME_CASE_PRESERVED
 }
@@ -370,5 +371,33 @@ mod profile_rules {
         // Invalid label
         let res = directionality_rule("\u{05be}Hello");
         assert_eq!(res, Err(Error::Invalid));
+    }
+
+    #[test]
+    fn username_name_case_mapped_profile() {
+        let profile = UsernameCaseMapped::new();
+
+        let res = profile.prepare("XxXxX");
+        assert_eq!(res, Ok(Cow::from("XxXxX")));
+
+        let res = profile.enforce("XxXxX");
+        assert_eq!(res, Ok(Cow::from("xxxxx")));
+
+        let res = profile.compare("heLLo", "Hello");
+        assert_eq!(res, Ok(true));
+    }
+
+    #[test]
+    fn username_name_case_preserved_profile() {
+        let profile = UsernameCasePreserved::new();
+
+        let res = profile.prepare("XxXxX");
+        assert_eq!(res, Ok(Cow::from("XxXxX")));
+
+        let res = profile.enforce("XxXxX");
+        assert_eq!(res, Ok(Cow::from("XxXxX")));
+
+        let res = profile.compare("Hello", "Hello");
+        assert_eq!(res, Ok(true));
     }
 }
