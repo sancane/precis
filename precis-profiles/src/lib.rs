@@ -21,16 +21,6 @@
 //! assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
 //!   "guybrush threepwood"), Ok(true));
 //! ```
-//!
-//! # `crates.io`
-//!
-//! You can use this package in your project by adding the following
-//! to your `Cargo.toml`:
-//!
-//! ```toml
-//! [dependencies]
-//! precis-profiles = "0.1.6"
-//! ```
 
 #![deny(missing_docs)]
 

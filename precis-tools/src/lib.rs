@@ -1,13 +1,4 @@
 //! Tools and parsers to generate PRECIS tables from the Unicode Character Database (`UCD`)
-//! # `crates.io`
-//!
-//! You can use this package in your project by adding the following
-//! to your `Cargo.toml`:
-//!
-//! ```toml
-//! [dependencies]
-//! precis-tools = "0.1.4"
-//! ```
 //! This crate is generally used to generate code to be used by other crates such as
 //! [precis-core](https://docs.rs/precis-core) or [precis-profiles](https://docs.rs/precis-profiles).
 //! Consider adding this in your [build-dependencies](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#build-dependencies) section instead.
