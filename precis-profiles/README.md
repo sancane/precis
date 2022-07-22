@@ -1,4 +1,5 @@
 [![Docs](https://docs.rs/precis-profiles/badge.svg)](https://docs.rs/precis-profiles)
+[![Crates.io](https://img.shields.io/crates/v/precis-profiles)](https://crates.io/crates/precis-profiles)
 
 # precis-profiles
 
@@ -14,6 +15,7 @@ This crate implements the next PRECIS profiles:
    Preparation, Enforcement, and Comparison of Internationalized Strings
    Representing Nicknames
 
+## Examples
 ```rust
 assert_eq!(Nickname::prepare("Guybrush Threepwood"),
   Ok(Cow::from("Guybrush Threepwood")));
@@ -23,21 +25,21 @@ assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
   "guybrush threepwood"), Ok(true));
 ```
 
-## `crates.io`
+# Contributing
 
-You can use this package in your project by adding the following
-to your `Cargo.toml`:
+Patches and feedback are welcome.
 
-```toml
-[dependencies]
-precis-profiles = "0.1.6"
-```
+# Donations
 
-# Documentation
-https://docs.rs/precis-profiles
+If you find this project helpful, you may consider making a donation:
+
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/micro/1EK28M4ht6qu7xFahTxuquXPzZSjCSGVBM)](https://en.cryptobadges.io/donate/1EK28M4ht6qu7xFahTxuquXPzZSjCSGVBM)
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/micro/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)](https://en.cryptobadges.io/donate/0xefa6404e5A50774117fd6204cbD33cf4454c67Fb)
 
 # License
 
 This project is licensed under either of
-* Apache License, Version 2.0, (LICENSE-APACHE or https://www.apache.org/licenses/LICENSE-2.0)
-* MIT license (LICENSE-MIT or https://opensource.org/licenses/MIT) at your option.
+* [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+* [MIT license](https://opensource.org/licenses/MIT)
+
+[![say thanks](https://img.shields.io/badge/Say%20Thanks-👍-1EAEDB.svg)](https://github.com/sancane/precis/stargazers)

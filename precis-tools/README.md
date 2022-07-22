@@ -1,29 +1,21 @@
 [![Docs](https://docs.rs/precis-tools/badge.svg)](https://docs.rs/precis-tools)
+[![Crates.io](https://img.shields.io/crates/v/precis-tools)](https://crates.io/crates/precis-tools)
 
 # precis-tools
 
 Tools and parsers to generate PRECIS tables from the Unicode Character Database (`UCD`)
 
-# `crates.io`
-
-You can use this package in your project by adding the following
-to your `Cargo.toml`:
-
-```toml
-[dependencies]
-precis-tools = "0.1.4"
-```
-
 This crate is generally used to generate code to be used by other crates such as
 [precis-core](https://docs.rs/precis-core) or [precis-profiles](https://docs.rs/precis-profiles).
 
-Consider adding this in your build-dependencies Cargo section instead.
+# Contributing
 
-# Documentation
-https://docs.rs/precis-tools
+Patches and feedback are welcome.
 
 # License
 
 This project is licensed under either of
-* Apache License, Version 2.0, (LICENSE-APACHE or https://www.apache.org/licenses/LICENSE-2.0)
-* MIT license (LICENSE-MIT or https://opensource.org/licenses/MIT) at your option.
+* [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+* [MIT license](https://opensource.org/licenses/MIT)
+
+[![say thanks](https://img.shields.io/badge/Say%20Thanks-👍-1EAEDB.svg)](https://github.com/sancane/precis/stargazers)
