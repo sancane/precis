@@ -82,22 +82,13 @@ where
 /// // compare strings
 /// assert_eq!(profile.compare("Guybrush", "guybrush"), Ok(true));
 /// ```
-pub struct UsernameCaseMapped {
-    class: IdentifierClass,
-}
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub struct UsernameCaseMapped(IdentifierClass);
 
 impl UsernameCaseMapped {
     /// Creates a [`UsernameCaseMapped`] profile.
     pub fn new() -> Self {
-        Self {
-            class: IdentifierClass {},
-        }
-    }
-}
-
-impl Default for UsernameCaseMapped {
-    fn default() -> Self {
-        UsernameCaseMapped::new()
+        Self(IdentifierClass::default())
     }
 }
 
@@ -108,7 +99,7 @@ impl Profile for UsernameCaseMapped {
     {
         let s = self.width_mapping_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(&s)?;
+        self.0.allows(&s)?;
         Ok(s)
     }
 
@@ -220,22 +211,13 @@ impl PrecisFastInvocation for UsernameCaseMapped {
 /// // compare strings
 /// assert_eq!(profile.compare("Guybrush", "Guybrush"), Ok(true));
 /// ```
-pub struct UsernameCasePreserved {
-    class: IdentifierClass,
-}
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub struct UsernameCasePreserved(IdentifierClass);
 
 impl UsernameCasePreserved {
     /// Creates a [`UsernameCasePreserved`] profile.
     pub fn new() -> Self {
-        Self {
-            class: IdentifierClass {},
-        }
-    }
-}
-
-impl Default for UsernameCasePreserved {
-    fn default() -> Self {
-        UsernameCasePreserved::new()
+        Self(IdentifierClass::default())
     }
 }
 
@@ -246,7 +228,7 @@ impl Profile for UsernameCasePreserved {
     {
         let s = self.width_mapping_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(&s)?;
+        self.0.allows(&s)?;
         Ok(s)
     }
 

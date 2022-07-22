@@ -32,22 +32,13 @@ use std::borrow::Cow;
 /// assert_eq!(profile.compare("That’s the second biggest 🐵 I’ve ever seen!",
 ///     "That’s the second biggest 🐵 I’ve ever seen!"), Ok(true));
 /// ```
-pub struct OpaqueString {
-    class: FreeformClass,
-}
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub struct OpaqueString(FreeformClass);
 
 impl OpaqueString {
     /// Creates a [`OpaqueString`] profile.
     pub fn new() -> Self {
-        Self {
-            class: FreeformClass {},
-        }
-    }
-}
-
-impl Default for OpaqueString {
-    fn default() -> Self {
-        OpaqueString::new()
+        Self(FreeformClass::default())
     }
 }
 
@@ -58,7 +49,7 @@ impl Profile for OpaqueString {
     {
         let s = s.into();
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(&s)?;
+        self.0.allows(&s)?;
         Ok(s)
     }
 

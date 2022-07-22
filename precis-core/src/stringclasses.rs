@@ -183,7 +183,7 @@ pub trait StringClass {
 /// # Example
 /// ```rust
 /// # use precis_core::{DerivedPropertyValue,IdentifierClass,StringClass};
-/// let id = IdentifierClass {};
+/// let id = IdentifierClass::default();
 /// // character 𐍁 is OtherLetterDigits (R)
 /// assert_eq!(id.get_value_from_char('𐍁'), DerivedPropertyValue::SpecClassDis);
 /// // Character S is ASCII7 (K)
@@ -191,6 +191,7 @@ pub trait StringClass {
 /// // Character 0x1170 is OldHangulJamo (I)
 /// assert_eq!(id.get_value_from_codepoint(0x1170), DerivedPropertyValue::Disallowed);
 /// ```
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub struct IdentifierClass {}
 
 impl SpecificDerivedPropertyValue for IdentifierClass {
@@ -227,7 +228,7 @@ impl StringClass for IdentifierClass {
 /// # Example
 /// ```rust
 /// # use precis_core::{DerivedPropertyValue,FreeformClass,StringClass};
-/// let ff = FreeformClass {};
+/// let ff = FreeformClass::default();
 /// // character 𐍁 is OtherLetterDigits (R)
 /// assert_eq!(ff.get_value_from_char('𐍁'), DerivedPropertyValue::SpecClassPval);
 /// // Character S is ASCII7 (K)
@@ -235,6 +236,7 @@ impl StringClass for IdentifierClass {
 /// // Character 0x1170 is OldHangulJamo (I)
 /// assert_eq!(ff.get_value_from_codepoint(0x1170), DerivedPropertyValue::Disallowed);
 /// ```
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub struct FreeformClass {}
 
 impl SpecificDerivedPropertyValue for FreeformClass {
