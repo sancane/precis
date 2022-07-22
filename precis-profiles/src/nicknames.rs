@@ -272,7 +272,7 @@ impl PrecisFastInvocation for Nickname {
 }
 
 #[cfg(test)]
-mod nickname {
+mod test_nicknames {
     use crate::nicknames::*;
 
     #[test]

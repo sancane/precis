@@ -233,6 +233,10 @@ mod bidi {
         assert_eq!(bidi_class(BN), BidiClass::BN);
         assert_eq!(bidi_class(NSM), BidiClass::NSM);
         assert_eq!(bidi_class(WS), BidiClass::WS);
+
+        // All code points not explicitly listed `Bidi_Class`
+        // have the value `Left_To_Right` (L).
+        assert_eq!(bidi_class('\u{e0080}'), BidiClass::L);
     }
 
     #[test]
@@ -262,6 +266,9 @@ mod bidi {
         assert_eq!(satisfy_bidi_rule(""), true);
 
         // Check rule 1
+        // First character is L
+        assert_eq!(satisfy_bidi_rule(&str_chars!(L)), true);
+
         // First character is R
         assert_eq!(satisfy_bidi_rule(&str_chars!(R)), true);
         // First character is AL

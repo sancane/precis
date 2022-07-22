@@ -264,3 +264,194 @@ impl StringClass for FreeformClass {
         get_derived_property_value(cp, self)
     }
 }
+
+#[cfg(test)]
+mod test_string_classes {
+    use super::*;
+
+    pub struct TestClass {}
+
+    impl StringClass for TestClass {
+        fn get_value_from_char(&self, c: char) -> DerivedPropertyValue {
+            self.get_value_from_codepoint(c as u32)
+        }
+
+        fn get_value_from_codepoint(&self, cp: u32) -> DerivedPropertyValue {
+            match cp {
+                0x0061 => DerivedPropertyValue::PValid,        // 'a'
+                0x0062 => DerivedPropertyValue::SpecClassPval, // 'b'
+                0x0063 => DerivedPropertyValue::SpecClassDis,  // 'c'
+                0x0064 => DerivedPropertyValue::ContextJ,      // 'd'
+                0x0065 => DerivedPropertyValue::ContextO,      // 'e'
+                0x0066 => DerivedPropertyValue::Disallowed,    // 'f'
+                0x006c => DerivedPropertyValue::PValid,        // 'l'
+                0x200d => DerivedPropertyValue::ContextJ,      // ZERO WIDTH JOINER
+                0x094d => DerivedPropertyValue::PValid,        // Virama
+                0x00b7 => DerivedPropertyValue::ContextO,      // MIDDLE DOT
+                _ => DerivedPropertyValue::Unassigned,
+            }
+        }
+    }
+
+    #[test]
+    fn test_allows_code_point() {
+        let id = TestClass {};
+
+        // Test PValid
+        assert_eq!(id.allows("\u{61}"), Ok(()));
+
+        // Test SpecClassPval
+        assert_eq!(id.allows("\u{62}"), Ok(()));
+
+        // Test SpecClassDis
+        assert_eq!(
+            id.allows("\u{63}"),
+            Err(Error::BadCodepoint(CodepointInfo {
+                cp: 0x63,
+                position: 0,
+                property: DerivedPropertyValue::SpecClassDis
+            }))
+        );
+
+        // Test Disallowed
+        assert_eq!(
+            id.allows("\u{0066}"),
+            Err(Error::BadCodepoint(CodepointInfo {
+                cp: 0x66,
+                position: 0,
+                property: DerivedPropertyValue::Disallowed
+            }))
+        );
+
+        // Test Unassigned
+        assert_eq!(
+            id.allows("\u{67}"),
+            Err(Error::BadCodepoint(CodepointInfo {
+                cp: 0x67,
+                position: 0,
+                property: DerivedPropertyValue::Unassigned
+            }))
+        );
+
+        // Test ContextJ without context rule
+        assert_eq!(
+            id.allows("\u{64}"),
+            Err(Error::Unexpected(UnexpectedError::MissingContextRule(
+                CodepointInfo {
+                    cp: 0x64,
+                    position: 0,
+                    property: DerivedPropertyValue::ContextJ
+                }
+            )))
+        );
+
+        // Test ContextJ with context rule (Disallowed)
+        assert_eq!(
+            id.allows("a\u{200d}"),
+            Err(Error::BadCodepoint(CodepointInfo {
+                cp: 0x200d,
+                position: 1,
+                property: DerivedPropertyValue::ContextJ
+            }))
+        );
+
+        // Test ContextJ with context rule (Disallowed) => Unexpected Error
+        assert_eq!(
+            id.allows("\u{200d}"),
+            Err(Error::Unexpected(UnexpectedError::Undefined))
+        );
+
+        // Test ContextJ with context rule (Allowed)
+        assert_eq!(id.allows("\u{94d}\u{200d}"), Ok(()));
+
+        // Test ContextO without context rule
+        assert_eq!(
+            id.allows("\u{65}"),
+            Err(Error::Unexpected(UnexpectedError::MissingContextRule(
+                CodepointInfo {
+                    cp: 0x65,
+                    position: 0,
+                    property: DerivedPropertyValue::ContextO
+                }
+            )))
+        );
+
+        // Test ContextO with context rule (Disallowed)
+        assert_eq!(
+            id.allows("a\u{00b7}b"),
+            Err(Error::BadCodepoint(CodepointInfo {
+                cp: 0x00b7,
+                position: 1,
+                property: DerivedPropertyValue::ContextO
+            }))
+        );
+
+        // Test ContextO with context rule (Disallowed) => Unexpected Error
+        assert_eq!(
+            id.allows("\u{00b7}"),
+            Err(Error::Unexpected(UnexpectedError::Undefined))
+        );
+
+        // Test ContextO with context rule (Allowed)
+        assert_eq!(id.allows("\u{006c}\u{00b7}\u{006c}"), Ok(()));
+    }
+
+    #[test]
+    fn test_allowed_by_context_rule() {
+        // Check missing context rule
+        assert_eq!(
+            allowed_by_context_rule("test", DerivedPropertyValue::ContextO, 0xffff, 0),
+            Err(Error::Unexpected(UnexpectedError::MissingContextRule(
+                CodepointInfo {
+                    cp: 0xffff,
+                    position: 0,
+                    property: DerivedPropertyValue::ContextO
+                }
+            )))
+        );
+
+        // Check rule allowed (middle dot rule)
+        assert_eq!(
+            allowed_by_context_rule(
+                "\u{006c}\u{00b7}\u{006c}",
+                DerivedPropertyValue::ContextO,
+                0x00b7,
+                1
+            ),
+            Ok(())
+        );
+
+        // Check rule disallowed (middle dot rule)
+        assert_eq!(
+            allowed_by_context_rule(
+                "\u{006c}\u{00b7}a",
+                DerivedPropertyValue::ContextO,
+                0x00b7,
+                1
+            ),
+            Err(Error::BadCodepoint(CodepointInfo {
+                cp: 0x00b7,
+                position: 1,
+                property: DerivedPropertyValue::ContextO
+            }))
+        );
+
+        // Check rule disallowed (middle dot rule) => Unexpected error
+        assert_eq!(
+            allowed_by_context_rule("\u{00b7}", DerivedPropertyValue::ContextO, 0x00b7, 0),
+            Err(Error::Unexpected(UnexpectedError::Undefined))
+        );
+
+        // Check rule not applicable
+        assert_eq!(
+            allowed_by_context_rule("\u{0066}", DerivedPropertyValue::ContextO, 0x00b7, 0),
+            Err(Error::Unexpected(
+                UnexpectedError::ContextRuleNotApplicable(CodepointInfo {
+                    cp: 0x00b7,
+                    position: 0,
+                    property: DerivedPropertyValue::ContextO
+                })
+            ))
+        );
+    }
+}

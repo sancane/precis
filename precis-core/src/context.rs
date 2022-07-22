@@ -738,6 +738,10 @@ mod tests {
         assert_eq!(val.is_some(), true);
         assert_eq!(val.unwrap() as usize, rule_middle_dot as usize);
 
+        let val = get_context_rule(0x200c);
+        assert_eq!(val.is_some(), true);
+        assert_eq!(val.unwrap() as usize, rule_zero_width_nonjoiner as usize);
+
         let val = get_context_rule(0x0375);
         assert_eq!(val.is_some(), true);
         assert_eq!(

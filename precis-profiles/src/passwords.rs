@@ -144,7 +144,7 @@ impl PrecisFastInvocation for OpaqueString {
 }
 
 #[cfg(test)]
-mod nickname {
+mod test_passwords {
     use crate::passwords::*;
 
     #[test]
