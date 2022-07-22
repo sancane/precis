@@ -1,6 +1,6 @@
 [package]
 name = "precis-tools"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Santiago Carot-Nemesio <sancane@gmail.com>"]
 description = """
 Tools and parsers to generate PRECIS tables from the Unicode Character Database (UCD)
