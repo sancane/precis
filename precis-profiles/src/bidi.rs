@@ -23,33 +23,33 @@ pub fn has_rtl(label: &str) -> bool {
         .is_some()
 }
 
-/// From `rfc5893` Right-to-Left Scripts for Internationalized Domain Names for Applications (`IDNA`)
-/// Section 2. The `Bidi` rule
-/// The following rule, consisting of six conditions, applies to labels
-/// in `Bidi` domain names.  The requirements that this rule satisfies are
-/// described in Section 3.  All the conditions must be satisfied for
-/// the rule to be satisfied.
-///
-/// 1.  The first character must be a character with `Bidi` property `L`, `R`,
-///     or `AL`.  If it has the `R` or `AL` property, it is an `RTL` label; if it
-///     has the `L` property, it is an `LTR` label.
-///
-/// 2.  In an `RTL` label, only characters with the `Bidi` properties `R`, `AL`,
-///     `AN`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed.
-///
-/// 3.  In an `RTL` label, the end of the label must be a character with
-///     `Bidi` property `R`, `AL`, `EN`, or `AN`, followed by zero or more
-///     characters with `Bidi` property `NSM`.
-///
-/// 4.  In an `RTL` label, if an `EN` is present, no `AN` may be present, and
-///     vice versa.
-///
-/// 5.  In an `LTR` label, only characters with the `Bidi` properties `L`, `EN`,
-///     `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed.
-///
-/// 6.  In an `LTR` label, the end of the label must be a character with
-///     `Bidi` property `L` or `EN`, followed by zero or more characters with
-///     `Bidi` property `NSM`.
+// From `rfc5893` Right-to-Left Scripts for Internationalized Domain Names for Applications (`IDNA`)
+// Section 2. The `Bidi` rule
+// The following rule, consisting of six conditions, applies to labels
+// in `Bidi` domain names.  The requirements that this rule satisfies are
+// described in Section 3.  All the conditions must be satisfied for
+// the rule to be satisfied.
+//
+// 1.  The first character must be a character with `Bidi` property `L`, `R`,
+//     or `AL`.  If it has the `R` or `AL` property, it is an `RTL` label; if it
+//     has the `L` property, it is an `LTR` label.
+//
+// 2.  In an `RTL` label, only characters with the `Bidi` properties `R`, `AL`,
+//     `AN`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed.
+//
+// 3.  In an `RTL` label, the end of the label must be a character with
+//     `Bidi` property `R`, `AL`, `EN`, or `AN`, followed by zero or more
+//     characters with `Bidi` property `NSM`.
+//
+// 4.  In an `RTL` label, if an `EN` is present, no `AN` may be present, and
+//     vice versa.
+//
+// 5.  In an `LTR` label, only characters with the `Bidi` properties `L`, `EN`,
+//     `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed.
+//
+// 6.  In an `LTR` label, the end of the label must be a character with
+//     `Bidi` property `L` or `EN`, followed by zero or more characters with
+//     `Bidi` property `NSM`.
 pub fn satisfy_bidi_rule(label: &str) -> bool {
     let mut it = label.chars();
 

@@ -56,7 +56,7 @@ where
 }
 
 /// [`UsernameCaseMapped`](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3).
-/// Profile designed to deal with usernames in security and application protocols.
+/// Profile designed to deal with `usernames` in security and application protocols.
 /// It replaces the `SASLprep` profile of `Stringprep`. Look at the
 /// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.1)
 /// section for more details.
@@ -185,7 +185,7 @@ impl PrecisFastInvocation for UsernameCaseMapped {
 }
 
 /// [`UsernameCasePreserved`](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4).
-/// Profile designed to deal with usernames in security and application protocols.
+/// Profile designed to deal with `usernames` in security and application protocols.
 /// It replaces the `SASLprep` profile of `Stringprep`. Look at the
 /// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.2)
 /// section for more details.

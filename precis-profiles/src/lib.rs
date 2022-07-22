@@ -5,7 +5,7 @@
 //! This crate implements the next PRECIS profiles:
 //! * [`rfc8265`](https://datatracker.ietf.org/doc/html/rfc8265).
 //!   Preparation, Enforcement, and Comparison of Internationalized Strings
-//!   Representing Usernames and Passwords.
+//!   Representing `Usernames` and `Passwords`.
 //! * [`rfc8266`](https://datatracker.ietf.org/doc/html/rfc8266).
 //!   Preparation, Enforcement, and Comparison of Internationalized Strings
 //!   Representing Nicknames

@@ -181,15 +181,15 @@ pub fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, ContextRu
 }
 
 /// [Appendix A.7](https://datatracker.ietf.org/doc/html/rfc5892#appendix-A.7).
-/// KATAKANA MIDDLE DOT\
-/// Note that the Script of Katakana Middle Dot is not any of
-/// "Hiragana", "Katakana", or "Han".  The effect of this rule is to
+/// `KATAKANA MIDDLE DOT`\
+/// Note that the Script of `Katakana Middle Dot` is not any of
+/// `Hiragana`, `Katakana`, or `Han`.  The effect of this rule is to
 /// require at least one character in the label to be in one of those
 /// scripts.
 /// # Arguments
 /// * `s`: String value to check
 /// # Returns
-/// Return true if context permits KATAKANA MIDDLE DOT `U+30FB`.
+/// Return true if context permits `KATAKANA MIDDLE DOT` `U+30FB`.
 pub fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     if 0x30fb != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
