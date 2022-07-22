@@ -56,7 +56,7 @@ where
 }
 
 /// [`UsernameCaseMapped`](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3).
-/// Profile designed to deal with usernames in security and application protocols.
+/// Profile designed to deal with `usernames` in security and application protocols.
 /// It replaces the `SASLprep` profile of `Stringprep`. Look at the
 /// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.1)
 /// section for more details.
@@ -82,22 +82,13 @@ where
 /// // compare strings
 /// assert_eq!(profile.compare("Guybrush", "guybrush"), Ok(true));
 /// ```
-pub struct UsernameCaseMapped {
-    class: IdentifierClass,
-}
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub struct UsernameCaseMapped(IdentifierClass);
 
 impl UsernameCaseMapped {
     /// Creates a [`UsernameCaseMapped`] profile.
     pub fn new() -> Self {
-        Self {
-            class: IdentifierClass {},
-        }
-    }
-}
-
-impl Default for UsernameCaseMapped {
-    fn default() -> Self {
-        UsernameCaseMapped::new()
+        Self(IdentifierClass::default())
     }
 }
 
@@ -108,7 +99,7 @@ impl Profile for UsernameCaseMapped {
     {
         let s = self.width_mapping_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(&s)?;
+        self.0.allows(&s)?;
         Ok(s)
     }
 
@@ -194,7 +185,7 @@ impl PrecisFastInvocation for UsernameCaseMapped {
 }
 
 /// [`UsernameCasePreserved`](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4).
-/// Profile designed to deal with usernames in security and application protocols.
+/// Profile designed to deal with `usernames` in security and application protocols.
 /// It replaces the `SASLprep` profile of `Stringprep`. Look at the
 /// [`IANA` Considerations](https://datatracker.ietf.org/doc/html/rfc8265#section-7.2)
 /// section for more details.
@@ -220,22 +211,13 @@ impl PrecisFastInvocation for UsernameCaseMapped {
 /// // compare strings
 /// assert_eq!(profile.compare("Guybrush", "Guybrush"), Ok(true));
 /// ```
-pub struct UsernameCasePreserved {
-    class: IdentifierClass,
-}
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub struct UsernameCasePreserved(IdentifierClass);
 
 impl UsernameCasePreserved {
     /// Creates a [`UsernameCasePreserved`] profile.
     pub fn new() -> Self {
-        Self {
-            class: IdentifierClass {},
-        }
-    }
-}
-
-impl Default for UsernameCasePreserved {
-    fn default() -> Self {
-        UsernameCasePreserved::new()
+        Self(IdentifierClass::default())
     }
 }
 
@@ -246,7 +228,7 @@ impl Profile for UsernameCasePreserved {
     {
         let s = self.width_mapping_rule(s)?;
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(&s)?;
+        self.0.allows(&s)?;
         Ok(s)
     }
 

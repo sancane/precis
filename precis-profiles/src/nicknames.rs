@@ -143,16 +143,13 @@ where
 /// assert_eq!(profile.compare("Guybrush   Threepwood  ",
 ///     "guybrush threepwood"), Ok(true));
 /// ```
-pub struct Nickname {
-    class: FreeformClass,
-}
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
+pub struct Nickname(FreeformClass);
 
 impl Nickname {
     /// Creates a [`Nickname`] profile.
     pub fn new() -> Self {
-        Self {
-            class: FreeformClass {},
-        }
+        Self(FreeformClass::default())
     }
 
     fn apply_prepare_rules<'a, T>(&self, s: T) -> Result<Cow<'a, str>, Error>
@@ -161,7 +158,7 @@ impl Nickname {
     {
         let s = s.into();
         let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
-        self.class.allows(&s)?;
+        self.0.allows(&s)?;
         Ok(s)
     }
 
@@ -183,12 +180,6 @@ impl Nickname {
         let s = self.additional_mapping_rule(s)?;
         let s = self.case_mapping_rule(s)?;
         self.normalization_rule(s)
-    }
-}
-
-impl Default for Nickname {
-    fn default() -> Self {
-        Nickname::new()
     }
 }
 
@@ -272,7 +263,7 @@ impl PrecisFastInvocation for Nickname {
 }
 
 #[cfg(test)]
-mod nickname {
+mod test_nicknames {
     use crate::nicknames::*;
 
     #[test]

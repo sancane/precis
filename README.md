@@ -116,7 +116,7 @@ If you find this project helpful, you may consider making a donation:
 # License
 
 This project is licensed under either of
-* Apache License, Version 2.0, (LICENSE-APACHE or https://www.apache.org/licenses/LICENSE-2.0)
-* MIT license (LICENSE-MIT or https://opensource.org/licenses/MIT) at your option.
+* [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+* [MIT license](https://opensource.org/licenses/MIT)
 
 [![say thanks](https://img.shields.io/badge/Say%20Thanks-👍-1EAEDB.svg)](https://github.com/sancane/precis/stargazers)
