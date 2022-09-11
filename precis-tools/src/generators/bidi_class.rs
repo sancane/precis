@@ -70,7 +70,7 @@ fn generate_bidi_class_enum(file: &mut File) -> Result<(), Error> {
     // which goes against the rust naming rules. Let's allow it just for this time
     writeln!(file, "#[allow(clippy::upper_case_acronyms)]")?;
 
-    writeln!(file, "#[derive(Copy, Clone, PartialEq, Debug)]")?;
+    writeln!(file, "#[derive(Copy, Clone, PartialEq, Eq, Debug)]")?;
     writeln!(file, "pub enum BidiClass {{")?;
     writeln!(file, "\tAL,")?;
     writeln!(file, "\tAN,")?;

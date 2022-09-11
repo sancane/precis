@@ -3,7 +3,7 @@ use crate::DerivedPropertyValue;
 /// Represents any kind of error that may happen when
 /// preparing, enforcing or comparing internationalized
 /// strings
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Error {
     /// Invalid label
     Invalid,
@@ -16,7 +16,7 @@ pub enum Error {
 }
 
 /// Error that contains information regarding the wrong Unicode code point
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct CodepointInfo {
     /// Unicode code point
     pub cp: u32,
@@ -40,7 +40,7 @@ impl CodepointInfo {
 /// Internal errors that group unusual error conditions that mostly
 /// have to do with the processing of wrong labels, unexpected Unicode
 /// code points if tested against another version defined in PRECIS, etc.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum UnexpectedError {
     /// Error caused when trying to apply a context rule over
     /// an invalid code point.
