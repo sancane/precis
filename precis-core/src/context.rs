@@ -44,7 +44,7 @@ fn before(s: &str, offset: usize) -> Option<char> {
 }
 
 /// Error associated to the application of any context rule.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum ContextRuleError {
     /// Context rule is not applicable
     NotApplicable,

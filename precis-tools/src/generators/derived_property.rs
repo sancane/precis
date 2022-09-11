@@ -97,7 +97,7 @@ impl CodeGen for DerivedPropertyValueGen {
             "/// extension if more classes are added beyond [`IdentifierClass`]"
         )?;
         writeln!(file, "/// and [`FreeformClass`] in the future.")?;
-        writeln!(file, "#[derive(Clone, Copy, Debug, PartialEq)]")?;
+        writeln!(file, "#[derive(Clone, Copy, Debug, PartialEq, Eq)]")?;
         writeln!(file, "pub enum DerivedPropertyValue {{")?;
         writeln!(file, "\t/// Value assigned to all those code points that are allowed to be used in any PRECIS string class.")?;
         writeln!(file, "\tPValid,")?;
