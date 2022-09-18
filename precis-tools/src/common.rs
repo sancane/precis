@@ -13,7 +13,7 @@ pub fn add_codepoints(range: &CodepointRange, vec: &mut Vec<Codepoints>) {
 
 pub fn insert_codepoint(cp: u32, set: &mut HashSet<u32>) -> Result<(), Error> {
     set.insert(cp)
-        .then(|| ())
+        .then_some(())
         .ok_or_else(|| Error::from(format!("Codepoint already processed {:#06x}", cp).as_str()))
 }
 
