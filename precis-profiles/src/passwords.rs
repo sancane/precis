@@ -48,7 +48,7 @@ impl Profile for OpaqueString {
         S: Into<Cow<'a, str>>,
     {
         let s = s.into();
-        let s = (!s.is_empty()).then(|| s).ok_or(Error::Invalid)?;
+        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
         self.0.allows(&s)?;
         Ok(s)
     }
@@ -60,7 +60,7 @@ impl Profile for OpaqueString {
         let s = self.prepare(s)?;
         let s = self.additional_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        (!s.is_empty()).then(|| s).ok_or(Error::Invalid)
+        (!s.is_empty()).then_some(s).ok_or(Error::Invalid)
     }
 
     fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
