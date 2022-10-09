@@ -1,4 +1,5 @@
 use crate::DerivedPropertyValue;
+use std::fmt;
 
 /// Represents any kind of error that may happen when
 /// preparing, enforcing or comparing internationalized
@@ -14,6 +15,18 @@ pub enum Error {
     /// covered by any other category.
     Unexpected(UnexpectedError),
 }
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Error::Invalid => write!(f, "invalid label"),
+            Error::BadCodepoint(info) => write!(f, "bad codepoint: {}", info),
+            Error::Unexpected(unexpected) => write!(f, "unexpected: {}", unexpected),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 /// Error that contains information regarding the wrong Unicode code point
 #[derive(Debug, PartialEq, Eq)]
@@ -37,6 +50,16 @@ impl CodepointInfo {
     }
 }
 
+impl fmt::Display for CodepointInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "code point {:#06x}, position: {}, property: {}",
+            self.cp, self.position, self.property
+        )
+    }
+}
+
 /// Internal errors that group unusual error conditions that mostly
 /// have to do with the processing of wrong labels, unexpected Unicode
 /// code points if tested against another version defined in PRECIS, etc.
@@ -54,4 +77,19 @@ pub enum UnexpectedError {
     /// Unexpected error condition such as an attempt to access to a character before
     /// the start of a label or after the end of a label.
     Undefined,
+}
+
+impl fmt::Display for UnexpectedError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            UnexpectedError::ContextRuleNotApplicable(info) => {
+                write!(f, "context rule not applicable [{}]", info)
+            }
+            UnexpectedError::MissingContextRule(info) => {
+                write!(f, "missing context rule [{}]", info)
+            }
+            UnexpectedError::ProfileRuleNotApplicable => write!(f, "profile rule not appplicable"),
+            UnexpectedError::Undefined => write!(f, "undefined"),
+        }
+    }
 }

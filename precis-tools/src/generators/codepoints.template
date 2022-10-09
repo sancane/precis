@@ -1,12 +1,24 @@
 use std::cmp::Ord;
 use std::cmp::Ordering;
+use std::fmt;
 
 /// A representation of either a single codepoint or a range of codepoints.
+#[derive(Debug)]
 pub enum Codepoints {
     /// A single codepoint.
     Single(u32),
     /// A range of codepoints.
     Range(std::ops::RangeInclusive<u32>),
+}
+
+impl fmt::Display for Codepoints {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Codepoints::Single(cp) => write!(f, "single codepoint {:#06x}", cp),
+            Codepoints::Range(range) => write!(f, "codepoints range: [{}..{}]",
+                range.start(), range.end()),
+        }
+    }
 }
 
 impl PartialEq<std::ops::RangeInclusive<u32>> for Codepoints {
