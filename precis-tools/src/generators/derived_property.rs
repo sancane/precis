@@ -126,6 +126,47 @@ impl CodeGen for DerivedPropertyValueGen {
         )?;
         writeln!(file, "\tUnassigned,")?;
         writeln!(file, "}}")?;
+
+        writeln!(file)?;
+        writeln!(file, "impl std::fmt::Display for DerivedPropertyValue {{")?;
+        writeln!(
+            file,
+            "\tfn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {{"
+        )?;
+        writeln!(file, "\t\tmatch self {{")?;
+        writeln!(
+            file,
+            "\t\t\tDerivedPropertyValue::PValid => writeln!(f, \"PValid\"),"
+        )?;
+        writeln!(
+            file,
+            "\t\t\tDerivedPropertyValue::SpecClassPval => writeln!(f, \"SpecClassPval\"),"
+        )?;
+        writeln!(
+            file,
+            "\t\t\tDerivedPropertyValue::SpecClassDis => writeln!(f, \"SpecClassDis\"),"
+        )?;
+        writeln!(
+            file,
+            "\t\t\tDerivedPropertyValue::ContextJ => writeln!(f, \"ContextJ\"),"
+        )?;
+        writeln!(
+            file,
+            "\t\t\tDerivedPropertyValue::ContextO => writeln!(f, \"ContextO\"),"
+        )?;
+        writeln!(
+            file,
+            "\t\t\tDerivedPropertyValue::Disallowed => writeln!(f, \"Disallowed\"),"
+        )?;
+        writeln!(
+            file,
+            "\t\t\tDerivedPropertyValue::Unassigned => writeln!(f, \"Unassigned\"),"
+        )?;
+        writeln!(file, "\t\t}}")?;
+
+        writeln!(file, "\t}}")?;
+        writeln!(file, "}}")?;
+
         Ok(writeln!(file)?)
     }
 }
