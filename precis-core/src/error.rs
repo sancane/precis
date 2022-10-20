@@ -93,3 +93,44 @@ impl fmt::Display for UnexpectedError {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn fmt_error() {
+        format!("{}", Error::Invalid);
+        format!(
+            "{}",
+            Error::BadCodepoint(CodepointInfo {
+                cp: 0,
+                position: 0,
+                property: DerivedPropertyValue::PValid
+            })
+        );
+        format!("{}", Error::Unexpected(UnexpectedError::Undefined));
+    }
+
+    #[test]
+    fn fmt_unexpected_error() {
+        format!("{}", UnexpectedError::Undefined);
+        format!("{}", UnexpectedError::ProfileRuleNotApplicable);
+        format!(
+            "{}",
+            UnexpectedError::MissingContextRule(CodepointInfo {
+                cp: 0,
+                position: 0,
+                property: DerivedPropertyValue::PValid
+            })
+        );
+        format!(
+            "{}",
+            UnexpectedError::ContextRuleNotApplicable(CodepointInfo {
+                cp: 0,
+                position: 0,
+                property: DerivedPropertyValue::PValid
+            })
+        );
+    }
+}
