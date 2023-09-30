@@ -51,7 +51,7 @@ pub fn get_codepoints_vector(codepoints: &HashSet<u32>) -> Vec<Codepoints> {
 
     for cp in vec.iter() {
         match range.as_mut() {
-            Some(mut r) => {
+            Some(r) => {
                 if **cp - r.end.value() == 1 {
                     r.end = Codepoint::from_u32(**cp).unwrap();
                 } else {

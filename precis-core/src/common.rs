@@ -153,34 +153,34 @@ mod tests {
     #[test]
     fn find_codepoint() {
         let empty_table: [Codepoints; 0] = [];
-        assert_eq!(is_in_table(34, &empty_table), false);
+        assert!(!is_in_table(34, &empty_table));
 
         let test_table: [Codepoints; 1] = [Codepoints::Single(11)];
-        assert_eq!(is_in_table(11, &test_table), true);
-        assert_eq!(is_in_table(12, &test_table), false);
+        assert!(is_in_table(11, &test_table));
+        assert!(!is_in_table(12, &test_table));
 
         let test_table: [Codepoints; 2] = [Codepoints::Single(1), Codepoints::Single(10)];
-        assert_eq!(is_in_table(1, &test_table), true);
-        assert_eq!(is_in_table(10, &test_table), true);
-        assert_eq!(is_in_table(5, &test_table), false);
+        assert!(is_in_table(1, &test_table));
+        assert!(is_in_table(10, &test_table));
+        assert!(!is_in_table(5, &test_table));
 
         let test_table: [Codepoints; 3] = [
             Codepoints::Single(1),
             Codepoints::Single(5),
             Codepoints::Single(10),
         ];
-        assert_eq!(is_in_table(1, &test_table), true);
-        assert_eq!(is_in_table(5, &test_table), true);
-        assert_eq!(is_in_table(10, &test_table), true);
-        assert_eq!(is_in_table(7, &test_table), false);
+        assert!(is_in_table(1, &test_table));
+        assert!(is_in_table(5, &test_table));
+        assert!(is_in_table(10, &test_table));
+        assert!(!is_in_table(7, &test_table));
 
         let test_table: [Codepoints; 1] =
             [Codepoints::Range(std::ops::RangeInclusive::new(10, 20))];
         for i in 10..=20 {
-            assert_eq!(is_in_table(i, &test_table), true);
+            assert!(is_in_table(i, &test_table));
         }
-        assert_eq!(is_in_table(9, &test_table), false);
-        assert_eq!(is_in_table(21, &test_table), false);
+        assert!(!is_in_table(9, &test_table));
+        assert!(!is_in_table(21, &test_table));
 
         let test_table: [Codepoints; 4] = [
             Codepoints::Range(std::ops::RangeInclusive::new(2, 4)),
@@ -189,37 +189,37 @@ mod tests {
             Codepoints::Single(25),
         ];
         for i in 2..=4 {
-            assert_eq!(is_in_table(i, &test_table), true);
+            assert!(is_in_table(i, &test_table));
         }
         for i in 10..=20 {
-            assert_eq!(is_in_table(i, &test_table), true);
+            assert!(is_in_table(i, &test_table));
         }
-        assert_eq!(is_in_table(7, &test_table), true);
-        assert_eq!(is_in_table(25, &test_table), true);
-        assert_eq!(is_in_table(1, &test_table), false);
-        assert_eq!(is_in_table(8, &test_table), false);
-        assert_eq!(is_in_table(26, &test_table), false);
+        assert!(is_in_table(7, &test_table));
+        assert!(is_in_table(25, &test_table));
+        assert!(!is_in_table(1, &test_table));
+        assert!(!is_in_table(8, &test_table));
+        assert!(!is_in_table(26, &test_table));
 
         let test_table: [Codepoints; 2] = [
             Codepoints::Range(std::ops::RangeInclusive::new(2, 4)),
             Codepoints::Range(std::ops::RangeInclusive::new(10, 20)),
         ];
         for i in 2..=4 {
-            assert_eq!(is_in_table(i, &test_table), true);
+            assert!(is_in_table(i, &test_table));
         }
         for i in 10..=20 {
-            assert_eq!(is_in_table(i, &test_table), true);
+            assert!(is_in_table(i, &test_table));
         }
-        assert_eq!(is_in_table(1, &test_table), false);
-        assert_eq!(is_in_table(21, &test_table), false);
+        assert!(!is_in_table(1, &test_table));
+        assert!(!is_in_table(21, &test_table));
     }
 
     #[test]
     fn compat() {
         let cp = 0x1e9a;
-        assert_eq!(has_compat(cp), true);
+        assert!(has_compat(cp));
 
         let cp = 0x006a;
-        assert_eq!(has_compat(cp), false);
+        assert!(!has_compat(cp));
     }
 }
