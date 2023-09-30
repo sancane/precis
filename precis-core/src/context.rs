@@ -302,497 +302,497 @@ mod tests {
         // code point at position 0 is not `U+200C`
         let label = "A";
         let res = rule_zero_width_nonjoiner(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Before(`FirstChar`) evaluates to Undefined.
         let label = "\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Before(`cp`) equal to `Virama` then true
         let label = "\u{94d}\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Before(`cp`) equal to `Virama` then true
         let label = "A\u{94d}\u{200c}B";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Previous `cp` is neither `Virama` nor transparent/`Joining_Type`:`{L,D}` then false
         let label = "A\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // Miss `Joining_Type`:`{L,D}` before Transparent then undefined error
         // "(`Joining_Type`:T)`U+200C`"
         let label = "\u{5bf}\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 1);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // No `Joining_Type`:`{L,D}` before Transparent then false
         // 'A'(`Joining_Type`:T)`U+200C`
         let label = "A\u{5bf}\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // First part of the `regExp` is complete but fails to meet the second one
         // (`Joining_Type`:L)(`Joining_Type`:T)`U+200C`
         let label = "\u{a872}\u{5bf}\u{200c}";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // First part of the `regExp` is complete but fails to meet the second one
         // (`Joining_Type`:L)(`Joining_Type`:T)`U+200C`(`Joining_Type`:T)
         let label = "\u{a872}\u{5bf}\u{200c}\u{5bf}";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Label matches `RegExp`
         // (`Joining_Type`:L)(`Joining_Type`:T)`U+200C`(`Joining_Type`:T)(`Joining_Type`:R)
         let label = "\u{a872}\u{5bf}\u{200c}\u{5bf}\u{629}";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Label does not match `RegExp`
         // (`Joining_Type`:L)(`Joining_Type`:T)`U+200C`(`Joining_Type`:T)'A'
         let label = "\u{a872}\u{5bf}\u{200c}\u{5bf}A";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // Label does not matches `RegExp`
         // (`Joining_Type`:L)(`Joining_Type`:T)`U+200C`'A'
         let label = "\u{a872}\u{5bf}\u{200c}A";
         let res = rule_zero_width_nonjoiner(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // 'A'(`Joining_Type`:T)(2)`U+200C`(`Joining_Type`:T)(4)(`Joining_Type`:D)
         let label = "A\u{5bf}\u{5bf}\u{200c}\u{5bf}\u{5bf}\u{5bf}\u{5bf}\u{626}";
         let res = rule_zero_width_nonjoiner(label, 3);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // All next tests should match `RegExp`
 
         // (`Joining_Type`:D)`U+200C`(`Joining_Type`:T)(`Joining_Type`:D)
         let label = "\u{626}\u{200c}\u{5bf}\u{626}";
         let res = rule_zero_width_nonjoiner(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // (`Joining_Type`:D)`U+200C`(`Joining_Type`:D)
         let label = "\u{626}\u{200c}\u{626}";
         let res = rule_zero_width_nonjoiner(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // (`Joining_Type`:D)(`Joining_Type`:T)(2)`U+200C`(`Joining_Type`:T)(4)(`Joining_Type`:D)
         let label = "\u{626}\u{5bf}\u{5bf}\u{200c}\u{5bf}\u{5bf}\u{5bf}\u{5bf}\u{626}";
         let res = rule_zero_width_nonjoiner(label, 3);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
     }
 
     #[test]
     fn check_rule_zero_width_joiner() {
         let label = "";
         let res = rule_zero_width_joiner(label, 3);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_zero_width_joiner(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{200d}";
         let res = rule_zero_width_joiner(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{200d}A";
         let res = rule_zero_width_joiner(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // `Canonical_Combining_Class`(Before(`cp`)) .`eq`.  `Virama` Then True
         let label = "\u{94d}\u{200d}";
         let res = rule_zero_width_joiner(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // `Canonical_Combining_Class`(Before(`cp`)) .`ne`.  `Virama` Then False
         let label = "A\u{200d}";
         let res = rule_zero_width_joiner(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // `Canonical_Combining_Class`(Before(`cp`)) .`eq`.  `Virama` Then True
         let label = "A\u{94d}\u{200d}B";
         let res = rule_zero_width_joiner(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
     }
 
     #[test]
     fn check_rule_middle_dot() {
         let label = "";
         let res = rule_middle_dot(label, 3);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_middle_dot(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{00b7}";
         let res = rule_middle_dot(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{006c}\u{00b7}";
         let res = rule_middle_dot(label, 1);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{006c}\u{00b7}\u{006c}";
         let res = rule_middle_dot(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "\u{006c}\u{00b7}A";
         let res = rule_middle_dot(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         let label = "A\u{00b7}A";
         let res = rule_middle_dot(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
     }
 
     #[test]
     fn check_rule_greek_lower_numeral_sign_keraia() {
         let label = "";
         let res = rule_greek_lower_numeral_sign_keraia(label, 3);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_greek_lower_numeral_sign_keraia(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{0375}";
         let res = rule_greek_lower_numeral_sign_keraia(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // Script(After(`cp`)) .`eq`.  Greek Then True
         let label = "\u{0375}\u{0384}";
         let res = rule_greek_lower_numeral_sign_keraia(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "A\u{0375}\u{0384}";
         let res = rule_greek_lower_numeral_sign_keraia(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Script(After(`cp`)) .`ne`.  Greek Then False
         let label = "\u{0375}A";
         let res = rule_greek_lower_numeral_sign_keraia(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
     }
 
     #[test]
     fn check_rule_hebrew_punctuation() {
         let label = "";
         let res = rule_hebrew_punctuation(label, 3);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_hebrew_punctuation(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{05F3}";
         let res = rule_hebrew_punctuation(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         // [`GERESH`] Script(Before(`cp`)) .`eq`.  Hebrew Then True;
         let label = "\u{5f0}\u{05F3}";
         let res = rule_hebrew_punctuation(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // [`GERSHAYIM`] Script(Before(`cp`)) .`eq`.  Hebrew Then True;
         let label = "\u{5f0}\u{05F4}";
         let res = rule_hebrew_punctuation(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Script(Before(`cp`)) .`ne`.  Hebrew Then False;
         let label = "A\u{05F4}";
         let res = rule_hebrew_punctuation(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // [`GERSHAYIM`] Script(Before(`cp`)) .`eq`.  Hebrew Then True;
         let label = "YYY\u{5f0}\u{05F4}XXX";
         let res = rule_hebrew_punctuation(label, 4);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
     }
 
     #[test]
     fn check_rule_katakana_middle_dot() {
         let label = "";
         let res = rule_katakana_middle_dot(label, 3);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "A";
         let res = rule_katakana_middle_dot(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{30fb}";
         let res = rule_katakana_middle_dot(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         let label = "a\u{30fb}b";
         let res = rule_katakana_middle_dot(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         // Check one character in the label is Hiragana
         let label = "a\u{30fb}b\u{1b001}c";
         let res = rule_katakana_middle_dot(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Check one character in the label is Katakana
         let label = "a\u{30fb}bc\u{3357}";
         let res = rule_katakana_middle_dot(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Check one character in the label is HAN
         let label = "\u{3007}\u{30fb}bc";
         let res = rule_katakana_middle_dot(label, 1);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
     }
 
     #[test]
     fn check_rule_arabic_indic_digits() {
         let label = "";
         let res = rule_arabic_indic_digits(label, 3);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{065f}";
         let res = rule_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{066a}";
         let res = rule_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         // Check values in range [`0x0660`..`0x0669`]
         let label = "\u{0660}";
         let res = rule_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "\u{0665}";
         let res = rule_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "\u{0669}";
         let res = rule_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Label does not contain Extended Arabic-Indic Digits then True
         let label = "ab\u{0669}cd";
         let res = rule_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "ab\u{0669}c\u{06ef}";
         let res = rule_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "ab\u{0669}c\u{06fa}";
         let res = rule_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Label contains Extended Arabic-Indic Digits then False
         let label = "ab\u{0669}c\u{06f0}";
         let res = rule_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         let label = "ab\u{0669}c\u{06f9}";
         let res = rule_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
     }
 
     #[test]
     fn check_rule_extended_arabic_indic_digits() {
         let label = "";
         let res = rule_extended_arabic_indic_digits(label, 3);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::Undefined);
 
         let label = "\u{06ef}";
         let res = rule_extended_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         let label = "\u{06fa}";
         let res = rule_extended_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_err(), true);
+        assert!(res.is_err());
         assert_eq!(res.unwrap_err(), ContextRuleError::NotApplicable);
 
         // Check values in range [`0x06f0`..`0x06f9`]
         let label = "\u{06f0}";
         let res = rule_extended_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "\u{06f5}";
         let res = rule_extended_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "\u{06f9}";
         let res = rule_extended_arabic_indic_digits(label, 0);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Label does not contain Arabic-Indic Digits then True
         let label = "ab\u{06f0}cd";
         let res = rule_extended_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "ab\u{06f0}c\u{065f}";
         let res = rule_extended_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         let label = "ab\u{06f0}c\u{066a}";
         let res = rule_extended_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), true);
+        assert!(res.is_ok());
+        assert!(res.unwrap());
 
         // Label contains Extended Arabic-Indic Digits then False
         let label = "ab\u{06f0}c\u{0660}";
         let res = rule_extended_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
 
         let label = "ab\u{06f0}c\u{0669}";
         let res = rule_extended_arabic_indic_digits(label, 2);
-        assert_eq!(res.is_ok(), true);
-        assert_eq!(res.unwrap(), false);
+        assert!(res.is_ok());
+        assert!(!res.unwrap());
     }
 
     #[test]
     fn check_get_context_rule() {
         let val = get_context_rule(0x013);
-        assert_eq!(val.is_none(), true);
+        assert!(val.is_none());
 
         let val = get_context_rule(0x00b7);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_middle_dot as usize);
 
         let val = get_context_rule(0x200c);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_zero_width_nonjoiner as usize);
 
         let val = get_context_rule(0x0375);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_greek_lower_numeral_sign_keraia as usize
         );
 
         let val = get_context_rule(0x05f3);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as usize);
 
         let val = get_context_rule(0x05f4);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as usize);
 
         let val = get_context_rule(0x30fb);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_katakana_middle_dot as usize);
 
         let val = get_context_rule(0x0660);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as usize);
 
         let val = get_context_rule(0x0669);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as usize);
 
         let val = get_context_rule(0x065f);
-        assert_eq!(val.is_none(), true);
+        assert!(val.is_none());
 
         let val = get_context_rule(0x066a);
-        assert_eq!(val.is_none(), true);
+        assert!(val.is_none());
 
         let val = get_context_rule(0x06f0);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_extended_arabic_indic_digits as usize
         );
 
         let val = get_context_rule(0x06f9);
-        assert_eq!(val.is_some(), true);
+        assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_extended_arabic_indic_digits as usize
         );
 
         let val = get_context_rule(0x06ef);
-        assert_eq!(val.is_none(), true);
+        assert!(val.is_none());
 
         let val = get_context_rule(0x06fa);
-        assert_eq!(val.is_none(), true);
+        assert!(val.is_none());
     }
 }

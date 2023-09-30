@@ -78,10 +78,10 @@ fn check_derived_property(
     ff: &FreeformClass,
 ) {
     match props {
-        precis_tools::DerivedProperties::Single(p) => validate_result(cp, *p, &id, &ff),
+        precis_tools::DerivedProperties::Single(p) => validate_result(cp, *p, id, ff),
         precis_tools::DerivedProperties::Tuple((p1, p2)) => {
-            validate_result(cp, *p1, &id, &ff);
-            validate_result(cp, *p2, &id, &ff);
+            validate_result(cp, *p1, id, ff);
+            validate_result(cp, *p2, id, ff);
         }
     }
 }

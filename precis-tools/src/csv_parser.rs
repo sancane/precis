@@ -279,136 +279,132 @@ mod tests {
 
     #[test]
     fn derived_property_from_str() {
-        assert_eq!(DerivedProperty::from_str("PVALID").is_ok(), true);
+        assert!(DerivedProperty::from_str("PVALID").is_ok());
         assert_eq!(
             DerivedProperty::from_str("PVALID").unwrap(),
             DerivedProperty::PValid
         );
 
-        assert_eq!(DerivedProperty::from_str("FREE_PVAL").is_ok(), true);
+        assert!(DerivedProperty::from_str("FREE_PVAL").is_ok());
         assert_eq!(
             DerivedProperty::from_str("FREE_PVAL").unwrap(),
             DerivedProperty::FreePVal
         );
 
-        assert_eq!(DerivedProperty::from_str("CONTEXTJ").is_ok(), true);
+        assert!(DerivedProperty::from_str("CONTEXTJ").is_ok());
         assert_eq!(
             DerivedProperty::from_str("CONTEXTJ").unwrap(),
             DerivedProperty::ContextJ
         );
 
-        assert_eq!(DerivedProperty::from_str("CONTEXTO").is_ok(), true);
+        assert!(DerivedProperty::from_str("CONTEXTO").is_ok());
         assert_eq!(
             DerivedProperty::from_str("CONTEXTO").unwrap(),
             DerivedProperty::ContextO
         );
 
-        assert_eq!(DerivedProperty::from_str("DISALLOWED").is_ok(), true);
+        assert!(DerivedProperty::from_str("DISALLOWED").is_ok());
         assert_eq!(
             DerivedProperty::from_str("DISALLOWED").unwrap(),
             DerivedProperty::Disallowed
         );
 
-        assert_eq!(DerivedProperty::from_str("ID_DIS").is_ok(), true);
+        assert!(DerivedProperty::from_str("ID_DIS").is_ok());
         assert_eq!(
             DerivedProperty::from_str("ID_DIS").unwrap(),
             DerivedProperty::IdDis
         );
 
-        assert_eq!(DerivedProperty::from_str("UNASSIGNED").is_ok(), true);
+        assert!(DerivedProperty::from_str("UNASSIGNED").is_ok());
         assert_eq!(
             DerivedProperty::from_str("UNASSIGNED").unwrap(),
             DerivedProperty::Unassigned
         );
 
-        assert_eq!(DerivedProperty::from_str("ASDFR").is_err(), true);
+        assert!(DerivedProperty::from_str("ASDFR").is_err());
     }
 
     #[test]
     fn derived_properties_from_str() {
         let res = DerivedProperties::from_str("UNASSIGNED");
-        assert_eq!(res.is_ok(), true);
+        assert!(res.is_ok());
         assert_eq!(
             DerivedProperties::Single(DerivedProperty::Unassigned),
             res.unwrap()
         );
 
         let res = DerivedProperties::from_str("ID_DIS or FREE_PVAL");
-        assert_eq!(res.is_ok(), true);
+        assert!(res.is_ok());
         assert_eq!(
             DerivedProperties::Tuple((DerivedProperty::IdDis, DerivedProperty::FreePVal)),
             res.unwrap()
         );
 
         let res = DerivedProperties::from_str("ID_DIS   or   FREE_PVAL");
-        assert_eq!(res.is_ok(), true);
+        assert!(res.is_ok());
         assert_eq!(
             DerivedProperties::Tuple((DerivedProperty::IdDis, DerivedProperty::FreePVal)),
             res.unwrap()
         );
 
         let res = DerivedProperties::from_str("ID_DIS or INVALID");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = DerivedProperties::from_str("  or ");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = DerivedProperties::from_str("");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = DerivedProperties::from_str("INVALID");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
     }
 
     #[test]
     fn codepoints_parse() {
         let res = parse_codepoints("0141-0148");
-        assert_eq!(res.is_ok(), true);
+        assert!(res.is_ok());
         assert_eq!(codepoints!(0x0141, 0x148), res.unwrap());
 
         let res = parse_codepoints("0141");
-        assert_eq!(res.is_ok(), true);
+        assert!(res.is_ok());
         assert_eq!(codepoints!(0x0141), res.unwrap());
 
         let res = parse_codepoints("ghy0141");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = parse_codepoints("");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = parse_codepoints("-0148");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = parse_codepoints("0148-");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = parse_codepoints("124-0148-2345");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
 
         let res = parse_codepoints("123454325460148");
-        assert_eq!(res.is_ok(), false);
+        assert!(res.is_err());
     }
 
     #[test]
     fn precis_derived_property_from_str() {
-        assert_eq!(
-            PrecisDerivedProperty::from_str("0020,ID_DIS or FREE_PVAL,SPACE").is_ok(),
-            true
+        assert!(
+            PrecisDerivedProperty::from_str("0020,ID_DIS or FREE_PVAL,SPACE").is_ok()
         );
-        assert_eq!(
+        assert!(
             PrecisDerivedProperty::from_str("0000-001F,DISALLOWED,NULL..INFORMATION SEPARATOR ONE")
-                .is_ok(),
-            true
+                .is_ok()
         );
-        assert_eq!(
-            PrecisDerivedProperty::from_str(",ID_DIS or FREE_PVAL,SPACE").is_err(),
-            true
+        assert!(
+            PrecisDerivedProperty::from_str(",ID_DIS or FREE_PVAL,SPACE").is_err()
         );
-        assert_eq!(
-            PrecisDerivedProperty::from_str("0020,,SPACE").is_err(),
-            true
+        assert!(
+            PrecisDerivedProperty::from_str("0020,,SPACE").is_err()
         );
-        assert_eq!(PrecisDerivedProperty::from_str(",,SPACE").is_err(), true);
-        assert_eq!(PrecisDerivedProperty::from_str("").is_err(), true);
+        assert!(PrecisDerivedProperty::from_str(",,SPACE").is_err());
+        assert!(PrecisDerivedProperty::from_str("").is_err());
     }
 }

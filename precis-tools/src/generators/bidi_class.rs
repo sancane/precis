@@ -130,7 +130,7 @@ impl BidiClassGen {
             match cp {
                 Codepoints::Single(cp) => {
                     match range.as_mut() {
-                        Some(mut r) => {
+                        Some(r) => {
                             if cp.value() - r.end.value() == 1 {
                                 r.end = *cp;
                             } else {
@@ -153,7 +153,7 @@ impl BidiClassGen {
                 }
                 Codepoints::Range(cp) => {
                     match range.as_mut() {
-                        Some(mut r) => {
+                        Some(r) => {
                             if cp.start.value() - r.end.value() == 1 {
                                 // This range can be included in the previous one
                                 r.end = cp.end;

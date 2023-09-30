@@ -193,7 +193,7 @@ where
 }
 
 #[cfg(test)]
-mod bidi {
+mod bidi_tests {
     use crate::bidi::*;
 
     const L: char = '\u{00aa}';
@@ -241,43 +241,43 @@ mod bidi {
 
     #[test]
     fn test_has_rtl() {
-        assert_eq!(has_rtl(""), false);
-        assert_eq!(has_rtl("Hi"), false);
+        assert!(!has_rtl(""));
+        assert!(!has_rtl("Hi"));
 
         // check R character
-        assert_eq!(has_rtl(&str_chars!(R)), true);
-        assert_eq!(has_rtl(&str_chars!(R, 'A')), true);
-        assert_eq!(has_rtl(&str_chars!('A', R)), true);
+        assert!(has_rtl(&str_chars!(R)));
+        assert!(has_rtl(&str_chars!(R, 'A')));
+        assert!(has_rtl(&str_chars!('A', R)));
 
         // check AL character
-        assert_eq!(has_rtl(&str_chars!(AL)), true);
-        assert_eq!(has_rtl(&str_chars!(AL, 'A')), true);
-        assert_eq!(has_rtl(&str_chars!('A', AL)), true);
+        assert!(has_rtl(&str_chars!(AL)));
+        assert!(has_rtl(&str_chars!(AL, 'A')));
+        assert!(has_rtl(&str_chars!('A', AL)));
 
         // check AN character
-        assert_eq!(has_rtl(&str_chars!(AN)), true);
-        assert_eq!(has_rtl(&str_chars!(AN, 'A')), true);
-        assert_eq!(has_rtl(&str_chars!('A', AN)), true);
+        assert!(has_rtl(&str_chars!(AN)));
+        assert!(has_rtl(&str_chars!(AN, 'A')));
+        assert!(has_rtl(&str_chars!('A', AN)));
     }
 
     #[test]
     fn test_bidi_rule() {
         // Check empty label
-        assert_eq!(satisfy_bidi_rule(""), true);
+        assert!(satisfy_bidi_rule(""));
 
         // Check rule 1
         // First character is L
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L)), true);
+        assert!(satisfy_bidi_rule(&str_chars!(L)));
 
         // First character is R
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R)), true);
+        assert!(satisfy_bidi_rule(&str_chars!(R)));
         // First character is AL
-        assert_eq!(satisfy_bidi_rule(&str_chars!(AL)), true);
+        assert!(satisfy_bidi_rule(&str_chars!(AL)));
 
         // First character is ES (not [`L`, `R` or `AL`])
-        assert_eq!(satisfy_bidi_rule(&str_chars!(ES)), false);
+        assert!(!satisfy_bidi_rule(&str_chars!(ES)));
         // First character is `WS`
-        assert_eq!(satisfy_bidi_rule(&str_chars!(WS)), false);
+        assert!(!satisfy_bidi_rule(&str_chars!(WS)));
     }
 
     #[test]
@@ -285,56 +285,50 @@ mod bidi {
         // Check rule 2
         // In an `RTL` label, only characters with the `Bidi` properties `R`, `AL`,
         // `AN`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed:
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, AN)),
-            true
+        assert!(
+            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, AN))
         );
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, EN)),
-            true
+        assert!(
+            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, EN))
         );
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, EN, NSM)),
-            true
+        assert!(
+            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, EN, NSM))
         );
         // Add a character with `Bidi` property `WS` which is not in
         // [`R`, `AL`, `AN`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM`]
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, WS, ON, BN, EN, NSM)),
-            false
+        assert!(
+            !satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, WS, ON, BN, EN, NSM))
         );
 
         // Check rule 3
         // In an `RTL` label, the end of the label must be a character with
         // `Bidi` property `R`, `AL`, `EN`, or `AN`, followed by zero or more
         // characters with `Bidi` property `NSM`
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, AL, EN, NSM, NSM)), true);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, NSM, NSM, NSM, NSM)), true);
+        assert!(satisfy_bidi_rule(&str_chars!(R, AL, EN, NSM, NSM)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, NSM, NSM, NSM, NSM)));
         // Next tests check that last character is not in [`R`, `AL`, `EN`, or `AN`]
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, CS)), false);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, ET, NSM)), false);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, BN, NSM, NSM)), false);
+        assert!(!satisfy_bidi_rule(&str_chars!(R, CS)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ET, NSM)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, BN, NSM, NSM)));
 
         // After a character with `Bidi` property `NSM`, only character with the
         // same `Bidi` property are allowed
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, NSM, AN)), false);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, BN, NSM, NSM, AN)), false);
+        assert!(!satisfy_bidi_rule(&str_chars!(R, NSM, AN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, BN, NSM, NSM, AN)));
 
         // Check rule 4
         // In an `RTL` label, if an `EN` is present, no `AN` may be present, and
         // vice versa.
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(R, EN, CS, AN, AL, NSM)),
-            false
+        assert!(
+            !satisfy_bidi_rule(&str_chars!(R, EN, CS, AN, AL, NSM))
         );
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(R, AN, CS, EN, AL, NSM)),
-            false
+        assert!(
+            !satisfy_bidi_rule(&str_chars!(R, AN, CS, EN, AL, NSM))
         );
         // Two characters `AN` are allowed
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, AN, AN, AL)), true);
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, AN, AL)));
         // Two characters `EN` are allowed
-        assert_eq!(satisfy_bidi_rule(&str_chars!(R, EN, EN, AL)), true);
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, EN, AL)));
     }
 
     #[test]
@@ -342,38 +336,35 @@ mod bidi {
         // Check rule 5
         // In an `LTR` label, only characters with the `Bidi` properties `L`, `EN`,
         // `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed.
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, ET, ON, BN, L)),
-            true
+        assert!(
+            satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, ET, ON, BN, L))
         );
         // `LTR` label with a character with `Bidi` property `R` which is
         // not in [`L`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, `NSM`] must fail
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, R, ON, BN, L)),
-            false
+        assert!(
+            !satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, R, ON, BN, L))
         );
 
         // Check rule 6
         // In an `LTR` label, the end of the label must be a character with
         // `Bidi` property `L` or `EN`, followed by zero or more characters with
         // `Bidi` property `NSM`.
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L)), true);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L, EN)), true);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L, EN, NSM)), true);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L, EN, NSM, NSM)), true);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L, NSM)), true);
+        assert!(satisfy_bidi_rule(&str_chars!(L)));
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN)));
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, NSM)));
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, NSM, NSM)));
+        assert!(satisfy_bidi_rule(&str_chars!(L, NSM)));
 
         // `LTR` label that not ends with a character with `Bidi` property that
         // is not `L` or `EN` must fail
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L, ES)), false);
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L, CS, NSM)), false);
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ES)));
+        assert!(!satisfy_bidi_rule(&str_chars!(L, CS, NSM)));
 
         // After a character with `Bidi` property `NSM` is found, only
         // characters with `Bidi` property `NSM` are allowed
-        assert_eq!(satisfy_bidi_rule(&str_chars!(L, NSM, EN)), false);
-        assert_eq!(
-            satisfy_bidi_rule(&str_chars!(L, NSM, NSM, L, EN, NSM)),
-            false
+        assert!(!satisfy_bidi_rule(&str_chars!(L, NSM, EN)));
+        assert!(
+            !satisfy_bidi_rule(&str_chars!(L, NSM, NSM, L, EN, NSM))
         );
     }
 }
