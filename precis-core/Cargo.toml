@@ -17,15 +17,15 @@ categories = ["text-processing", "internationalization"]
 edition = "2018"
 
 [dev-dependencies]
-precis-tools = { path = "../precis-tools", version = "0.1.6" }
-ucd-parse = "0.1.8"
+precis-tools.workspace = true
+ucd-parse.workspace = true
 
 [build-dependencies]
-precis-tools = { path = "../precis-tools", version = "0.1.6" }
-ucd-parse = "0.1.8"
+precis-tools.workspace = true
+ucd-parse.workspace = true
 
 [dependencies]
-unicode-normalization = "0.1.19"
+unicode-normalization.workspace = true
 
 [features]
 networking = ["precis-tools/networking"]

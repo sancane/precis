@@ -5,3 +5,13 @@ members = [
 	"precis-profiles",
 	"precis-tools",
 ]
+
+[workspace.dependencies]
+lazy_static = "1.4.0"
+precis-core = {path = "precis-core"}
+precis-profiles = {path = "precis-profiles"}
+precis-tools = {path = "precis-tools"}
+regex = "1"
+reqwest = { version = "0.11.4", features = ["blocking"] }
+ucd-parse = "0.1.8"
+unicode-normalization = "0.1.19"

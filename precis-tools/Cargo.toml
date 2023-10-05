@@ -15,10 +15,10 @@ categories = ["text-processing", "internationalization"]
 edition = "2018"
 
 [dependencies]
-lazy_static = "1.4.0"
-regex = "1"
-reqwest = { version = "0.11.4", features = ["blocking"], optional = true }
-ucd-parse = "0.1.8"
+lazy_static.workspace = true
+regex.workspace = true
+reqwest = { workspace = true, optional = true }
+ucd-parse.workspace = true
 
 [features]
 networking = ["reqwest"]
