@@ -149,7 +149,7 @@ mod networking {
 
     fn create_dir(path: &Path) {
         if !path.is_dir() {
-            fs::create_dir(&path).unwrap();
+            fs::create_dir(path).unwrap();
         }
     }
 
@@ -210,8 +210,8 @@ fn main() {
     let out_path = Path::new(&out_dir);
     let ucd_path = Path::new(&out_path).join("ucd");
 
-    networking::download_files(&out_path);
-    generate_code(&ucd_path, &out_path);
+    networking::download_files(out_path);
+    generate_code(&ucd_path, out_path);
 
     println!("cargo:rerun-if-changed=build.rs");
 }

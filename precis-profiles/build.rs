@@ -46,7 +46,7 @@ mod download_ucd {
 
     pub fn create_dir(path: &Path) {
         if !path.is_dir() {
-            fs::create_dir(&path).unwrap();
+            fs::create_dir(path).unwrap();
         }
     }
 }
@@ -61,7 +61,7 @@ fn main() {
 
     precis_tools::download::get_ucd_file(UNICODE_VERSION, &ucd_path, "UnicodeData.txt").unwrap();
 
-    generate_code(&ucd_path, &out_path);
+    generate_code(&ucd_path, out_path);
 
     println!("cargo:rerun-if-changed=build.rs");
 }
