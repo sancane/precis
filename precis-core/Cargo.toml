@@ -1,6 +1,6 @@
 [package]
 name = "precis-core"
-version = "0.1.8"
+version = "0.1.9"
 authors = ["Santiago Carot-Nemesio <sancane@gmail.com>"]
 description = """
 PRECIS Framework: Preparation, Enforcement, and Comparison of
