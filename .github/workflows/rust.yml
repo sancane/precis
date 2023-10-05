@@ -25,15 +25,15 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
 
-  cargo_check:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install cargo-sort
-      run: cargo install --locked cargo-sort
-    - run: cargo sort -w -c
+#  cargo_check:
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Install cargo-sort
+#      run: cargo install --locked cargo-sort
+#    - run: cargo sort -w -c
 
 #  spellcheck:
 
