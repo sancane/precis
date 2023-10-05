@@ -1,6 +1,6 @@
 [package]
 name = "precis-profiles"
-version = "0.1.8"
+version = "0.1.9"
 authors = ["Santiago Carot-Nemesio <sancane@gmail.com"]
 description = """
 Implementation of the PRECIS Framework: Preparation, Enforcement,
@@ -18,12 +18,12 @@ categories = ["text-processing", "internationalization"]
 edition = "2018"
 
 [build-dependencies]
-precis-tools = { path = "../precis-tools", version = "0.1.6" }
+precis-tools.workspace = true
 
 [dependencies]
-lazy_static = "1.4.0"
-precis-core = { path = "../precis-core", version = "0.1.8" }
-unicode-normalization = "0.1.19"
+lazy_static.workspace = true
+precis-core.workspace = true
+unicode-normalization.workspace = true
 
 [features]
 networking = ["precis-core/networking", "precis-tools/networking"]
