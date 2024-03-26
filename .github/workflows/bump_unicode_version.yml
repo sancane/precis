@@ -1,0 +1,30 @@
+name: Update UnicodeData.txt monthly
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Getting latest UnicodeData.txt
+        uses: wei/wget@v1
+        with:
+            args: -O precis-profiles/resources/ucd/UnicodeData.txt https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+            commit-message: Update UnicodeData.txt to the latest version
+            title: Update UnicodeData.txt to the latest version
+            body: |
+              Update [UnicodeData.txt][1] to the latest version
+
+              [1]: https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt
+            branch: bump-unicode-data
+            base: main
+            labels: data
+            assignees: ${{ github.actor }}
+            reviewers: ${{ github.actor }}
+            delete-branch: true
