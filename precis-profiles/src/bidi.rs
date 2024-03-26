@@ -285,20 +285,20 @@ mod bidi_tests {
         // Check rule 2
         // In an `RTL` label, only characters with the `Bidi` properties `R`, `AL`,
         // `AN`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed:
-        assert!(
-            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, AN))
-        );
-        assert!(
-            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, EN))
-        );
-        assert!(
-            satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, ET, ON, BN, EN, NSM))
-        );
+        assert!(satisfy_bidi_rule(&str_chars!(
+            R, AL, ES, CS, ET, ON, BN, AN
+        )));
+        assert!(satisfy_bidi_rule(&str_chars!(
+            R, AL, ES, CS, ET, ON, BN, EN
+        )));
+        assert!(satisfy_bidi_rule(&str_chars!(
+            R, AL, ES, CS, ET, ON, BN, EN, NSM
+        )));
         // Add a character with `Bidi` property `WS` which is not in
         // [`R`, `AL`, `AN`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM`]
-        assert!(
-            !satisfy_bidi_rule(&str_chars!(R, AL, ES, CS, WS, ON, BN, EN, NSM))
-        );
+        assert!(!satisfy_bidi_rule(&str_chars!(
+            R, AL, ES, CS, WS, ON, BN, EN, NSM
+        )));
 
         // Check rule 3
         // In an `RTL` label, the end of the label must be a character with
@@ -319,12 +319,8 @@ mod bidi_tests {
         // Check rule 4
         // In an `RTL` label, if an `EN` is present, no `AN` may be present, and
         // vice versa.
-        assert!(
-            !satisfy_bidi_rule(&str_chars!(R, EN, CS, AN, AL, NSM))
-        );
-        assert!(
-            !satisfy_bidi_rule(&str_chars!(R, AN, CS, EN, AL, NSM))
-        );
+        assert!(!satisfy_bidi_rule(&str_chars!(R, EN, CS, AN, AL, NSM)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, AN, CS, EN, AL, NSM)));
         // Two characters `AN` are allowed
         assert!(satisfy_bidi_rule(&str_chars!(R, AN, AN, AL)));
         // Two characters `EN` are allowed
@@ -336,14 +332,10 @@ mod bidi_tests {
         // Check rule 5
         // In an `LTR` label, only characters with the `Bidi` properties `L`, `EN`,
         // `ES`, `CS`, `ET`, `ON`, `BN`, or `NSM` are allowed.
-        assert!(
-            satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, ET, ON, BN, L))
-        );
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, ET, ON, BN, L)));
         // `LTR` label with a character with `Bidi` property `R` which is
         // not in [`L`, `EN`, `ES`, `CS`, `ET`, `ON`, `BN`, `NSM`] must fail
-        assert!(
-            !satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, R, ON, BN, L))
-        );
+        assert!(!satisfy_bidi_rule(&str_chars!(L, EN, ES, CS, R, ON, BN, L)));
 
         // Check rule 6
         // In an `LTR` label, the end of the label must be a character with
@@ -363,8 +355,6 @@ mod bidi_tests {
         // After a character with `Bidi` property `NSM` is found, only
         // characters with `Bidi` property `NSM` are allowed
         assert!(!satisfy_bidi_rule(&str_chars!(L, NSM, EN)));
-        assert!(
-            !satisfy_bidi_rule(&str_chars!(L, NSM, NSM, L, EN, NSM))
-        );
+        assert!(!satisfy_bidi_rule(&str_chars!(L, NSM, NSM, L, EN, NSM)));
     }
 }
