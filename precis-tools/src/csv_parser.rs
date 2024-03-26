@@ -391,19 +391,13 @@ mod tests {
 
     #[test]
     fn precis_derived_property_from_str() {
-        assert!(
-            PrecisDerivedProperty::from_str("0020,ID_DIS or FREE_PVAL,SPACE").is_ok()
-        );
-        assert!(
-            PrecisDerivedProperty::from_str("0000-001F,DISALLOWED,NULL..INFORMATION SEPARATOR ONE")
-                .is_ok()
-        );
-        assert!(
-            PrecisDerivedProperty::from_str(",ID_DIS or FREE_PVAL,SPACE").is_err()
-        );
-        assert!(
-            PrecisDerivedProperty::from_str("0020,,SPACE").is_err()
-        );
+        assert!(PrecisDerivedProperty::from_str("0020,ID_DIS or FREE_PVAL,SPACE").is_ok());
+        assert!(PrecisDerivedProperty::from_str(
+            "0000-001F,DISALLOWED,NULL..INFORMATION SEPARATOR ONE"
+        )
+        .is_ok());
+        assert!(PrecisDerivedProperty::from_str(",ID_DIS or FREE_PVAL,SPACE").is_err());
+        assert!(PrecisDerivedProperty::from_str("0020,,SPACE").is_err());
         assert!(PrecisDerivedProperty::from_str(",,SPACE").is_err());
         assert!(PrecisDerivedProperty::from_str("").is_err());
     }
