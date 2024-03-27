@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build with networking
       run: cargo build --features networking --verbose
     - name: Build
@@ -44,7 +44,7 @@ jobs:
       with:
         tool: cargo-spellcheck
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Run cargo spellcheck
       run: cargo-spellcheck --code 1 --cfg=.github/workflows/spellchecker.cfg
