@@ -58,11 +58,10 @@ jobs:
       with:
         tool: cargo-careful
 
-    - uses: actions/checkout@v3
-    - name: Install minimal nightly
-      uses: actions-rs/toolchain@v1
+    - uses: actions/checkout@v4
+    - name: Install nightly
+      uses: dtolnay/rust-toolchain@stable
       with:
-        profile: minimal
         toolchain: nightly
 
     - name: Run cargo careful
@@ -76,7 +75,7 @@ jobs:
     - uses: taiki-e/install-action@v2
       with:
         tool: cargo-machete
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Run cargo machete
       run: cargo machete
