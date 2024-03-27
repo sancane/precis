@@ -10,10 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Getting latest UnicodeData.txt
-        uses: wei/wget@v1
-        with:
-            args: -O precis-profiles/resources/ucd/UnicodeData.txt https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt
+      - name: Updating latest unicode version in precis-profiles
+        run: |
+          file=precis-profiles/build.rs
+          new_version=`curl -Ls -o /dev/null -w %{url_effective} https://www.unicode.org/versions/latest/ | grep -o 'Unicode[0-9]\+\.[0-9]\+\.[0-9]\+' | sed 's/Unicode//'`
+          awk -v new_version="$new_version" '/const UNICODE_VERSION: &str = "[0-9]+\.[0-9]+\.[0-9]+";/ && !done {sub(/"[0-9]+\.[0-9]+\.[0-9]+"/, "\""new_version"\""); done=1} 1' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+          base_url="https://www.unicode.org/Public/$new_version"
+          curl -s -o precis-profiles/resources/ucd/UnicodeData.txt "$base_url/ucd/UnicodeData.txt"
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
