@@ -48,7 +48,7 @@ pub trait SpecificDerivedPropertyValue {
 /// > Else If .`cp`. .in. `Spaces` Then `ID_DIS` or `FREE_PVAL`;\
 /// > Else If .`cp`. .in. `Symbols` Then `ID_DIS` or `FREE_PVAL`;\
 /// > Else If .`cp`. .in. `Punctuation` Then `ID_DIS` or `FREE_PVAL`;\
-/// > Else DISALLOWED;\
+/// > Else `DISALLOWED`;
 ///
 /// # Arguments
 /// * `cp` - Unicode code point
