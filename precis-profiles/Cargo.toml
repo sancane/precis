@@ -1,6 +1,6 @@
 [package]
 name = "precis-profiles"
-version = "0.1.10"
+version = "0.1.11"
 authors = ["Santiago Carot-Nemesio <sancane@gmail.com"]
 description = """
 Implementation of the PRECIS Framework: Preparation, Enforcement,

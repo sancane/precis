@@ -36,3 +36,4 @@ pub use crate::nicknames::Nickname;
 pub use crate::passwords::OpaqueString;
 pub use crate::usernames::UsernameCaseMapped;
 pub use crate::usernames::UsernameCasePreserved;
+pub use precis_core;
