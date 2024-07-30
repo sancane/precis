@@ -44,59 +44,59 @@ impl CodeGen for DerivedPropertyValueGen {
         )?;
         writeln!(
             file,
-            "/// to be used in specific string classes such as [`IdentifierClass`]"
+            "///   to be used in specific string classes such as [`IdentifierClass`]"
         )?;
         writeln!(
             file,
-            "/// and [`FreeformClass`]. PRECIS framework defines two allowed"
+            "///   and [`FreeformClass`]. PRECIS framework defines two allowed"
         )?;
         writeln!(
             file,
-            "/// values for above classes (ID_PVAL adn FREE_PVAL). In practice,"
+            "///   values for above classes (ID_PVAL adn FREE_PVAL). In practice,"
         )?;
         writeln!(
             file,
-            "/// the derived property ID_PVAL is not used in this specification,"
+            "///   the derived property ID_PVAL is not used in this specification,"
         )?;
         writeln!(
             file,
-            "/// because every ID_PVAL code point is PVALID, so only FREE_PVAL"
+            "///   because every ID_PVAL code point is PVALID, so only FREE_PVAL"
         )?;
-        writeln!(file, "/// is actually mapped to SpecClassPVal.")?;
+        writeln!(file, "///   is actually mapped to SpecClassPVal.")?;
         writeln!(
             file,
             "/// * **SpecClassDis** maps to those code points that are not to be"
         )?;
         writeln!(
             file,
-            "/// included in one of the string classes but that might be permitted"
+            "///   included in one of the string classes but that might be permitted"
         )?;
         writeln!(
             file,
-            "/// in others. PRECIS framework defines \"FREE_DIS\" for the"
+            "///   in others. PRECIS framework defines \"FREE_DIS\" for the"
         )?;
         writeln!(
             file,
-            "/// [`FreeformClass`] and \"ID_DIS\" for the [`IdentifierClass`]."
+            "///   [`FreeformClass`] and \"ID_DIS\" for the [`IdentifierClass`]."
         )?;
         writeln!(
             file,
-            "/// In practice, the derived property FREE_DIS is not used in this"
+            "///   In practice, the derived property FREE_DIS is not used in this"
         )?;
         writeln!(
             file,
-            "/// specification, because every FREE_DIS code point is DISALLOWED,"
+            "///   specification, because every FREE_DIS code point is DISALLOWED,"
         )?;
-        writeln!(file, "/// so only ID_DIS is mapped to SpecClassDis.")?;
+        writeln!(file, "///   so only ID_DIS is mapped to SpecClassDis.")?;
         writeln!(
             file,
-            "/// Both SpecClassPVal and SpecClassDis values are used to ease"
+            "///   Both SpecClassPVal and SpecClassDis values are used to ease"
         )?;
         writeln!(
             file,
-            "/// extension if more classes are added beyond [`IdentifierClass`]"
+            "///   extension if more classes are added beyond [`IdentifierClass`]"
         )?;
-        writeln!(file, "/// and [`FreeformClass`] in the future.")?;
+        writeln!(file, "///   and [`FreeformClass`] in the future.")?;
         writeln!(file, "#[derive(Clone, Copy, Debug, PartialEq, Eq)]")?;
         writeln!(file, "pub enum DerivedPropertyValue {{")?;
         writeln!(file, "\t/// Value assigned to all those code points that are allowed to be used in any PRECIS string class.")?;
