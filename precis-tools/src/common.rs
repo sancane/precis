@@ -25,17 +25,14 @@ pub fn insert_codepoint_range(range: &CodepointRange, set: &mut HashSet<u32>) ->
 }
 
 fn add_range(range: &Option<CodepointRange>, out: &mut Vec<Codepoints>) {
-    match range {
-        Some(r) => {
-            if r.start == r.end {
-                // Add single code point
-                out.push(Single(r.start));
-            } else {
-                // Add range
-                out.push(Range(*r));
-            }
+    if let Some(r) = range {
+        if r.start == r.end {
+            // Add single code point
+            out.push(Single(r.start));
+        } else {
+            // Add range
+            out.push(Range(*r));
         }
-        None => (),
     };
 }
 
