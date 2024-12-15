@@ -100,8 +100,8 @@ mod tests {
 
     #[test]
     fn fmt_error() {
-        format!("{}", Error::Invalid);
-        format!(
+        let _val = format!("{}", Error::Invalid);
+        let _val = format!(
             "{}",
             Error::BadCodepoint(CodepointInfo {
                 cp: 0,
@@ -109,14 +109,14 @@ mod tests {
                 property: DerivedPropertyValue::PValid
             })
         );
-        format!("{}", Error::Unexpected(UnexpectedError::Undefined));
+        let _val = format!("{}", Error::Unexpected(UnexpectedError::Undefined));
     }
 
     #[test]
     fn fmt_unexpected_error() {
-        format!("{}", UnexpectedError::Undefined);
-        format!("{}", UnexpectedError::ProfileRuleNotApplicable);
-        format!(
+        let _val = format!("{}", UnexpectedError::Undefined);
+        let _val = format!("{}", UnexpectedError::ProfileRuleNotApplicable);
+        let _val = format!(
             "{}",
             UnexpectedError::MissingContextRule(CodepointInfo {
                 cp: 0,
@@ -124,7 +124,7 @@ mod tests {
                 property: DerivedPropertyValue::PValid
             })
         );
-        format!(
+        let _val = format!(
             "{}",
             UnexpectedError::ContextRuleNotApplicable(CodepointInfo {
                 cp: 0,
