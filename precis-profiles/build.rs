@@ -6,7 +6,7 @@ use precis_tools::{
 use std::env;
 use std::path::Path;
 
-const UNICODE_VERSION: &str = "16.0.0";
+const UNICODE_VERSION: &str = "17.0.0";
 
 fn generate_code(ucd: &Path, out: &Path) {
     let mut gen = RustCodeGen::new(Path::new(&out).join("bidi_class.rs")).unwrap();
