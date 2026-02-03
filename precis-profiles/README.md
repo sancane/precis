@@ -15,6 +15,20 @@ This crate implements the next PRECIS profiles:
    Preparation, Enforcement, and Comparison of Internationalized Strings
    Representing Nicknames
 
+## Unicode Version
+
+This crate uses a more recent version of Unicode than the RFC specification to provide support for a broader set of characters and modern scripts. This allows the profiles to accept contemporary Unicode characters that may not be present in the RFC-specified Unicode version.
+
+### Compatibility with precis-core
+
+While `precis-core` uses the RFC-specified Unicode version (as maintained by the IANA PRECIS registry), this crate deliberately uses a more recent Unicode version. This design provides:
+
+- **Broader Character Support**: Modern Unicode characters and scripts
+- **Better User Experience**: Reduces validation failures for legitimate modern text
+- **Forward Compatibility**: Ready for future IANA registry updates
+
+The core library maintains RFC compliance with the IANA-maintained Unicode version, while this profiles crate enhances usability by supporting newer characters. This approach prevents unexpected validation failures when processing code points whose derived properties are not yet defined in the official IANA PRECIS registry.
+
 ## Examples
 ```rust
 assert_eq!(Nickname::prepare("Guybrush Threepwood"),
