@@ -1,11 +1,12 @@
 use crate::error::Error;
 use crate::file_writer;
+use crate::generators::constants::{ASCII7_END, ASCII7_START};
 use crate::generators::CodeGen;
 use std::fs::File;
 
 const ASCII7: std::ops::Range<u32> = std::ops::Range {
-    start: 0x0021,
-    end: 0x007E,
+    start: ASCII7_START,
+    end: ASCII7_END,
 };
 
 /// Generates the [`ASCII7`](https://datatracker.ietf.org/doc/html/rfc8264#section-9.11)

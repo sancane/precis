@@ -1,6 +1,7 @@
 use crate::common;
 use crate::error::Error;
 use crate::file_writer;
+use crate::generators::constants::CANONICAL_COMBINING_CLASS_VIRAMA;
 use crate::generators::CodeGen;
 use crate::ucd_parsers;
 use std::collections::HashSet;
@@ -268,8 +269,6 @@ impl CodeGen for GeneralCategoryGen {
         Ok(())
     }
 }
-
-const CANONICAL_COMBINING_CLASS_VIRAMA: u8 = 9;
 
 /// Generator that creates a table of Unicode code points
 /// with the `Virama` canonical combining class.

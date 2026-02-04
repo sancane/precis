@@ -15,6 +15,24 @@
 
 use crate::common;
 
+// Unicode codepoints for context rules
+const ZERO_WIDTH_NON_JOINER: u32 = 0x200c;
+const ZERO_WIDTH_JOINER: u32 = 0x200d;
+const MIDDLE_DOT: u32 = 0x00b7;
+const LATIN_SMALL_LETTER_L: u32 = 0x006c;
+const GREEK_LOWER_NUMERAL_SIGN: u32 = 0x0375;
+const HEBREW_PUNCTUATION_GERESH: u32 = 0x05f3;
+const HEBREW_PUNCTUATION_GERSHAYIM: u32 = 0x05f4;
+const KATAKANA_MIDDLE_DOT: u32 = 0x30fb;
+
+// Arabic-Indic digits range
+const ARABIC_INDIC_DIGIT_START: u32 = 0x0660;
+const ARABIC_INDIC_DIGIT_END: u32 = 0x0669;
+
+// Extended Arabic-Indic digits range
+const EXTENDED_ARABIC_INDIC_DIGIT_START: u32 = 0x06f0;
+const EXTENDED_ARABIC_INDIC_DIGIT_END: u32 = 0x06f9;
+
 /// Gets the next character
 /// # Arguments
 /// * `s`: String label
@@ -67,7 +85,7 @@ pub enum ContextRuleError {
 /// # Returns
 /// True if context permits a ZERO WIDTH NON-JOINER `U+200C`.
 pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if 0x200c != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    if ZERO_WIDTH_NON_JOINER != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
 
@@ -118,7 +136,7 @@ pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, 
 /// # Returns
 /// Return true if context permits a ZERO WIDTH JOINER `U+200D`.
 pub(crate) fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if 0x200d != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    if ZERO_WIDTH_JOINER != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
     let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
@@ -135,12 +153,12 @@ pub(crate) fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, Con
 /// # Returns
 /// Return true if context permits a MIDDLE DOT `U+00B7`.
 pub(crate) fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if 0x00b7 != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    if MIDDLE_DOT != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
     let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
     let next = after(s, offset).ok_or(ContextRuleError::Undefined)?;
-    Ok(prev as u32 == 0x006c && next as u32 == 0x006c)
+    Ok(prev as u32 == LATIN_SMALL_LETTER_L && next as u32 == LATIN_SMALL_LETTER_L)
 }
 
 /// [Appendix A.4](https://datatracker.ietf.org/doc/html/rfc5892#appendix-A.4).
@@ -155,7 +173,8 @@ pub(crate) fn rule_greek_lower_numeral_sign_keraia(
     s: &str,
     offset: usize,
 ) -> Result<bool, ContextRuleError> {
-    if 0x0375 != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    if GREEK_LOWER_NUMERAL_SIGN != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32
+    {
         return Err(ContextRuleError::NotApplicable);
     }
     let after = after(s, offset).ok_or(ContextRuleError::Undefined)?;
@@ -173,7 +192,7 @@ pub(crate) fn rule_greek_lower_numeral_sign_keraia(
 /// Return true if context permits HEBREW PUNCTUATION `GERESH` or `GERSHAYIM` (`U+05F3`, `U+05F4`).
 pub(crate) fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
-    if cp != 0x05f3 && cp != 0x05f4 {
+    if cp != HEBREW_PUNCTUATION_GERESH && cp != HEBREW_PUNCTUATION_GERSHAYIM {
         return Err(ContextRuleError::NotApplicable);
     }
     let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
@@ -191,7 +210,7 @@ pub(crate) fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, Co
 /// # Returns
 /// Return true if context permits `KATAKANA MIDDLE DOT` `U+30FB`.
 pub(crate) fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if 0x30fb != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    if KATAKANA_MIDDLE_DOT != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
     for c in s.chars() {
@@ -213,10 +232,10 @@ pub(crate) fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, C
 /// Return true if context permits ARABIC-INDIC DIGITS (`U+0660`..`U+0669`).
 pub(crate) fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
-    if !(0x0660..=0x0669).contains(&cp) {
+    if !(ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END).contains(&cp) {
         return Err(ContextRuleError::NotApplicable);
     }
-    let range = 0x06f0..=0x06f9;
+    let range = EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END;
     for c in s.chars() {
         if range.contains(&(c as u32)) {
             return Ok(false);
@@ -238,10 +257,10 @@ pub(crate) fn rule_extended_arabic_indic_digits(
     offset: usize,
 ) -> Result<bool, ContextRuleError> {
     let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
-    if !(0x06f0..=0x06f9).contains(&cp) {
+    if !(EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END).contains(&cp) {
         return Err(ContextRuleError::NotApplicable);
     }
-    let range = 0x0660..=0x0669;
+    let range = ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END;
     for c in s.chars() {
         if range.contains(&(c as u32)) {
             return Ok(false);
@@ -262,14 +281,16 @@ pub type ContextRule = fn(s: &str, offset: usize) -> Result<bool, ContextRuleErr
 /// defined for the code point `cp`
 pub(crate) fn get_context_rule(cp: u32) -> Option<ContextRule> {
     match cp {
-        0x00b7 => Some(rule_middle_dot),
-        0x200c => Some(rule_zero_width_nonjoiner),
-        0x200d => Some(rule_zero_width_joiner),
-        0x0375 => Some(rule_greek_lower_numeral_sign_keraia),
-        0x05f3 | 0x5f4 => Some(rule_hebrew_punctuation),
-        0x30fb => Some(rule_katakana_middle_dot),
-        0x0660..=0x0669 => Some(rule_arabic_indic_digits),
-        0x06f0..=0x06f9 => Some(rule_extended_arabic_indic_digits),
+        MIDDLE_DOT => Some(rule_middle_dot),
+        ZERO_WIDTH_NON_JOINER => Some(rule_zero_width_nonjoiner),
+        ZERO_WIDTH_JOINER => Some(rule_zero_width_joiner),
+        GREEK_LOWER_NUMERAL_SIGN => Some(rule_greek_lower_numeral_sign_keraia),
+        HEBREW_PUNCTUATION_GERESH | HEBREW_PUNCTUATION_GERSHAYIM => Some(rule_hebrew_punctuation),
+        KATAKANA_MIDDLE_DOT => Some(rule_katakana_middle_dot),
+        ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END => Some(rule_arabic_indic_digits),
+        EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END => {
+            Some(rule_extended_arabic_indic_digits)
+        }
         _ => None,
     }
 }
@@ -737,53 +758,53 @@ mod tests {
         let val = get_context_rule(0x013);
         assert!(val.is_none());
 
-        let val = get_context_rule(0x00b7);
+        let val = get_context_rule(MIDDLE_DOT);
         assert!(val.is_some());
         assert_eq!(val.unwrap() as usize, rule_middle_dot as *const () as usize);
 
-        let val = get_context_rule(0x200c);
+        let val = get_context_rule(ZERO_WIDTH_NON_JOINER);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_zero_width_nonjoiner as *const () as usize
         );
 
-        let val = get_context_rule(0x0375);
+        let val = get_context_rule(GREEK_LOWER_NUMERAL_SIGN);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_greek_lower_numeral_sign_keraia as *const () as usize
         );
 
-        let val = get_context_rule(0x05f3);
+        let val = get_context_rule(HEBREW_PUNCTUATION_GERESH);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_hebrew_punctuation as *const () as usize
         );
 
-        let val = get_context_rule(0x05f4);
+        let val = get_context_rule(HEBREW_PUNCTUATION_GERSHAYIM);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_hebrew_punctuation as *const () as usize
         );
 
-        let val = get_context_rule(0x30fb);
+        let val = get_context_rule(KATAKANA_MIDDLE_DOT);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_katakana_middle_dot as *const () as usize
         );
 
-        let val = get_context_rule(0x0660);
+        let val = get_context_rule(ARABIC_INDIC_DIGIT_START);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_arabic_indic_digits as *const () as usize
         );
 
-        let val = get_context_rule(0x0669);
+        let val = get_context_rule(ARABIC_INDIC_DIGIT_END);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
@@ -796,14 +817,14 @@ mod tests {
         let val = get_context_rule(0x066a);
         assert!(val.is_none());
 
-        let val = get_context_rule(0x06f0);
+        let val = get_context_rule(EXTENDED_ARABIC_INDIC_DIGIT_START);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
             rule_extended_arabic_indic_digits as *const () as usize
         );
 
-        let val = get_context_rule(0x06f9);
+        let val = get_context_rule(EXTENDED_ARABIC_INDIC_DIGIT_END);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,

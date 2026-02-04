@@ -10,16 +10,15 @@ use ucd_parse::{
 
 use crate::common;
 use crate::file_writer;
+use crate::generators::constants::{ASCII7_END, ASCII7_START, CANONICAL_COMBINING_CLASS_VIRAMA};
 use crate::ucd_parsers::{DerivedJoiningType, HangulSyllableType};
 
 // 9.11.  ASCII7 (K)
 // K: cp is in {0021..007E}
 const ASCII7: std::ops::Range<u32> = std::ops::Range {
-    start: 0x0021,
-    end: 0x007E,
+    start: ASCII7_START,
+    end: ASCII7_END,
 };
-
-const CANONICAL_COMBINING_CLASS_VIRAMA: u8 = 9;
 
 pub struct CodeGenerator {
     // General_Category identified by abbreviated symbolic name
