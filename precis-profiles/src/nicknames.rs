@@ -1,10 +1,10 @@
 use crate::common;
-use lazy_static::lazy_static;
 use precis_core::profile::stabilize;
 use precis_core::profile::{PrecisFastInvocation, Profile, Rules};
 use precis_core::Error;
 use precis_core::{FreeformClass, StringClass};
 use std::borrow::Cow;
+use std::sync::LazyLock;
 
 // This function is used to check whether the input label will require any
 // modifications to apply the additional mapping rule for Nickname profile or not.
@@ -232,9 +232,7 @@ impl Rules for Nickname {
 }
 
 fn get_nickname_profile() -> &'static Nickname {
-    lazy_static! {
-        static ref NICKNAME: Nickname = Nickname::default();
-    }
+    static NICKNAME: LazyLock<Nickname> = LazyLock::new(Nickname::default);
     &NICKNAME
 }
 

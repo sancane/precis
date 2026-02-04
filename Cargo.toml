@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 
 members = [
 	"precis-core",
@@ -7,7 +8,6 @@ members = [
 ]
 
 [workspace.dependencies]
-lazy_static = "1.4.0"
 precis-core = { path = "precis-core" }
 precis-profiles = { path = "precis-profiles" }
 precis-tools = { path = "precis-tools" }

@@ -15,13 +15,12 @@ readme = "README.md"
 keywords = ["precis", "profiles", "rfc8264", "rfc8265", "rfc8266"]
 license = "MIT/Apache-2.0"
 categories = ["text-processing", "internationalization"]
-edition = "2018"
+edition = "2021"
 
 [build-dependencies]
 precis-tools.workspace = true
 
 [dependencies]
-lazy_static.workspace = true
 precis-core.workspace = true
 unicode-normalization.workspace = true
 

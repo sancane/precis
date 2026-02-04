@@ -1,9 +1,9 @@
 use crate::common;
-use lazy_static::lazy_static;
 use precis_core::profile::{PrecisFastInvocation, Profile, Rules};
 use precis_core::Error;
 use precis_core::{FreeformClass, StringClass};
 use std::borrow::Cow;
+use std::sync::LazyLock;
 
 /// [`OpaqueString`](<https://datatracker.ietf.org/doc/html/rfc8265#section-4.2>)
 /// Profile designed to deal with passwords and other opaque strings in security
@@ -104,9 +104,7 @@ impl Rules for OpaqueString {
 }
 
 fn get_opaque_string_profile() -> &'static OpaqueString {
-    lazy_static! {
-        static ref OPAQUE_STRING: OpaqueString = OpaqueString::default();
-    }
+    static OPAQUE_STRING: LazyLock<OpaqueString> = LazyLock::new(OpaqueString::default);
     &OPAQUE_STRING
 }
 

@@ -2,12 +2,12 @@ include!(concat!(env!("OUT_DIR"), "/width_mapping.rs"));
 
 use crate::bidi;
 use crate::common;
-use lazy_static::lazy_static;
 use precis_core::profile::{PrecisFastInvocation, Profile, Rules};
 use precis_core::Codepoints;
 use precis_core::{Error, UnexpectedError};
 use precis_core::{IdentifierClass, StringClass};
 use std::borrow::Cow;
+use std::sync::LazyLock;
 
 fn get_decomposition_mapping(cp: u32) -> Option<u32> {
     WIDE_NARROW_MAPPING
@@ -156,9 +156,8 @@ impl Rules for UsernameCaseMapped {
 }
 
 fn get_username_case_mapped_profile() -> &'static UsernameCaseMapped {
-    lazy_static! {
-        static ref USERNAME_CASE_MAPPED: UsernameCaseMapped = UsernameCaseMapped::default();
-    }
+    static USERNAME_CASE_MAPPED: LazyLock<UsernameCaseMapped> =
+        LazyLock::new(UsernameCaseMapped::default);
     &USERNAME_CASE_MAPPED
 }
 
@@ -277,10 +276,8 @@ impl Rules for UsernameCasePreserved {
 }
 
 fn get_username_case_preserved_profile() -> &'static UsernameCasePreserved {
-    lazy_static! {
-        static ref USERNAME_CASE_PRESERVED: UsernameCasePreserved =
-            UsernameCasePreserved::default();
-    }
+    static USERNAME_CASE_PRESERVED: LazyLock<UsernameCasePreserved> =
+        LazyLock::new(UsernameCasePreserved::default);
     &USERNAME_CASE_PRESERVED
 }
 
