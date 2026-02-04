@@ -66,7 +66,7 @@ pub enum ContextRuleError {
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// True if context permits a ZERO WIDTH NON-JOINER `U+200C`.
-pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     if 0x200c != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
@@ -117,7 +117,7 @@ pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, Context
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits a ZERO WIDTH JOINER `U+200D`.
-pub fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+pub(crate) fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     if 0x200d != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
@@ -134,7 +134,7 @@ pub fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, ContextRul
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits a MIDDLE DOT `U+00B7`.
-pub fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+pub(crate) fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     if 0x00b7 != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
@@ -151,7 +151,7 @@ pub fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError>
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits GREEK LOWER NUMERAL SIGN `U+0375`.
-pub fn rule_greek_lower_numeral_sign_keraia(
+pub(crate) fn rule_greek_lower_numeral_sign_keraia(
     s: &str,
     offset: usize,
 ) -> Result<bool, ContextRuleError> {
@@ -171,7 +171,7 @@ pub fn rule_greek_lower_numeral_sign_keraia(
 /// * `offset`: The position of the character in the label
 /// # Returns
 /// Return true if context permits HEBREW PUNCTUATION `GERESH` or `GERSHAYIM` (`U+05F3`, `U+05F4`).
-pub fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+pub(crate) fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
     if cp != 0x05f3 && cp != 0x05f4 {
         return Err(ContextRuleError::NotApplicable);
@@ -190,7 +190,7 @@ pub fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, ContextRu
 /// * `s`: String value to check
 /// # Returns
 /// Return true if context permits `KATAKANA MIDDLE DOT` `U+30FB`.
-pub fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+pub(crate) fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     if 0x30fb != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
         return Err(ContextRuleError::NotApplicable);
     }
@@ -211,7 +211,7 @@ pub fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextR
 /// * `s`: String value to check
 /// # Returns
 /// Return true if context permits ARABIC-INDIC DIGITS (`U+0660`..`U+0669`).
-pub fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+pub(crate) fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
     let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
     if !(0x0660..=0x0669).contains(&cp) {
         return Err(ContextRuleError::NotApplicable);
@@ -233,7 +233,10 @@ pub fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextR
 /// * `s`: String value to check
 /// # Returns
 /// Return true if context permits EXTENDED ARABIC-INDIC DIGITS (`U+06F0`..`U+06F9`).
-pub fn rule_extended_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
+pub(crate) fn rule_extended_arabic_indic_digits(
+    s: &str,
+    offset: usize,
+) -> Result<bool, ContextRuleError> {
     let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
     if !(0x06f0..=0x06f9).contains(&cp) {
         return Err(ContextRuleError::NotApplicable);
@@ -257,7 +260,7 @@ pub type ContextRule = fn(s: &str, offset: usize) -> Result<bool, ContextRuleErr
 /// # Returns
 /// The context rule function or None if there is no context rule
 /// defined for the code point `cp`
-pub fn get_context_rule(cp: u32) -> Option<ContextRule> {
+pub(crate) fn get_context_rule(cp: u32) -> Option<ContextRule> {
     match cp {
         0x00b7 => Some(rule_middle_dot),
         0x200c => Some(rule_zero_width_nonjoiner),
@@ -740,7 +743,10 @@ mod tests {
 
         let val = get_context_rule(0x200c);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_zero_width_nonjoiner as *const () as usize);
+        assert_eq!(
+            val.unwrap() as usize,
+            rule_zero_width_nonjoiner as *const () as usize
+        );
 
         let val = get_context_rule(0x0375);
         assert!(val.is_some());
@@ -751,23 +757,38 @@ mod tests {
 
         let val = get_context_rule(0x05f3);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as *const () as usize);
+        assert_eq!(
+            val.unwrap() as usize,
+            rule_hebrew_punctuation as *const () as usize
+        );
 
         let val = get_context_rule(0x05f4);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as *const () as usize);
+        assert_eq!(
+            val.unwrap() as usize,
+            rule_hebrew_punctuation as *const () as usize
+        );
 
         let val = get_context_rule(0x30fb);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_katakana_middle_dot as *const () as usize);
+        assert_eq!(
+            val.unwrap() as usize,
+            rule_katakana_middle_dot as *const () as usize
+        );
 
         let val = get_context_rule(0x0660);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as *const () as usize);
+        assert_eq!(
+            val.unwrap() as usize,
+            rule_arabic_indic_digits as *const () as usize
+        );
 
         let val = get_context_rule(0x0669);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as *const () as usize);
+        assert_eq!(
+            val.unwrap() as usize,
+            rule_arabic_indic_digits as *const () as usize
+        );
 
         let val = get_context_rule(0x065f);
         assert!(val.is_none());

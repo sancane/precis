@@ -5,20 +5,20 @@ use precis_core::Error;
 use std::borrow::Cow;
 use unicode_normalization::UnicodeNormalization;
 
-pub const SPACE: char = '\u{0020}';
+pub(crate) const SPACE: char = '\u{0020}';
 
-pub fn is_space_separator(c: char) -> bool {
+pub(crate) fn is_space_separator(c: char) -> bool {
     let cp = c as u32;
     SPACE_SEPARATOR
         .binary_search_by(|cps| cps.partial_cmp(&cp).unwrap())
         .is_ok()
 }
 
-pub fn is_non_ascii_space(c: char) -> bool {
+pub(crate) fn is_non_ascii_space(c: char) -> bool {
     c != SPACE && is_space_separator(c)
 }
 
-pub fn normalization_form_nfkc<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
+pub(crate) fn normalization_form_nfkc<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
 {
@@ -33,7 +33,7 @@ where
     }
 }
 
-pub fn normalization_form_nfc<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
+pub(crate) fn normalization_form_nfc<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
 {
@@ -48,7 +48,7 @@ where
     }
 }
 
-pub fn case_mapping_rule<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
+pub(crate) fn case_mapping_rule<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
 {
