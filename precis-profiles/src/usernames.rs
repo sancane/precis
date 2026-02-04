@@ -100,7 +100,7 @@ impl Profile for UsernameCaseMapped {
         S: Into<Cow<'a, str>>,
     {
         let s = self.width_mapping_rule(s)?;
-        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
+        let s = common::ensure_not_empty(s)?;
         self.0.allows(&s)?;
         Ok(s)
     }
@@ -112,7 +112,7 @@ impl Profile for UsernameCaseMapped {
         let s = self.prepare(s)?;
         let s = self.case_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
+        let s = common::ensure_not_empty(s)?;
         self.directionality_rule(s)
     }
 
@@ -228,7 +228,7 @@ impl Profile for UsernameCasePreserved {
         S: Into<Cow<'a, str>>,
     {
         let s = self.width_mapping_rule(s)?;
-        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
+        let s = common::ensure_not_empty(s)?;
         self.0.allows(&s)?;
         Ok(s)
     }
@@ -239,7 +239,7 @@ impl Profile for UsernameCasePreserved {
     {
         let s = self.prepare(s)?;
         let s = self.normalization_rule(s)?;
-        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
+        let s = common::ensure_not_empty(s)?;
         self.directionality_rule(s)
     }
 

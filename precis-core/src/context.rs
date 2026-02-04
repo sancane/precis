@@ -71,6 +71,41 @@ pub enum ContextRuleError {
     Undefined,
 }
 
+/// Helper to check if the character at offset matches the expected codepoint.
+/// Returns NotApplicable if it doesn't match, Undefined if offset is out of bounds.
+#[inline]
+fn check_char_at_offset(s: &str, offset: usize, expected: u32) -> Result<(), ContextRuleError> {
+    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
+    if cp != expected {
+        return Err(ContextRuleError::NotApplicable);
+    }
+    Ok(())
+}
+
+/// Helper to check if the character at offset is in the expected range.
+/// Returns NotApplicable if it's not in range, Undefined if offset is out of bounds.
+#[inline]
+fn check_char_in_range(
+    s: &str,
+    offset: usize,
+    start: u32,
+    end: u32,
+) -> Result<u32, ContextRuleError> {
+    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
+    if !(start..=end).contains(&cp) {
+        return Err(ContextRuleError::NotApplicable);
+    }
+    Ok(cp)
+}
+
+/// Helper to check that a string doesn't contain any characters in the forbidden range.
+/// Used for checking exclusive digit ranges (Arabic-Indic vs Extended Arabic-Indic).
+#[inline]
+fn check_no_chars_in_range(s: &str, forbidden_start: u32, forbidden_end: u32) -> bool {
+    let range = forbidden_start..=forbidden_end;
+    !s.chars().any(|c| range.contains(&(c as u32)))
+}
+
 /// [Appendix A.1](https://datatracker.ietf.org/doc/html/rfc5892#appendix-A.1).
 /// ZERO WIDTH NON-JOINER `U+200C`
 /// This may occur in a formally cursive script (such as Arabic) in a
@@ -85,9 +120,7 @@ pub enum ContextRuleError {
 /// # Returns
 /// True if context permits a ZERO WIDTH NON-JOINER `U+200C`.
 pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if ZERO_WIDTH_NON_JOINER != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
-        return Err(ContextRuleError::NotApplicable);
-    }
+    check_char_at_offset(s, offset, ZERO_WIDTH_NON_JOINER)?;
 
     let mut prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
     let mut cp = prev as u32;
@@ -136,9 +169,7 @@ pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, 
 /// # Returns
 /// Return true if context permits a ZERO WIDTH JOINER `U+200D`.
 pub(crate) fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if ZERO_WIDTH_JOINER != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
-        return Err(ContextRuleError::NotApplicable);
-    }
+    check_char_at_offset(s, offset, ZERO_WIDTH_JOINER)?;
     let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(common::is_virama(prev as u32))
 }
@@ -153,9 +184,7 @@ pub(crate) fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, Con
 /// # Returns
 /// Return true if context permits a MIDDLE DOT `U+00B7`.
 pub(crate) fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if MIDDLE_DOT != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
-        return Err(ContextRuleError::NotApplicable);
-    }
+    check_char_at_offset(s, offset, MIDDLE_DOT)?;
     let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
     let next = after(s, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(prev as u32 == LATIN_SMALL_LETTER_L && next as u32 == LATIN_SMALL_LETTER_L)
@@ -173,10 +202,7 @@ pub(crate) fn rule_greek_lower_numeral_sign_keraia(
     s: &str,
     offset: usize,
 ) -> Result<bool, ContextRuleError> {
-    if GREEK_LOWER_NUMERAL_SIGN != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32
-    {
-        return Err(ContextRuleError::NotApplicable);
-    }
+    check_char_at_offset(s, offset, GREEK_LOWER_NUMERAL_SIGN)?;
     let after = after(s, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(common::is_greek(after as u32))
 }
@@ -210,9 +236,7 @@ pub(crate) fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, Co
 /// # Returns
 /// Return true if context permits `KATAKANA MIDDLE DOT` `U+30FB`.
 pub(crate) fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if KATAKANA_MIDDLE_DOT != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
-        return Err(ContextRuleError::NotApplicable);
-    }
+    check_char_at_offset(s, offset, KATAKANA_MIDDLE_DOT)?;
     for c in s.chars() {
         let cp = c as u32;
         if common::is_hiragana(cp) || common::is_katakana(cp) || common::is_han(cp) {
@@ -231,18 +255,12 @@ pub(crate) fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, C
 /// # Returns
 /// Return true if context permits ARABIC-INDIC DIGITS (`U+0660`..`U+0669`).
 pub(crate) fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
-    if !(ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END).contains(&cp) {
-        return Err(ContextRuleError::NotApplicable);
-    }
-    let range = EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END;
-    for c in s.chars() {
-        if range.contains(&(c as u32)) {
-            return Ok(false);
-        }
-    }
-
-    Ok(true)
+    check_char_in_range(s, offset, ARABIC_INDIC_DIGIT_START, ARABIC_INDIC_DIGIT_END)?;
+    Ok(check_no_chars_in_range(
+        s,
+        EXTENDED_ARABIC_INDIC_DIGIT_START,
+        EXTENDED_ARABIC_INDIC_DIGIT_END,
+    ))
 }
 
 /// [Appendix A.9](https://datatracker.ietf.org/doc/html/rfc5892#appendix-A.9).
@@ -256,18 +274,17 @@ pub(crate) fn rule_extended_arabic_indic_digits(
     s: &str,
     offset: usize,
 ) -> Result<bool, ContextRuleError> {
-    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
-    if !(EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END).contains(&cp) {
-        return Err(ContextRuleError::NotApplicable);
-    }
-    let range = ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END;
-    for c in s.chars() {
-        if range.contains(&(c as u32)) {
-            return Ok(false);
-        }
-    }
-
-    Ok(true)
+    check_char_in_range(
+        s,
+        offset,
+        EXTENDED_ARABIC_INDIC_DIGIT_START,
+        EXTENDED_ARABIC_INDIC_DIGIT_END,
+    )?;
+    Ok(check_no_chars_in_range(
+        s,
+        ARABIC_INDIC_DIGIT_START,
+        ARABIC_INDIC_DIGIT_END,
+    ))
 }
 
 /// Describes a context rule function

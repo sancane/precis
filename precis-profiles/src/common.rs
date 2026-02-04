@@ -18,6 +18,55 @@ pub(crate) fn is_non_ascii_space(c: char) -> bool {
     c != SPACE && is_space_separator(c)
 }
 
+/// Helper function to transform a string starting from the first position where
+/// a predicate matches, avoiding allocation if no transformation is needed.
+///
+/// # Arguments
+/// * `s` - Input string
+/// * `predicate` - Function to find the first position to transform
+/// * `transform` - Function to transform each character from that position
+///
+/// # Returns
+/// Original string if predicate never matches, or transformed string otherwise
+pub(crate) fn transform_from_first_match<'a, T, P, F>(
+    s: T,
+    predicate: P,
+    mut transform: F,
+) -> Result<Cow<'a, str>, Error>
+where
+    T: Into<Cow<'a, str>>,
+    P: Fn(char) -> bool,
+    F: FnMut(char, &mut String),
+{
+    let s = s.into();
+    match s.find(predicate) {
+        None => Ok(s),
+        Some(pos) => {
+            let mut res = String::from(&s[..pos]);
+            res.reserve(s.len() - res.len());
+            for c in s[pos..].chars() {
+                transform(c, &mut res);
+            }
+            Ok(res.into())
+        }
+    }
+}
+
+/// Ensures a string is not empty, returning an error if it is.
+///
+/// # Arguments
+/// * `s` - Input string
+///
+/// # Returns
+/// The input string if not empty, or Error::Invalid if empty
+pub(crate) fn ensure_not_empty<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
+where
+    T: Into<Cow<'a, str>>,
+{
+    let s = s.into();
+    (!s.is_empty()).then_some(s).ok_or(Error::Invalid)
+}
+
 pub(crate) fn normalization_form_nfkc<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
@@ -52,22 +101,13 @@ pub(crate) fn case_mapping_rule<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
 {
-    let s = s.into();
-    match s.find(char::is_uppercase) {
-        None => Ok(s),
-        Some(pos) => {
-            let mut res = String::from(&s[..pos]);
-            res.reserve(s.len() - res.len());
-            for c in s[pos..].chars() {
-                if c.is_lowercase() {
-                    res.push(c);
-                } else {
-                    c.to_lowercase().for_each(|x| res.push(x));
-                }
-            }
-            Ok(res.into())
+    transform_from_first_match(s, char::is_uppercase, |c, res| {
+        if c.is_lowercase() {
+            res.push(c);
+        } else {
+            c.to_lowercase().for_each(|x| res.push(x));
         }
-    }
+    })
 }
 
 #[cfg(test)]

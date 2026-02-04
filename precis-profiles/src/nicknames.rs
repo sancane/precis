@@ -156,8 +156,7 @@ impl Nickname {
     where
         T: Into<Cow<'a, str>>,
     {
-        let s = s.into();
-        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
+        let s = common::ensure_not_empty(s)?;
         self.0.allows(&s)?;
         Ok(s)
     }
@@ -169,7 +168,7 @@ impl Nickname {
         let s = self.apply_prepare_rules(s)?;
         let s = self.additional_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        (!s.is_empty()).then_some(s).ok_or(Error::Invalid)
+        common::ensure_not_empty(s)
     }
 
     fn apply_compare_rules<'a, T>(&self, s: T) -> Result<Cow<'a, str>, Error>

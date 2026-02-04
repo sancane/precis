@@ -6,18 +6,22 @@ use crate::DerivedPropertyValue;
 use std::char;
 use unicode_normalization::UnicodeNormalization;
 
+/// Helper function to perform binary search on a table of (Codepoints, T) tuples
+/// and return the associated value if found.
+#[inline]
+fn binary_search_codepoints_table<T>(table: &[(Codepoints, T)], cp: u32) -> Option<&T> {
+    table
+        .binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap())
+        .ok()
+        .map(|idx| &table[idx].1)
+}
+
 pub(crate) fn get_exception_val(cp: u32) -> Option<&'static DerivedPropertyValue> {
-    match EXCEPTIONS.binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap()) {
-        Ok(idx) => Some(&EXCEPTIONS[idx].1),
-        Err(_) => None,
-    }
+    binary_search_codepoints_table(&EXCEPTIONS, cp)
 }
 
 pub(crate) fn get_backward_compatible_val(cp: u32) -> Option<&'static DerivedPropertyValue> {
-    match BACKWARD_COMPATIBLE.binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap()) {
-        Ok(idx) => Some(&BACKWARD_COMPATIBLE[idx].1),
-        Err(_) => None,
-    }
+    binary_search_codepoints_table(&BACKWARD_COMPATIBLE, cp)
 }
 
 fn is_in_table(cp: u32, table: &[Codepoints]) -> bool {
