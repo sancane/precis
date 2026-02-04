@@ -12,10 +12,9 @@ readme = "README.md"
 keywords = ["Preparation", "Enforcement", "Comparison", "Internationalized", "precis"]
 license = "MIT/Apache-2.0"
 categories = ["text-processing", "internationalization"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-lazy_static.workspace = true
 regex.workspace = true
 reqwest = { workspace = true, optional = true }
 ucd-parse.workspace = true

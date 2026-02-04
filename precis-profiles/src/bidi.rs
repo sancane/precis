@@ -17,7 +17,7 @@ fn bidi_class(c: char) -> BidiClass {
 
 /// From `rfc5893` Right-to-Left Scripts for Internationalized Domain Names for Applications (`IDNA`)
 /// An `RTL` label is a label that contains at least one character of type R, AL, or AN.
-pub fn has_rtl(label: &str) -> bool {
+pub(crate) fn has_rtl(label: &str) -> bool {
     label
         .find(|c| matches!(bidi_class(c), BidiClass::R | BidiClass::AL | BidiClass::AN))
         .is_some()
@@ -50,7 +50,7 @@ pub fn has_rtl(label: &str) -> bool {
 // 6.  In an `LTR` label, the end of the label must be a character with
 //     `Bidi` property `L` or `EN`, followed by zero or more characters with
 //     `Bidi` property `NSM`.
-pub fn satisfy_bidi_rule(label: &str) -> bool {
+pub(crate) fn satisfy_bidi_rule(label: &str) -> bool {
     let mut it = label.chars();
 
     if let Some(c) = it.next() {

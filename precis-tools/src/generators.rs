@@ -7,6 +7,7 @@ pub mod ascii7;
 pub mod backward_compatible;
 pub mod bidi_class;
 pub mod codepoints;
+pub mod constants;
 pub mod derived_property;
 pub mod exceptions;
 pub mod ucd_generator;

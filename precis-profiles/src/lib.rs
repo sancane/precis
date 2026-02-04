@@ -21,6 +21,28 @@
 //! assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
 //!   "guybrush threepwood"), Ok(true));
 //! ```
+//!
+//! # Unicode Version
+//!
+//! This crate uses a more recent version of Unicode than the RFC specification to provide
+//! support for a broader set of characters and modern scripts used by applications. This
+//! allows the profiles to accept contemporary Unicode characters that may not be present
+//! in the RFC-specified Unicode version.
+//!
+//! ## Compatibility with precis-core
+//!
+//! While `precis-core` uses the RFC-specified Unicode version (as maintained by the `IANA`
+//! PRECIS registry), this crate deliberately uses a more recent Unicode version. This design
+//! decision provides:
+//!
+//! - **Broader Character Support**: Modern Unicode characters and scripts
+//! - **Better User Experience**: Reduces validation failures for legitimate modern text
+//! - **Forward Compatibility**: Ready for future `IANA` registry updates
+//!
+//! The core library maintains RFC compliance by using the `IANA`-maintained Unicode version,
+//! while this profiles crate enhances usability by supporting newer characters. This approach
+//! avoids unexpected validation failures when processing code points whose derived properties
+//! are not yet defined in the official `IANA` PRECIS registry.
 
 #![deny(missing_docs)]
 

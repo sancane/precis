@@ -1,12 +1,16 @@
 use crate::Error;
-use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
+use std::sync::LazyLock;
 use ucd_parse::CodepointRange;
+
+/// Expected number of columns in PRECIS CSV table format
+/// Format: codepoint,property,description
+const PRECIS_CSV_COLUMN_COUNT: usize = 3;
 
 /// A line oriented parser for a particular `UCD` file.
 ///
@@ -146,9 +150,8 @@ impl FromStr for DerivedProperty {
 }
 
 fn parse_codepoint_range(s: &str) -> Result<ucd_parse::CodepointRange, Error> {
-    lazy_static! {
-        static ref PARTS: Regex = Regex::new(r"^(?P<start>[A-Z0-9]+)-(?P<end>[A-Z0-9]+)$").unwrap();
-    }
+    static PARTS: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"^(?P<start>[A-Z0-9]+)-(?P<end>[A-Z0-9]+)$").unwrap());
     let caps = match PARTS.captures(s) {
         Some(caps) => caps,
         None => return err!("invalid codepoint range: '{}'", s),
@@ -171,9 +174,8 @@ fn parse_codepoints(s: &str) -> Result<ucd_parse::Codepoints, Error> {
 }
 
 fn parse_derived_property_tuple(s: &str) -> Result<(DerivedProperty, DerivedProperty), Error> {
-    lazy_static! {
-        static ref PARTS: Regex = Regex::new(r"^(?P<p1>[A-Z_]+)\s+or\s+(?P<p2>[A-Z_]+)$").unwrap();
-    }
+    static PARTS: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"^(?P<p1>[A-Z_]+)\s+or\s+(?P<p2>[A-Z_]+)$").unwrap());
 
     let caps = match PARTS.captures(s) {
         Some(caps) => caps,
@@ -198,8 +200,8 @@ fn parse_derived_properties(s: &str) -> Result<DerivedProperties, Error> {
 fn parse_precis_table_line(
     line: &str,
 ) -> Result<(ucd_parse::Codepoints, DerivedProperties, &str), Error> {
-    let v: Vec<&str> = line.splitn(3, ',').collect();
-    if v.len() != 3 {
+    let v: Vec<&str> = line.splitn(PRECIS_CSV_COLUMN_COUNT, ',').collect();
+    if v.len() != PRECIS_CSV_COLUMN_COUNT {
         return Err(Error {
             mesg: "Error parsing line".to_string(),
             line: None,

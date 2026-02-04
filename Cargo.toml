@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 
 members = [
 	"precis-core",
@@ -7,11 +8,10 @@ members = [
 ]
 
 [workspace.dependencies]
-lazy_static = "1.4.0"
 precis-core = { path = "precis-core" }
 precis-profiles = { path = "precis-profiles" }
 precis-tools = { path = "precis-tools" }
 regex = "1"
-reqwest = { version = "0.12.1", features = ["blocking"] }
-ucd-parse = "0.1.8"
-unicode-normalization = "0.1.24"
+reqwest = { version = "0.13", features = ["blocking"] }
+ucd-parse = "0.1"
+unicode-normalization = "0.1"

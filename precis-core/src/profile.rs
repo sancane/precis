@@ -121,7 +121,7 @@ pub trait Profile {
 
 /// Fast invocation trait that allows profiles to be used without providing
 /// a specific instance. This is usually achieved by using a static instance
-/// allocated with [`lazy_static`](https://docs.rs/lazy_static/1.4.0/lazy_static)
+/// allocated with [`LazyLock`](https://doc.rust-lang.org/std/sync/struct.LazyLock.html)
 pub trait PrecisFastInvocation {
     /// Ensures that the code points in a single input string are allowed
     /// by the underlying PRECIS string class, and sometimes also entails

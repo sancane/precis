@@ -1,9 +1,9 @@
 use crate::error::Error;
 use crate::generators::CodeGen;
-use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
 use std::io::Write;
+use std::sync::LazyLock;
 
 /// Generates the UNICODE version variable used to generate
 /// the library.
@@ -21,9 +21,8 @@ impl UnicodeVersionGen {
 }
 
 fn get_version(version: &str) -> Result<(u64, u64, u64), Error> {
-    lazy_static! {
-        static ref VERSION_RX: Regex = Regex::new(r"([0-9]+).([0-9]+).([0-9]+)").unwrap();
-    }
+    static VERSION_RX: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"([0-9]+).([0-9]+).([0-9]+)").unwrap());
 
     let caps = match VERSION_RX.captures(version) {
         Some(c) => c,

@@ -15,6 +15,20 @@ This crate provides the `APIs` required for profiles to be implemented.
 The crate [precis-profiles](https://docs.rs/precis-profiles)
 provides a list of implemented profiles that applications can use.
 
+## Unicode Version
+
+This crate uses the Unicode version specified in the PRECIS RFC and maintained by the [IANA PRECIS registry](https://www.iana.org/assignments/precis-tables/precis-tables.xhtml). The core library strictly adheres to the RFC specification and will continue to use the IANA-maintained Unicode version until the registry is updated.
+
+### Why the RFC-specified Unicode version?
+
+- **RFC Compliance**: Full conformance with the PRECIS specification
+- **Predictable Behavior**: Consistent validation results across implementations
+- **Interoperability**: Compatibility with other RFC-compliant PRECIS implementations
+
+### Note on Unicode Version Differences
+
+The `precis-profiles` crate uses a more recent Unicode version to support a broader set of modern characters. This is a deliberate design decision to enhance usability while maintaining RFC compliance at the core level. See the [precis-profiles documentation](https://docs.rs/precis-profiles) for more details.
+
 # Contributing
 
 Patches and feedback are welcome.
