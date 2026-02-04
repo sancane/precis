@@ -155,10 +155,10 @@ impl UnicodeData {
             }
 
             if udata.is_range_start() {
-                if range.is_some() {
+                if let Some(r) = range {
                     return err!(
                             "Previous range started with codepoint {:#06x} has not yet finished. File: {}",
-							range.unwrap().start.value(),
+							r.start.value(),
                             ucd_parse::UnicodeData::file_path(ucd_dir)
                                 .to_str()
                                 .unwrap()

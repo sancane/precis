@@ -736,38 +736,38 @@ mod tests {
 
         let val = get_context_rule(0x00b7);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_middle_dot as usize);
+        assert_eq!(val.unwrap() as usize, rule_middle_dot as *const () as usize);
 
         let val = get_context_rule(0x200c);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_zero_width_nonjoiner as usize);
+        assert_eq!(val.unwrap() as usize, rule_zero_width_nonjoiner as *const () as usize);
 
         let val = get_context_rule(0x0375);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
-            rule_greek_lower_numeral_sign_keraia as usize
+            rule_greek_lower_numeral_sign_keraia as *const () as usize
         );
 
         let val = get_context_rule(0x05f3);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as usize);
+        assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as *const () as usize);
 
         let val = get_context_rule(0x05f4);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as usize);
+        assert_eq!(val.unwrap() as usize, rule_hebrew_punctuation as *const () as usize);
 
         let val = get_context_rule(0x30fb);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_katakana_middle_dot as usize);
+        assert_eq!(val.unwrap() as usize, rule_katakana_middle_dot as *const () as usize);
 
         let val = get_context_rule(0x0660);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as usize);
+        assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as *const () as usize);
 
         let val = get_context_rule(0x0669);
         assert!(val.is_some());
-        assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as usize);
+        assert_eq!(val.unwrap() as usize, rule_arabic_indic_digits as *const () as usize);
 
         let val = get_context_rule(0x065f);
         assert!(val.is_none());
@@ -779,14 +779,14 @@ mod tests {
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
-            rule_extended_arabic_indic_digits as usize
+            rule_extended_arabic_indic_digits as *const () as usize
         );
 
         let val = get_context_rule(0x06f9);
         assert!(val.is_some());
         assert_eq!(
             val.unwrap() as usize,
-            rule_extended_arabic_indic_digits as usize
+            rule_extended_arabic_indic_digits as *const () as usize
         );
 
         let val = get_context_rule(0x06ef);
