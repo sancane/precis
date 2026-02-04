@@ -149,3 +149,112 @@ fn compare() {
         )))
     );
 }
+
+#[test]
+fn test_multibyte_utf8_characters() {
+    // Test with Spanish characters (accented)
+    let res = Nickname::enforce("José García");
+    assert_eq!(res, Ok(Cow::from("José García")));
+
+    let res = Nickname::enforce("  José   García  ");
+    assert_eq!(res, Ok(Cow::from("José García")));
+
+    // Test with French characters
+    let res = Nickname::enforce("François Müller");
+    assert_eq!(res, Ok(Cow::from("François Müller")));
+
+    let res = Nickname::enforce("  Naïve   Test  ");
+    assert_eq!(res, Ok(Cow::from("Naïve Test")));
+
+    // Test with German characters
+    let res = Nickname::enforce("  Björk   Güdröndóttir  ");
+    assert_eq!(res, Ok(Cow::from("Björk Güdröndóttir")));
+
+    // Test with café example (the original bug case)
+    let res = Nickname::enforce("café test");
+    assert_eq!(res, Ok(Cow::from("café test")));
+
+    let res = Nickname::enforce("  café   test  ");
+    assert_eq!(res, Ok(Cow::from("café test")));
+
+    // Test comparison with multibyte
+    let res = Nickname::compare("  José   García  ", "josé garcía");
+    assert_eq!(res, Ok(true));
+
+    let res = Nickname::compare("  café   test  ", "café test");
+    assert_eq!(res, Ok(true));
+}
+
+#[test]
+fn test_cjk_characters() {
+    // Test with Chinese characters
+    let res = Nickname::enforce("李明");
+    assert_eq!(res, Ok(Cow::from("李明")));
+
+    let res = Nickname::enforce("  李明  ");
+    assert_eq!(res, Ok(Cow::from("李明")));
+
+    let res = Nickname::enforce("  张三   李四  ");
+    assert_eq!(res, Ok(Cow::from("张三 李四")));
+
+    // Test with Japanese characters
+    let res = Nickname::enforce("田中太郎");
+    assert_eq!(res, Ok(Cow::from("田中太郎")));
+
+    let res = Nickname::enforce("  佐藤   花子  ");
+    assert_eq!(res, Ok(Cow::from("佐藤 花子")));
+
+    // Test with Korean characters
+    let res = Nickname::enforce("김철수");
+    assert_eq!(res, Ok(Cow::from("김철수")));
+
+    let res = Nickname::enforce("  박영희   이민수  ");
+    assert_eq!(res, Ok(Cow::from("박영희 이민수")));
+}
+
+#[test]
+fn test_arabic_characters() {
+    // Test with Arabic characters
+    let res = Nickname::enforce("محمد");
+    assert_eq!(res, Ok(Cow::from("محمد")));
+
+    let res = Nickname::enforce("  محمد   علي  ");
+    assert_eq!(res, Ok(Cow::from("محمد علي")));
+
+    // Test with mixed Arabic and Latin
+    let res = Nickname::enforce("  User   محمد  ");
+    assert_eq!(res, Ok(Cow::from("User محمد")));
+}
+
+#[test]
+fn test_emoji_with_spaces() {
+    // Test with emoji characters
+    let res = Nickname::enforce("User 🎮");
+    assert_eq!(res, Ok(Cow::from("User 🎮")));
+
+    let res = Nickname::enforce("  Player   🎯  ");
+    assert_eq!(res, Ok(Cow::from("Player 🎯")));
+
+    let res = Nickname::enforce("  Test   ⚡   User  ");
+    assert_eq!(res, Ok(Cow::from("Test ⚡ User")));
+}
+
+#[test]
+fn test_utf8_bug_double_space_after_multibyte() {
+    // This test specifically targets the UTF-8 bug:
+    // "café  test" has a 2-byte character 'é' followed by double space
+    // If chars().enumerate() is used instead of char_indices(),
+    // it will return character index 4 for the first space,
+    // but the byte index at character 4 is actually 5 (because 'é' is 2 bytes).
+    // Using character index as byte index in slicing will cause panic.
+    let res = Nickname::enforce("café  test");
+    assert_eq!(res, Ok(Cow::from("café test")));
+
+    // Another case: leading double space after multibyte at start
+    let res = Nickname::enforce("é  test");
+    assert_eq!(res, Ok(Cow::from("é test")));
+
+    // Case with emoji (4-byte UTF-8) followed by double space
+    let res = Nickname::enforce("hi🎮  test");
+    assert_eq!(res, Ok(Cow::from("hi🎮 test")));
+}

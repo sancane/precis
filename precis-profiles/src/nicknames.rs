@@ -20,10 +20,10 @@ fn find_disallowed_space(label: &str) -> Option<usize> {
     let mut begin = true;
     let mut prev_space = false;
     let mut last_c: Option<char> = None;
-    let mut offset = 0;
+    let mut last_byte_index = 0;
 
-    for (index, c) in label.chars().enumerate() {
-        offset = index;
+    for (byte_index, c) in label.char_indices() {
+        last_byte_index = byte_index;
         if !common::is_space_separator(c) {
             last_c = Some(c);
             prev_space = false;
@@ -33,12 +33,12 @@ fn find_disallowed_space(label: &str) -> Option<usize> {
 
         if begin {
             // Starts with space
-            return Some(index);
+            return Some(byte_index);
         }
 
         if prev_space {
             // More than one separator
-            return Some(index);
+            return Some(byte_index);
         }
 
         if c == common::SPACE {
@@ -46,13 +46,13 @@ fn find_disallowed_space(label: &str) -> Option<usize> {
             last_c = Some(c);
         } else {
             // non-ASCII space
-            return Some(index);
+            return Some(byte_index);
         }
     }
 
     if let Some(common::SPACE) = last_c {
         // last character is a space
-        Some(offset)
+        Some(last_byte_index)
     } else {
         // The string might have ASCII separators, but it does not contain
         // more than one spaces in a row and it does not ends with a space

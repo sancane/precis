@@ -81,11 +81,11 @@ pub fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, Context
     //     (`Joining_Type`:T)*(`Joining_Type`:`{R,D}`))
 
     // Check all transparent joining type code points before `U+200C` (0 or more)
-    let mut i = offset - 1;
+    let mut i = offset;
     while common::is_transparent(cp) {
+        i = i.checked_sub(1).ok_or(ContextRuleError::Undefined)?;
         prev = before(s, i).ok_or(ContextRuleError::Undefined)?;
         cp = prev as u32;
-        i -= 1;
     }
 
     // `Joining_Type`:`{L,D}`
