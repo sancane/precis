@@ -107,8 +107,14 @@ pub(crate) fn has_compat(cp: u32) -> bool {
     // "compatibility `decomposable` characters" as defined in the Unicode
     // Standard.
 
-    let cs = c.to_string();
-    cs != cs.nfkc().collect::<String>()
+    // Optimize: Check if NFKC normalization changes the character
+    // without allocating strings. If the normalized form produces
+    // exactly one character equal to the original, it has no compat mapping.
+    // We check by consuming the first two elements of the iterator:
+    // - If first char equals original and second is None => no compat
+    // - Otherwise => has compat
+    let mut normalized = c.nfkc();
+    !matches!((normalized.next(), normalized.next()), (Some(nc), None) if nc == c)
 }
 
 pub(crate) fn is_virama(cp: u32) -> bool {
