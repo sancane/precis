@@ -16,16 +16,16 @@ license = "MIT/Apache-2.0"
 categories = ["text-processing", "internationalization"]
 edition = "2021"
 
-[dev-dependencies]
-precis-tools.workspace = true
-ucd-parse.workspace = true
+[features]
+networking = ["precis-tools/networking"]
+
+[dependencies]
+unicode-normalization.workspace = true
 
 [build-dependencies]
 precis-tools.workspace = true
 ucd-parse.workspace = true
 
-[dependencies]
-unicode-normalization.workspace = true
-
-[features]
-networking = ["precis-tools/networking"]
+[dev-dependencies]
+precis-tools.workspace = true
+ucd-parse.workspace = true
