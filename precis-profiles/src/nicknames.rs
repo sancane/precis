@@ -235,8 +235,6 @@ mod test_nicknames {
         assert_eq!(trim_spaces("hello  world"), Ok(Cow::from("hello world")));
 
         assert_eq!(trim_spaces(""), Ok(Cow::from("")));
-        assert_eq!(trim_spaces(" test"), Ok(Cow::from("test")));
-        assert_eq!(trim_spaces("test "), Ok(Cow::from("test")));
         assert_eq!(
             trim_spaces("   hello  world   "),
             Ok(Cow::from("hello world"))
@@ -269,5 +267,117 @@ mod test_nicknames {
 
         let res = profile.compare("Foo Bar", "foo bar");
         assert_eq!(res, Ok(true));
+    }
+
+    #[test]
+    fn test_comprehensive_space_handling() {
+        // Only leading ASCII spaces
+        assert_eq!(trim_spaces("   test"), Ok(Cow::from("test")));
+        assert_eq!(trim_spaces("     hello"), Ok(Cow::from("hello")));
+
+        // Only trailing ASCII spaces
+        assert_eq!(trim_spaces("test   "), Ok(Cow::from("test")));
+        assert_eq!(trim_spaces("hello     "), Ok(Cow::from("hello")));
+
+        // Only interior consecutive spaces
+        assert_eq!(trim_spaces("hello   world"), Ok(Cow::from("hello world")));
+        assert_eq!(trim_spaces("a    b    c"), Ok(Cow::from("a b c")));
+
+        // Mix of ASCII and non-ASCII spaces
+        assert_eq!(trim_spaces(" \u{00A0}test\u{00A0} "), Ok(Cow::from("test")));
+        assert_eq!(
+            trim_spaces("\u{2000} hello \u{2000}"),
+            Ok(Cow::from("hello"))
+        );
+
+        // Empty string after trimming
+        assert_eq!(trim_spaces("   "), Ok(Cow::from("")));
+        assert_eq!(trim_spaces("\u{00A0}\u{00A0}"), Ok(Cow::from("")));
+
+        // String of only spaces (mix)
+        assert_eq!(trim_spaces(" \u{00A0} \u{2000} "), Ok(Cow::from("")));
+    }
+
+    #[test]
+    fn test_all_space_separator_types() {
+        // U+0020 - SPACE (already tested above)
+        // U+00A0 - NO-BREAK SPACE
+        assert_eq!(trim_spaces("\u{00A0}test\u{00A0}"), Ok(Cow::from("test")));
+
+        // U+1680 - OGHAM SPACE MARK
+        assert_eq!(trim_spaces("\u{1680}test\u{1680}"), Ok(Cow::from("test")));
+
+        // U+2000 - EN QUAD
+        assert_eq!(trim_spaces("\u{2000}test\u{2000}"), Ok(Cow::from("test")));
+
+        // U+2001 - EM QUAD
+        assert_eq!(trim_spaces("\u{2001}test\u{2001}"), Ok(Cow::from("test")));
+
+        // U+2002 - EN SPACE
+        assert_eq!(trim_spaces("\u{2002}test\u{2002}"), Ok(Cow::from("test")));
+
+        // U+2003 - EM SPACE
+        assert_eq!(trim_spaces("\u{2003}test\u{2003}"), Ok(Cow::from("test")));
+
+        // U+2004 - THREE-PER-EM SPACE
+        assert_eq!(trim_spaces("\u{2004}test\u{2004}"), Ok(Cow::from("test")));
+
+        // U+2005 - FOUR-PER-EM SPACE
+        assert_eq!(trim_spaces("\u{2005}test\u{2005}"), Ok(Cow::from("test")));
+
+        // U+2006 - SIX-PER-EM SPACE
+        assert_eq!(trim_spaces("\u{2006}test\u{2006}"), Ok(Cow::from("test")));
+
+        // U+2007 - FIGURE SPACE
+        assert_eq!(trim_spaces("\u{2007}test\u{2007}"), Ok(Cow::from("test")));
+
+        // U+2008 - PUNCTUATION SPACE
+        assert_eq!(trim_spaces("\u{2008}test\u{2008}"), Ok(Cow::from("test")));
+
+        // U+2009 - THIN SPACE
+        assert_eq!(trim_spaces("\u{2009}test\u{2009}"), Ok(Cow::from("test")));
+
+        // U+200A - HAIR SPACE
+        assert_eq!(trim_spaces("\u{200A}test\u{200A}"), Ok(Cow::from("test")));
+
+        // U+202F - NARROW NO-BREAK SPACE
+        assert_eq!(trim_spaces("\u{202F}test\u{202F}"), Ok(Cow::from("test")));
+
+        // U+205F - MEDIUM MATHEMATICAL SPACE
+        assert_eq!(trim_spaces("\u{205F}test\u{205F}"), Ok(Cow::from("test")));
+
+        // U+3000 - IDEOGRAPHIC SPACE
+        assert_eq!(trim_spaces("\u{3000}test\u{3000}"), Ok(Cow::from("test")));
+    }
+
+    #[test]
+    fn test_space_handling_with_multibyte() {
+        // Spaces around emoji
+        assert_eq!(trim_spaces("  😀  "), Ok(Cow::from("😀")));
+
+        // Spaces around CJK
+        assert_eq!(trim_spaces("  文字  "), Ok(Cow::from("文字")));
+
+        // Non-ASCII spaces with multibyte characters
+        assert_eq!(
+            trim_spaces("\u{3000}こんにちは\u{3000}"),
+            Ok(Cow::from("こんにちは"))
+        );
+
+        // Interior consecutive spaces with multibyte
+        assert_eq!(trim_spaces("café  test"), Ok(Cow::from("café test")));
+    }
+
+    #[test]
+    fn test_trim_spaces_no_transformation_needed() {
+        // Strings that don't need transformation should return Cow::Borrowed
+        let result = trim_spaces("hello");
+        assert!(matches!(result, Ok(Cow::Borrowed(_))));
+
+        let result = trim_spaces("hello world");
+        assert!(matches!(result, Ok(Cow::Borrowed(_))));
+
+        let result = trim_spaces("test");
+        assert!(matches!(result, Ok(Cow::Borrowed(_))));
     }
 }

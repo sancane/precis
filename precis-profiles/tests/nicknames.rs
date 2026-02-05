@@ -258,3 +258,56 @@ fn test_utf8_bug_double_space_after_multibyte() {
     let res = Nickname::enforce("hi🎮  test");
     assert_eq!(res, Ok(Cow::from("hi🎮 test")));
 }
+
+#[test]
+fn test_single_character_inputs() {
+    // Single ASCII character
+    let res = Nickname::prepare("a");
+    assert_eq!(res, Ok(Cow::from("a")));
+
+    let res = Nickname::enforce("a");
+    assert_eq!(res, Ok(Cow::from("a")));
+
+    // Single uppercase ASCII
+    let res = Nickname::enforce("A");
+    assert_eq!(res, Ok(Cow::from("A")));
+
+    // Single digit
+    let res = Nickname::prepare("5");
+    assert_eq!(res, Ok(Cow::from("5")));
+
+    // Single Unicode character
+    let res = Nickname::prepare("é");
+    assert_eq!(res, Ok(Cow::from("é")));
+
+    // Single emoji
+    let res = Nickname::prepare("😀");
+    assert_eq!(res, Ok(Cow::from("😀")));
+
+    // Single CJK character
+    let res = Nickname::prepare("文");
+    assert_eq!(res, Ok(Cow::from("文")));
+
+    // Single space should fail after trimming (becomes empty)
+    let res = Nickname::enforce(" ");
+    assert_eq!(res, Err(Error::Invalid));
+}
+
+#[test]
+fn test_single_character_with_context_rules() {
+    // Single ZWNJ - context rule should fail (needs proper context)
+    let res = Nickname::prepare("\u{200C}");
+    // ZWNJ alone typically fails context rules
+    assert!(res.is_err());
+
+    // Single ZWJ - context rule should fail
+    let res = Nickname::prepare("\u{200D}");
+    assert!(res.is_err());
+
+    // Middle dot alone should fail (needs l·l context per RFC 5892 A.3)
+    let res = Nickname::prepare("\u{00B7}");
+    assert!(
+        res.is_err(),
+        "Middle dot alone should fail - requires l·l context"
+    );
+}

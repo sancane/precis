@@ -267,4 +267,103 @@ mod tests {
         let cp = 0x006a;
         assert!(!has_compat(cp));
     }
+
+    // Character classification tests
+    #[test]
+    fn test_letter_digit_classification() {
+        // Lowercase letters
+        assert!(is_letter_digit('a' as u32));
+        assert!(is_letter_digit('z' as u32));
+
+        // Uppercase letters
+        assert!(is_letter_digit('A' as u32));
+        assert!(is_letter_digit('Z' as u32));
+
+        // Decimal digits
+        assert!(is_letter_digit('0' as u32));
+        assert!(is_letter_digit('9' as u32));
+
+        // Not symbols or punctuation
+        assert!(!is_letter_digit('+' as u32));
+        assert!(!is_letter_digit('.' as u32));
+    }
+
+    #[test]
+    fn test_symbol_classification() {
+        // Math symbols
+        assert!(is_symbol('+' as u32));
+        assert!(is_symbol('=' as u32));
+
+        // Currency symbols
+        assert!(is_symbol('$' as u32));
+        assert!(is_symbol('€' as u32));
+
+        // Not letters
+        assert!(!is_symbol('a' as u32));
+        assert!(!is_symbol('5' as u32));
+    }
+
+    #[test]
+    fn test_punctuation_classification() {
+        // Common punctuation
+        assert!(is_punctuation('.' as u32));
+        assert!(is_punctuation(',' as u32));
+        assert!(is_punctuation('!' as u32));
+        assert!(is_punctuation('?' as u32));
+
+        // Brackets
+        assert!(is_punctuation('(' as u32));
+        assert!(is_punctuation(')' as u32));
+
+        // Not letters
+        assert!(!is_punctuation('a' as u32));
+        assert!(!is_punctuation('5' as u32));
+    }
+
+    #[test]
+    fn test_special_categories() {
+        // Join control
+        assert!(is_join_control(0x200C)); // ZWNJ
+        assert!(is_join_control(0x200D)); // ZWJ
+
+        // ASCII7
+        assert!(is_ascii7('a' as u32));
+        assert!(is_ascii7('Z' as u32));
+        assert!(!is_ascii7('ñ' as u32));
+
+        // Control characters
+        assert!(is_control(0x0009)); // TAB
+        assert!(is_control(0x000A)); // LF
+        assert!(!is_control('a' as u32));
+    }
+
+    #[test]
+    fn test_script_classification() {
+        // Greek
+        assert!(is_greek('α' as u32));
+        assert!(is_greek('Σ' as u32));
+        assert!(!is_greek('a' as u32));
+
+        // Hebrew
+        assert!(is_hebrew('א' as u32));
+        assert!(is_hebrew('ב' as u32));
+        assert!(!is_hebrew('a' as u32));
+
+        // Han (CJK)
+        assert!(is_han('文' as u32));
+        assert!(is_han('字' as u32));
+        assert!(!is_han('a' as u32));
+    }
+
+    #[test]
+    fn test_space_classification() {
+        // Space separator
+        assert!(is_space(' ' as u32));
+        assert!(is_space(0x00A0)); // NO-BREAK SPACE
+        assert!(is_space(0x3000)); // IDEOGRAPHIC SPACE
+
+        // Not spaces
+        assert!(!is_space('\t' as u32)); // TAB
+        assert!(!is_space('a' as u32));
+    }
 }

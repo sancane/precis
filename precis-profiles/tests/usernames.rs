@@ -182,6 +182,51 @@ mod case_mapped {
             )))
         );
     }
+
+    #[test]
+    fn test_single_character_usernames() {
+        // Single ASCII character
+        let res = UsernameCaseMapped::prepare("a");
+        assert_eq!(res, Ok(Cow::from("a")));
+
+        let res = UsernameCaseMapped::enforce("a");
+        assert_eq!(res, Ok(Cow::from("a")));
+
+        // Single uppercase gets lowercased
+        let res = UsernameCaseMapped::enforce("A");
+        assert_eq!(res, Ok(Cow::from("a")));
+
+        // Single digit
+        let res = UsernameCaseMapped::prepare("5");
+        assert_eq!(res, Ok(Cow::from("5")));
+
+        // Single Unicode character
+        let res = UsernameCaseMapped::prepare("π");
+        assert_eq!(res, Ok(Cow::from("π")));
+
+        // Single CJK character
+        let res = UsernameCaseMapped::prepare("文");
+        assert_eq!(res, Ok(Cow::from("文")));
+    }
+
+    #[test]
+    fn test_width_mapping_edge_cases() {
+        // Fullwidth characters at boundaries
+        let res = UsernameCaseMapped::prepare("\u{ff21}"); // Fullwidth A
+        assert_eq!(res, Ok(Cow::from("A")));
+
+        // Multiple consecutive fullwidth characters
+        let res = UsernameCaseMapped::prepare("\u{ff21}\u{ff22}\u{ff23}");
+        assert_eq!(res, Ok(Cow::from("ABC")));
+
+        // Fullwidth at start of longer string
+        let res = UsernameCaseMapped::enforce("\u{ff21}test");
+        assert_eq!(res, Ok(Cow::from("atest")));
+
+        // Fullwidth at end
+        let res = UsernameCaseMapped::enforce("test\u{ff21}");
+        assert_eq!(res, Ok(Cow::from("testa")));
+    }
 }
 
 #[cfg(test)]
@@ -367,5 +412,23 @@ mod case_preserved {
                 DerivedPropertyValue::SpecClassDis
             )))
         );
+    }
+
+    #[test]
+    fn test_single_character_case_preserved() {
+        // Single ASCII character (case preserved)
+        let res = UsernameCasePreserved::prepare("a");
+        assert_eq!(res, Ok(Cow::from("a")));
+
+        let res = UsernameCasePreserved::enforce("A");
+        assert_eq!(res, Ok(Cow::from("A")));
+
+        // Single digit
+        let res = UsernameCasePreserved::prepare("5");
+        assert_eq!(res, Ok(Cow::from("5")));
+
+        // Single Unicode character
+        let res = UsernameCasePreserved::prepare("π");
+        assert_eq!(res, Ok(Cow::from("π")));
     }
 }
