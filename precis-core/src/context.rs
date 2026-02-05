@@ -33,31 +33,25 @@ const ARABIC_INDIC_DIGIT_END: u32 = 0x0669;
 const EXTENDED_ARABIC_INDIC_DIGIT_START: u32 = 0x06f0;
 const EXTENDED_ARABIC_INDIC_DIGIT_END: u32 = 0x06f9;
 
-/// Gets the next character
-/// # Arguments
-/// * `s`: String label
-/// * `offset`: The position of the character in the label
-/// # Returns
-/// The character immediately following the one at the offset position in logical
-/// order in the string representing the label. After(`LastChar`) evaluates to None.
+/// Helper to get character at offset from a character slice
 #[inline]
-fn after(s: &str, offset: usize) -> Option<char> {
-    s.chars().nth(offset + 1)
+fn char_at(chars: &[char], offset: usize) -> Option<char> {
+    chars.get(offset).copied()
 }
 
-/// Gets the previous character
-/// # Arguments
-/// * `s`: String label
-/// * `offset`: The position of the character in the label
-/// # Returns
-/// The character immediately preceding the one at the offset position in logical
-/// order in the string representing the label. Before(`FirstChar`) evaluates to None.
+/// Helper to get the character after offset from a character slice
 #[inline]
-fn before(s: &str, offset: usize) -> Option<char> {
+fn after(chars: &[char], offset: usize) -> Option<char> {
+    chars.get(offset + 1).copied()
+}
+
+/// Helper to get the character before offset from a character slice
+#[inline]
+fn before(chars: &[char], offset: usize) -> Option<char> {
     if offset == 0 {
         None
     } else {
-        s.chars().nth(offset - 1)
+        chars.get(offset - 1).copied()
     }
 }
 
@@ -85,11 +79,14 @@ pub enum ContextRuleError {
 /// # Returns
 /// True if context permits a ZERO WIDTH NON-JOINER `U+200C`.
 pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if ZERO_WIDTH_NON_JOINER != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
+    if cp != ZERO_WIDTH_NON_JOINER {
         return Err(ContextRuleError::NotApplicable);
     }
 
-    let mut prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
+    let mut prev = before(&chars, offset).ok_or(ContextRuleError::Undefined)?;
     let mut cp = prev as u32;
     if common::is_virama(cp) {
         return Ok(true);
@@ -102,7 +99,7 @@ pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, 
     let mut i = offset;
     while common::is_transparent(cp) {
         i = i.checked_sub(1).ok_or(ContextRuleError::Undefined)?;
-        prev = before(s, i).ok_or(ContextRuleError::Undefined)?;
+        prev = before(&chars, i).ok_or(ContextRuleError::Undefined)?;
         cp = prev as u32;
     }
 
@@ -112,11 +109,11 @@ pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, 
     }
 
     // Check all transparent joining type code points following `U+200C` (0 or more)
-    let mut next = after(s, offset).ok_or(ContextRuleError::Undefined)?;
+    let mut next = after(&chars, offset).ok_or(ContextRuleError::Undefined)?;
     cp = next as u32;
     i = offset + 1;
     while common::is_transparent(cp) {
-        next = after(s, i).ok_or(ContextRuleError::Undefined)?;
+        next = after(&chars, i).ok_or(ContextRuleError::Undefined)?;
         cp = next as u32;
         i += 1;
     }
@@ -136,10 +133,14 @@ pub(crate) fn rule_zero_width_nonjoiner(s: &str, offset: usize) -> Result<bool, 
 /// # Returns
 /// Return true if context permits a ZERO WIDTH JOINER `U+200D`.
 pub(crate) fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if ZERO_WIDTH_JOINER != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
+    if cp != ZERO_WIDTH_JOINER {
         return Err(ContextRuleError::NotApplicable);
     }
-    let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
+
+    let prev = before(&chars, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(common::is_virama(prev as u32))
 }
 
@@ -153,11 +154,15 @@ pub(crate) fn rule_zero_width_joiner(s: &str, offset: usize) -> Result<bool, Con
 /// # Returns
 /// Return true if context permits a MIDDLE DOT `U+00B7`.
 pub(crate) fn rule_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if MIDDLE_DOT != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
+    if cp != MIDDLE_DOT {
         return Err(ContextRuleError::NotApplicable);
     }
-    let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
-    let next = after(s, offset).ok_or(ContextRuleError::Undefined)?;
+
+    let prev = before(&chars, offset).ok_or(ContextRuleError::Undefined)?;
+    let next = after(&chars, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(prev as u32 == LATIN_SMALL_LETTER_L && next as u32 == LATIN_SMALL_LETTER_L)
 }
 
@@ -173,12 +178,15 @@ pub(crate) fn rule_greek_lower_numeral_sign_keraia(
     s: &str,
     offset: usize,
 ) -> Result<bool, ContextRuleError> {
-    if GREEK_LOWER_NUMERAL_SIGN != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32
-    {
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
+    if cp != GREEK_LOWER_NUMERAL_SIGN {
         return Err(ContextRuleError::NotApplicable);
     }
-    let after = after(s, offset).ok_or(ContextRuleError::Undefined)?;
-    Ok(common::is_greek(after as u32))
+
+    let after_char = after(&chars, offset).ok_or(ContextRuleError::Undefined)?;
+    Ok(common::is_greek(after_char as u32))
 }
 
 /// [Appendix A.5](https://datatracker.ietf.org/doc/html/rfc5892#appendix-A.5).
@@ -191,11 +199,14 @@ pub(crate) fn rule_greek_lower_numeral_sign_keraia(
 /// # Returns
 /// Return true if context permits HEBREW PUNCTUATION `GERESH` or `GERSHAYIM` (`U+05F3`, `U+05F4`).
 pub(crate) fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
     if cp != HEBREW_PUNCTUATION_GERESH && cp != HEBREW_PUNCTUATION_GERSHAYIM {
         return Err(ContextRuleError::NotApplicable);
     }
-    let prev = before(s, offset).ok_or(ContextRuleError::Undefined)?;
+
+    let prev = before(&chars, offset).ok_or(ContextRuleError::Undefined)?;
     Ok(common::is_hebrew(prev as u32))
 }
 
@@ -210,11 +221,15 @@ pub(crate) fn rule_hebrew_punctuation(s: &str, offset: usize) -> Result<bool, Co
 /// # Returns
 /// Return true if context permits `KATAKANA MIDDLE DOT` `U+30FB`.
 pub(crate) fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    if KATAKANA_MIDDLE_DOT != s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32 {
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
+    if cp != KATAKANA_MIDDLE_DOT {
         return Err(ContextRuleError::NotApplicable);
     }
-    for c in s.chars() {
-        let cp = c as u32;
+
+    for c in &chars {
+        let cp = *c as u32;
         if common::is_hiragana(cp) || common::is_katakana(cp) || common::is_han(cp) {
             return Ok(true);
         }
@@ -231,18 +246,16 @@ pub(crate) fn rule_katakana_middle_dot(s: &str, offset: usize) -> Result<bool, C
 /// # Returns
 /// Return true if context permits ARABIC-INDIC DIGITS (`U+0660`..`U+0669`).
 pub(crate) fn rule_arabic_indic_digits(s: &str, offset: usize) -> Result<bool, ContextRuleError> {
-    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
     if !(ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END).contains(&cp) {
         return Err(ContextRuleError::NotApplicable);
     }
-    let range = EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END;
-    for c in s.chars() {
-        if range.contains(&(c as u32)) {
-            return Ok(false);
-        }
-    }
 
-    Ok(true)
+    // Check that no character in the string is an Extended Arabic-Indic digit
+    let range = EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END;
+    Ok(!chars.iter().any(|c| range.contains(&(*c as u32))))
 }
 
 /// [Appendix A.9](https://datatracker.ietf.org/doc/html/rfc5892#appendix-A.9).
@@ -256,18 +269,16 @@ pub(crate) fn rule_extended_arabic_indic_digits(
     s: &str,
     offset: usize,
 ) -> Result<bool, ContextRuleError> {
-    let cp = s.chars().nth(offset).ok_or(ContextRuleError::Undefined)? as u32;
+    let chars: Vec<char> = s.chars().collect();
+
+    let cp = char_at(&chars, offset).ok_or(ContextRuleError::Undefined)? as u32;
     if !(EXTENDED_ARABIC_INDIC_DIGIT_START..=EXTENDED_ARABIC_INDIC_DIGIT_END).contains(&cp) {
         return Err(ContextRuleError::NotApplicable);
     }
-    let range = ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END;
-    for c in s.chars() {
-        if range.contains(&(c as u32)) {
-            return Ok(false);
-        }
-    }
 
-    Ok(true)
+    // Check that no character in the string is an Arabic-Indic digit
+    let range = ARABIC_INDIC_DIGIT_START..=ARABIC_INDIC_DIGIT_END;
+    Ok(!chars.iter().any(|c| range.contains(&(*c as u32))))
 }
 
 /// Describes a context rule function
@@ -300,25 +311,54 @@ mod tests {
     use crate::context::*;
 
     #[test]
+    fn check_char_at() {
+        let chars: Vec<char> = "".chars().collect();
+        assert_eq!(char_at(&chars, 0), None);
+        assert_eq!(char_at(&chars, 5), None);
+
+        let chars: Vec<char> = "a".chars().collect();
+        assert_eq!(char_at(&chars, 0), Some('a'));
+        assert_eq!(char_at(&chars, 1), None);
+
+        let chars: Vec<char> = "abc".chars().collect();
+        assert_eq!(char_at(&chars, 1), Some('b'));
+        assert_eq!(char_at(&chars, 5), None);
+    }
+
+    #[test]
     fn check_after() {
-        assert_eq!(after("", 0), None);
-        assert_eq!(after("", 5), None);
-        assert_eq!(after("a", 0), None);
-        assert_eq!(after("a", 5), None);
-        assert_eq!(after("ab", 0), Some('b'));
-        assert_eq!(after("ab", 1), None);
-        assert_eq!(after("abc", 1), Some('c'));
+        let chars: Vec<char> = "".chars().collect();
+        assert_eq!(after(&chars, 0), None);
+        assert_eq!(after(&chars, 5), None);
+
+        let chars: Vec<char> = "a".chars().collect();
+        assert_eq!(after(&chars, 0), None);
+        assert_eq!(after(&chars, 5), None);
+
+        let chars: Vec<char> = "ab".chars().collect();
+        assert_eq!(after(&chars, 0), Some('b'));
+        assert_eq!(after(&chars, 1), None);
+
+        let chars: Vec<char> = "abc".chars().collect();
+        assert_eq!(after(&chars, 1), Some('c'));
     }
 
     #[test]
     fn check_before() {
-        assert_eq!(before("", 0), None);
-        assert_eq!(before("", 5), None);
-        assert_eq!(before("a", 0), None);
-        assert_eq!(before("a", 5), None);
-        assert_eq!(before("ab", 1), Some('a'));
-        assert_eq!(before("ab", 0), None);
-        assert_eq!(before("abc", 2), Some('b'));
+        let chars: Vec<char> = "".chars().collect();
+        assert_eq!(before(&chars, 0), None);
+        assert_eq!(before(&chars, 5), None);
+
+        let chars: Vec<char> = "a".chars().collect();
+        assert_eq!(before(&chars, 0), None);
+        assert_eq!(before(&chars, 5), None);
+
+        let chars: Vec<char> = "ab".chars().collect();
+        assert_eq!(before(&chars, 1), Some('a'));
+        assert_eq!(before(&chars, 0), None);
+
+        let chars: Vec<char> = "abc".chars().collect();
+        assert_eq!(before(&chars, 2), Some('b'));
     }
 
     #[test]

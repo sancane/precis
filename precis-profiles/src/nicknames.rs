@@ -6,60 +6,6 @@ use precis_core::{FreeformClass, StringClass};
 use std::borrow::Cow;
 use std::sync::LazyLock;
 
-// This function is used to check whether the input label will require any
-// modifications to apply the additional mapping rule for Nickname profile or not.
-// It makes a quick check to see if we can avoid making a copy of the input label,
-// for such purpose, it processes characters starting from the beginning of
-// the label looking for spaces characters. It stops processing characters
-// as soon as a non-ASCII character is found and returns its index. If it is a
-// ASCII character, it processes the next character and if it is a space separator
-// stops processing more characters returning the position of the next separator,
-// otherwise it continues iterating over the label. If not modifications will be
-// required, then the function will return None
-fn find_disallowed_space(label: &str) -> Option<usize> {
-    let mut begin = true;
-    let mut prev_space = false;
-    let mut last_c: Option<char> = None;
-    let mut last_byte_index = 0;
-
-    for (byte_index, c) in label.char_indices() {
-        last_byte_index = byte_index;
-        if !common::is_space_separator(c) {
-            last_c = Some(c);
-            prev_space = false;
-            begin = false;
-            continue;
-        }
-
-        if begin {
-            // Starts with space
-            return Some(byte_index);
-        }
-
-        if prev_space {
-            // More than one separator
-            return Some(byte_index);
-        }
-
-        if c == common::SPACE {
-            prev_space = true;
-            last_c = Some(c);
-        } else {
-            // non-ASCII space
-            return Some(byte_index);
-        }
-    }
-
-    if let Some(common::SPACE) = last_c {
-        // last character is a space
-        Some(last_byte_index)
-    } else {
-        // The string might have ASCII separators, but it does not contain
-        // more than one spaces in a row and it does not ends with a space
-        None
-    }
-}
-
 // Additional Mapping Rule: The additional mapping rule consists of
 // the following sub-rules.
 //  a. Map any instances of non-ASCII space to SPACE (`U+0020`); a
@@ -80,41 +26,57 @@ where
     T: Into<Cow<'a, str>>,
 {
     let s = s.into();
-    match find_disallowed_space(&s) {
-        None => Ok(s),
-        Some(pos) => {
-            let mut res = String::from(&s[..pos]);
-            res.reserve(s.len() - res.len());
-            let mut begin = true;
-            let mut prev_space = false;
-            for c in s[pos..].chars() {
-                if !common::is_space_separator(c) {
-                    res.push(c);
-                    prev_space = false;
-                    begin = false;
-                    continue;
-                }
 
-                if begin {
-                    // skip spaces at the beginning
-                    continue;
-                }
+    // First pass: check if transformation is needed to avoid allocation
+    let needs_transform = {
+        let mut begin = true;
+        let mut pending_space = false;
 
-                if !prev_space {
-                    res.push(common::SPACE);
+        s.chars().any(|c| {
+            if !common::is_space_separator(c) {
+                pending_space = false;
+                begin = false;
+                false
+            } else {
+                // Need transform if: space at beginning, consecutive spaces, or non-ASCII space
+                let needs = begin || pending_space || c != common::SPACE;
+                if !begin {
+                    pending_space = true;
                 }
-
-                prev_space = true;
+                begin = false;
+                needs
             }
-            // Skip last space character
-            if let Some(c) = res.pop() {
-                if c != common::SPACE {
-                    res.push(c);
-                }
+        }) || pending_space // Also need transform if string ends with space
+    };
+
+    if !needs_transform {
+        return Ok(s);
+    }
+
+    // Second pass: transform the string
+    let mut res = String::new();
+    res.reserve(s.len());
+    let mut begin = true;
+    let mut pending_space = false;
+
+    for c in s.chars() {
+        if !common::is_space_separator(c) {
+            // Add pending space before this character if there was one
+            if pending_space {
+                res.push(common::SPACE);
+                pending_space = false;
             }
-            Ok(res.into())
+            res.push(c);
+            begin = false;
+        } else if !begin {
+            // Mark that we have a space, but don't add it yet
+            // (only add it when we see a non-space character)
+            pending_space = true;
         }
     }
+
+    // No need to remove trailing space - it was never added
+    Ok(res.into())
 }
 
 /// [`Nickname`](https://datatracker.ietf.org/doc/html/rfc8266#section-2).
@@ -156,8 +118,7 @@ impl Nickname {
     where
         T: Into<Cow<'a, str>>,
     {
-        let s = s.into();
-        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
+        let s = common::ensure_not_empty(s)?;
         self.0.allows(&s)?;
         Ok(s)
     }
@@ -169,7 +130,7 @@ impl Nickname {
         let s = self.apply_prepare_rules(s)?;
         let s = self.additional_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        (!s.is_empty()).then_some(s).ok_or(Error::Invalid)
+        common::ensure_not_empty(s)
     }
 
     fn apply_compare_rules<'a, T>(&self, s: T) -> Result<Cow<'a, str>, Error>
@@ -265,26 +226,6 @@ mod test_nicknames {
     use crate::nicknames::*;
 
     #[test]
-    fn test_find_disallowed_space() {
-        assert_eq!(find_disallowed_space(""), None);
-        assert_eq!(find_disallowed_space("test"), None);
-        assert_eq!(find_disallowed_space("test "), Some(4));
-        assert_eq!(find_disallowed_space("test good"), None);
-
-        // Two ASCII spaces in a row
-        assert_eq!(find_disallowed_space("  test"), Some(0));
-        assert_eq!(find_disallowed_space("t  est"), Some(2));
-
-        // Starts with ASCII space
-        assert_eq!(find_disallowed_space(" test"), Some(0));
-
-        // Non ASCII separator
-        assert_eq!(find_disallowed_space("\u{00a0}test"), Some(0));
-        assert_eq!(find_disallowed_space("te\u{00a0}st"), Some(2));
-        assert_eq!(find_disallowed_space("test\u{00a0}"), Some(4));
-    }
-
-    #[test]
     fn test_trim_spaces() {
         // Check ASCII spaces
         assert_eq!(trim_spaces("  "), Ok(Cow::from("")));
@@ -294,8 +235,6 @@ mod test_nicknames {
         assert_eq!(trim_spaces("hello  world"), Ok(Cow::from("hello world")));
 
         assert_eq!(trim_spaces(""), Ok(Cow::from("")));
-        assert_eq!(trim_spaces(" test"), Ok(Cow::from("test")));
-        assert_eq!(trim_spaces("test "), Ok(Cow::from("test")));
         assert_eq!(
             trim_spaces("   hello  world   "),
             Ok(Cow::from("hello world"))
@@ -328,5 +267,117 @@ mod test_nicknames {
 
         let res = profile.compare("Foo Bar", "foo bar");
         assert_eq!(res, Ok(true));
+    }
+
+    #[test]
+    fn test_comprehensive_space_handling() {
+        // Only leading ASCII spaces
+        assert_eq!(trim_spaces("   test"), Ok(Cow::from("test")));
+        assert_eq!(trim_spaces("     hello"), Ok(Cow::from("hello")));
+
+        // Only trailing ASCII spaces
+        assert_eq!(trim_spaces("test   "), Ok(Cow::from("test")));
+        assert_eq!(trim_spaces("hello     "), Ok(Cow::from("hello")));
+
+        // Only interior consecutive spaces
+        assert_eq!(trim_spaces("hello   world"), Ok(Cow::from("hello world")));
+        assert_eq!(trim_spaces("a    b    c"), Ok(Cow::from("a b c")));
+
+        // Mix of ASCII and non-ASCII spaces
+        assert_eq!(trim_spaces(" \u{00A0}test\u{00A0} "), Ok(Cow::from("test")));
+        assert_eq!(
+            trim_spaces("\u{2000} hello \u{2000}"),
+            Ok(Cow::from("hello"))
+        );
+
+        // Empty string after trimming
+        assert_eq!(trim_spaces("   "), Ok(Cow::from("")));
+        assert_eq!(trim_spaces("\u{00A0}\u{00A0}"), Ok(Cow::from("")));
+
+        // String of only spaces (mix)
+        assert_eq!(trim_spaces(" \u{00A0} \u{2000} "), Ok(Cow::from("")));
+    }
+
+    #[test]
+    fn test_all_space_separator_types() {
+        // U+0020 - SPACE (already tested above)
+        // U+00A0 - NO-BREAK SPACE
+        assert_eq!(trim_spaces("\u{00A0}test\u{00A0}"), Ok(Cow::from("test")));
+
+        // U+1680 - OGHAM SPACE MARK
+        assert_eq!(trim_spaces("\u{1680}test\u{1680}"), Ok(Cow::from("test")));
+
+        // U+2000 - EN QUAD
+        assert_eq!(trim_spaces("\u{2000}test\u{2000}"), Ok(Cow::from("test")));
+
+        // U+2001 - EM QUAD
+        assert_eq!(trim_spaces("\u{2001}test\u{2001}"), Ok(Cow::from("test")));
+
+        // U+2002 - EN SPACE
+        assert_eq!(trim_spaces("\u{2002}test\u{2002}"), Ok(Cow::from("test")));
+
+        // U+2003 - EM SPACE
+        assert_eq!(trim_spaces("\u{2003}test\u{2003}"), Ok(Cow::from("test")));
+
+        // U+2004 - THREE-PER-EM SPACE
+        assert_eq!(trim_spaces("\u{2004}test\u{2004}"), Ok(Cow::from("test")));
+
+        // U+2005 - FOUR-PER-EM SPACE
+        assert_eq!(trim_spaces("\u{2005}test\u{2005}"), Ok(Cow::from("test")));
+
+        // U+2006 - SIX-PER-EM SPACE
+        assert_eq!(trim_spaces("\u{2006}test\u{2006}"), Ok(Cow::from("test")));
+
+        // U+2007 - FIGURE SPACE
+        assert_eq!(trim_spaces("\u{2007}test\u{2007}"), Ok(Cow::from("test")));
+
+        // U+2008 - PUNCTUATION SPACE
+        assert_eq!(trim_spaces("\u{2008}test\u{2008}"), Ok(Cow::from("test")));
+
+        // U+2009 - THIN SPACE
+        assert_eq!(trim_spaces("\u{2009}test\u{2009}"), Ok(Cow::from("test")));
+
+        // U+200A - HAIR SPACE
+        assert_eq!(trim_spaces("\u{200A}test\u{200A}"), Ok(Cow::from("test")));
+
+        // U+202F - NARROW NO-BREAK SPACE
+        assert_eq!(trim_spaces("\u{202F}test\u{202F}"), Ok(Cow::from("test")));
+
+        // U+205F - MEDIUM MATHEMATICAL SPACE
+        assert_eq!(trim_spaces("\u{205F}test\u{205F}"), Ok(Cow::from("test")));
+
+        // U+3000 - IDEOGRAPHIC SPACE
+        assert_eq!(trim_spaces("\u{3000}test\u{3000}"), Ok(Cow::from("test")));
+    }
+
+    #[test]
+    fn test_space_handling_with_multibyte() {
+        // Spaces around emoji
+        assert_eq!(trim_spaces("  😀  "), Ok(Cow::from("😀")));
+
+        // Spaces around CJK
+        assert_eq!(trim_spaces("  文字  "), Ok(Cow::from("文字")));
+
+        // Non-ASCII spaces with multibyte characters
+        assert_eq!(
+            trim_spaces("\u{3000}こんにちは\u{3000}"),
+            Ok(Cow::from("こんにちは"))
+        );
+
+        // Interior consecutive spaces with multibyte
+        assert_eq!(trim_spaces("café  test"), Ok(Cow::from("café test")));
+    }
+
+    #[test]
+    fn test_trim_spaces_no_transformation_needed() {
+        // Strings that don't need transformation should return Cow::Borrowed
+        let result = trim_spaces("hello");
+        assert!(matches!(result, Ok(Cow::Borrowed(_))));
+
+        let result = trim_spaces("hello world");
+        assert!(matches!(result, Ok(Cow::Borrowed(_))));
+
+        let result = trim_spaces("test");
+        assert!(matches!(result, Ok(Cow::Borrowed(_))));
     }
 }

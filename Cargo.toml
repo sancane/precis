@@ -1,11 +1,7 @@
 [workspace]
 resolver = "2"
 
-members = [
-	"precis-core",
-	"precis-profiles",
-	"precis-tools",
-]
+members = ["precis-core", "precis-profiles", "precis-tools"]
 
 [workspace.dependencies]
 precis-core = { path = "precis-core" }

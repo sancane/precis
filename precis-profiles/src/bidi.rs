@@ -2,6 +2,7 @@ include!(concat!(env!("OUT_DIR"), "/bidi_class.rs"));
 
 use precis_core::Codepoints;
 
+#[inline]
 fn bidi_class_cp(cp: u32) -> BidiClass {
     match BIDI_CLASS_TABLE.binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap()) {
         Ok(idx) => BIDI_CLASS_TABLE[idx].1,
@@ -11,12 +12,14 @@ fn bidi_class_cp(cp: u32) -> BidiClass {
     }
 }
 
+#[inline]
 fn bidi_class(c: char) -> BidiClass {
     bidi_class_cp(c as u32)
 }
 
 /// From `rfc5893` Right-to-Left Scripts for Internationalized Domain Names for Applications (`IDNA`)
 /// An `RTL` label is a label that contains at least one character of type R, AL, or AN.
+#[inline]
 pub(crate) fn has_rtl(label: &str) -> bool {
     label
         .find(|c| matches!(bidi_class(c), BidiClass::R | BidiClass::AL | BidiClass::AN))
@@ -356,5 +359,553 @@ mod bidi_tests {
         // characters with `Bidi` property `NSM` are allowed
         assert!(!satisfy_bidi_rule(&str_chars!(L, NSM, EN)));
         assert!(!satisfy_bidi_rule(&str_chars!(L, NSM, NSM, L, EN, NSM)));
+    }
+
+    #[test]
+    fn test_rtl_edge_cases() {
+        // Single R character
+        assert!(satisfy_bidi_rule(&str_chars!(R)));
+
+        // Single AL character
+        assert!(satisfy_bidi_rule(&str_chars!(AL)));
+
+        // R followed by AL
+        assert!(satisfy_bidi_rule(&str_chars!(R, AL)));
+
+        // AL followed by R
+        assert!(satisfy_bidi_rule(&str_chars!(AL, R)));
+
+        // Long NSM sequence at end
+        assert!(satisfy_bidi_rule(&str_chars!(
+            R, AL, NSM, NSM, NSM, NSM, NSM
+        )));
+
+        // NSM without proper preceding character
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ES, NSM)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, CS, NSM)));
+
+        // BN (Boundary Neutral) characters
+        assert!(satisfy_bidi_rule(&str_chars!(R, BN, AL)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, BN, BN, AL)));
+
+        // CS/ES/ET (Common Separators and European Terminators)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ES, AL)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, CS, AL)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, ET, AL)));
+
+        // ON (Other Neutrals)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, AL)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, ON, AL)));
+    }
+
+    #[test]
+    fn test_ltr_edge_cases() {
+        // Single L character
+        assert!(satisfy_bidi_rule(&str_chars!(L)));
+
+        // Single L with NSM
+        assert!(satisfy_bidi_rule(&str_chars!(L, NSM)));
+
+        // Long NSM sequence at end
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, NSM, NSM, NSM, NSM)));
+
+        // BN (Boundary Neutral) in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, BN, EN)));
+        assert!(satisfy_bidi_rule(&str_chars!(L, BN, BN, L)));
+
+        // ES in LTR ending with L
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, L)));
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, EN)));
+
+        // NSM not after L or EN should fail
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ES, NSM)));
+        assert!(!satisfy_bidi_rule(&str_chars!(L, BN, NSM)));
+    }
+
+    #[test]
+    fn test_mixed_numeric_edge_cases() {
+        // AN without EN in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, AN, R)));
+
+        // EN without AN in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, EN, R)));
+
+        // Multiple AN at different positions
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, ES, AN, AL)));
+
+        // Multiple EN at different positions
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, ES, EN, AL)));
+
+        // EN in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, EN, EN)));
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, EN)));
+    }
+
+    #[test]
+    fn test_rtl_all_allowed_classes() {
+        // Test each allowed class individually in RTL context
+        // This ensures coverage of all match arms in is_valid_rtl_label
+
+        // R class
+        assert!(satisfy_bidi_rule(&str_chars!(R, R, R)));
+
+        // AL class
+        assert!(satisfy_bidi_rule(&str_chars!(AL, AL, AL)));
+
+        // ES (European Separator) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, ES, R)));
+
+        // CS (Common Separator) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, CS, R)));
+
+        // ET (European Terminator) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, ET, R)));
+
+        // ON (Other Neutral) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, R)));
+
+        // BN (Boundary Neutral) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, BN, R)));
+
+        // AN (Arabic Number) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, AN, R)));
+
+        // EN (European Number) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, EN, R)));
+
+        // NSM (Non-Spacing Mark) in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, NSM)));
+        assert!(satisfy_bidi_rule(&str_chars!(AL, NSM)));
+    }
+
+    #[test]
+    fn test_ltr_all_allowed_classes() {
+        // Test each allowed class individually in LTR context
+        // This ensures coverage of all match arms in is_valid_ltr_label
+
+        // L class
+        assert!(satisfy_bidi_rule(&str_chars!(L, L, L)));
+
+        // EN (European Number) in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, L)));
+
+        // ES (European Separator) in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, L)));
+
+        // CS (Common Separator) in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, CS, L)));
+
+        // ET (European Terminator) in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, ET, L)));
+
+        // ON (Other Neutral) in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, ON, L)));
+
+        // BN (Boundary Neutral) in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, BN, L)));
+
+        // NSM (Non-Spacing Mark) in LTR after L
+        assert!(satisfy_bidi_rule(&str_chars!(L, NSM)));
+
+        // NSM after EN in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, NSM)));
+    }
+
+    #[test]
+    fn test_rtl_ending_validation() {
+        // Test the final validation in is_valid_rtl_label (line 147)
+        // Must end with R, AL, EN, or AN (possibly followed by NSM)
+
+        // Valid endings
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, R))); // ends with R
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, AL))); // ends with AL
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, EN))); // ends with EN
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, AN))); // ends with AN
+
+        // With NSM
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, R, NSM)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, AL, NSM)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, EN, NSM)));
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, AN, NSM)));
+
+        // Invalid endings (should fail)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ON, ES)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ON, CS)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ON, ET)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ON, BN)));
+    }
+
+    #[test]
+    fn test_invalid_first_char() {
+        // Characters that are not L, R, or AL at the start
+        assert!(!satisfy_bidi_rule(&str_chars!(EN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(AN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(NSM)));
+        assert!(!satisfy_bidi_rule(&str_chars!(BN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(ON)));
+    }
+
+    #[test]
+    fn test_bidi_class_cp() {
+        // Test codepoint-based classification
+        assert_eq!(bidi_class_cp(L as u32), BidiClass::L);
+        assert_eq!(bidi_class_cp(R as u32), BidiClass::R);
+        assert_eq!(bidi_class_cp(AL as u32), BidiClass::AL);
+
+        // Test default case (unassigned codepoints default to L)
+        assert_eq!(bidi_class_cp(0xE0080), BidiClass::L);
+
+        // Test all major BiDi classes
+        assert_eq!(bidi_class_cp(AN as u32), BidiClass::AN);
+        assert_eq!(bidi_class_cp(EN as u32), BidiClass::EN);
+        assert_eq!(bidi_class_cp(ES as u32), BidiClass::ES);
+        assert_eq!(bidi_class_cp(CS as u32), BidiClass::CS);
+        assert_eq!(bidi_class_cp(ET as u32), BidiClass::ET);
+        assert_eq!(bidi_class_cp(ON as u32), BidiClass::ON);
+        assert_eq!(bidi_class_cp(BN as u32), BidiClass::BN);
+        assert_eq!(bidi_class_cp(NSM as u32), BidiClass::NSM);
+        assert_eq!(bidi_class_cp(WS as u32), BidiClass::WS);
+    }
+
+    #[test]
+    fn test_bidi_class_char() {
+        // Test char-based classification (wraps bidi_class_cp)
+        assert_eq!(bidi_class(L), BidiClass::L);
+        assert_eq!(bidi_class(R), BidiClass::R);
+        assert_eq!(bidi_class(AL), BidiClass::AL);
+    }
+
+    #[test]
+    fn test_has_rtl_comprehensive() {
+        // Empty string
+        assert!(!has_rtl(""));
+
+        // Only LTR characters
+        assert!(!has_rtl("Hello World"));
+        assert!(!has_rtl("123"));
+
+        // Contains R
+        assert!(has_rtl(&str_chars!(L, R, L)));
+        assert!(has_rtl(&str_chars!(R)));
+
+        // Contains AL
+        assert!(has_rtl(&str_chars!(L, AL, L)));
+        assert!(has_rtl(&str_chars!(AL)));
+
+        // Contains AN
+        assert!(has_rtl(&str_chars!(L, AN, L)));
+        assert!(has_rtl(&str_chars!(AN)));
+
+        // Mixed RTL markers
+        assert!(has_rtl(&str_chars!(R, AL, AN)));
+    }
+
+    #[test]
+    fn test_rtl_label_nsm_edge_cases() {
+        // NSM at the very end after valid ending
+        assert!(satisfy_bidi_rule(&str_chars!(R, AL, NSM, NSM, NSM)));
+
+        // Multiple NSM sequences
+        assert!(satisfy_bidi_rule(&str_chars!(R, NSM, NSM)));
+
+        // NSM after AN (valid ending)
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, NSM)));
+
+        // NSM after EN (valid ending)
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, NSM)));
+    }
+
+    #[test]
+    fn test_ltr_label_comprehensive() {
+        // L with various neutrals
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, ET, CS, ON, BN, L)));
+
+        // Multiple EN in sequence
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, EN, EN, EN)));
+
+        // L with ending EN
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, CS, EN)));
+
+        // Just L
+        assert!(satisfy_bidi_rule(&str_chars!(L)));
+
+        // L followed by EN
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN)));
+    }
+
+    #[test]
+    fn test_bidi_rule_boundary_conditions() {
+        // String with only neutrals starting with valid L
+        assert!(satisfy_bidi_rule(&str_chars!(L, BN, BN, BN, L)));
+
+        // String with alternating valid patterns
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, ES, EN, CS, EN)));
+
+        // RTL with maximum allowed neutral characters
+        assert!(satisfy_bidi_rule(&str_chars!(
+            R, BN, ES, CS, ET, ON, BN, AL
+        )));
+    }
+
+    #[test]
+    fn test_bidi_invalid_endings() {
+        // LTR ending with invalid character
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ES, CS)));
+        assert!(!satisfy_bidi_rule(&str_chars!(L, BN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ON)));
+
+        // RTL ending with invalid character
+        assert!(!satisfy_bidi_rule(&str_chars!(R, BN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ES)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ON)));
+    }
+
+    #[test]
+    fn test_rtl_all_neutral_types() {
+        // Test each neutral type explicitly in RTL context
+        // This ensures all match arms in is_valid_rtl_label are covered
+
+        // R type
+        assert!(satisfy_bidi_rule(&str_chars!(R, R, R)));
+
+        // AL type
+        assert!(satisfy_bidi_rule(&str_chars!(R, AL, AL, R)));
+
+        // ES type (European Separator)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ES, R)));
+
+        // CS type (Common Separator)
+        assert!(satisfy_bidi_rule(&str_chars!(R, CS, R)));
+
+        // ET type (European Terminator)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ET, R)));
+
+        // ON type (Other Neutral)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, R)));
+
+        // BN type (Boundary Neutral)
+        assert!(satisfy_bidi_rule(&str_chars!(R, BN, R)));
+    }
+
+    #[test]
+    fn test_ltr_all_neutral_types() {
+        // Test each neutral type explicitly in LTR context
+
+        // Multiple L
+        assert!(satisfy_bidi_rule(&str_chars!(L, L, L)));
+
+        // EN type
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, EN, L)));
+
+        // ES type in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, L)));
+
+        // CS type in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, CS, L)));
+
+        // ET type in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, ET, L)));
+
+        // ON type in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, ON, L)));
+
+        // BN type in LTR
+        assert!(satisfy_bidi_rule(&str_chars!(L, BN, L)));
+    }
+
+    #[test]
+    fn test_nsm_after_invalid_base() {
+        // NSM after ES in RTL (ES is not R/AL/EN/AN)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ES, NSM)));
+
+        // NSM after CS in RTL
+        assert!(!satisfy_bidi_rule(&str_chars!(R, CS, NSM)));
+
+        // NSM after ET in RTL
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ET, NSM)));
+
+        // NSM after ON in RTL
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ON, NSM)));
+
+        // NSM after BN in RTL
+        assert!(!satisfy_bidi_rule(&str_chars!(R, BN, NSM)));
+    }
+
+    #[test]
+    fn test_nsm_after_invalid_base_ltr() {
+        // NSM after ES in LTR (ES is not L/EN)
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ES, NSM)));
+
+        // NSM after CS in LTR
+        assert!(!satisfy_bidi_rule(&str_chars!(L, CS, NSM)));
+
+        // NSM after ET in LTR
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ET, NSM)));
+
+        // NSM after ON in LTR
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ON, NSM)));
+
+        // NSM after BN in LTR
+        assert!(!satisfy_bidi_rule(&str_chars!(L, BN, NSM)));
+    }
+
+    #[test]
+    fn test_character_after_nsm_sequence() {
+        // In RTL: after NSM sequence starts, only NSM allowed
+        assert!(!satisfy_bidi_rule(&str_chars!(R, AL, NSM, R)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, EN, NSM, EN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, AN, NSM, AN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, AL, NSM, AL)));
+
+        // In LTR: after NSM sequence starts, only NSM allowed
+        assert!(!satisfy_bidi_rule(&str_chars!(L, NSM, L)));
+        assert!(!satisfy_bidi_rule(&str_chars!(L, EN, NSM, EN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(L, EN, NSM, L)));
+    }
+
+    #[test]
+    fn test_rtl_each_character_type_individually() {
+        // Test that each character type R, AL, ES, CS, ET, ON, BN
+        // is individually accepted in RTL labels (lines 93-99)
+
+        // R in middle position
+        assert!(satisfy_bidi_rule(&str_chars!(R, R, R)));
+
+        // AL in middle position
+        assert!(satisfy_bidi_rule(&str_chars!(R, AL, R)));
+
+        // ES in middle position
+        assert!(satisfy_bidi_rule(&str_chars!(R, ES, R)));
+
+        // CS in middle position
+        assert!(satisfy_bidi_rule(&str_chars!(R, CS, R)));
+
+        // ET in middle position
+        assert!(satisfy_bidi_rule(&str_chars!(R, ET, R)));
+
+        // ON in middle position
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, R)));
+
+        // BN in middle position
+        assert!(satisfy_bidi_rule(&str_chars!(R, BN, R)));
+    }
+
+    #[test]
+    fn test_ltr_each_character_type_individually() {
+        // Test that each character type L, EN, ES, CS, ET, ON, BN
+        // is individually accepted in LTR labels (lines 164-170)
+
+        // L in middle
+        assert!(satisfy_bidi_rule(&str_chars!(L, L, L)));
+
+        // EN in middle
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, L)));
+
+        // ES in middle
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, L)));
+
+        // CS in middle
+        assert!(satisfy_bidi_rule(&str_chars!(L, CS, L)));
+
+        // ET in middle
+        assert!(satisfy_bidi_rule(&str_chars!(L, ET, L)));
+
+        // ON in middle
+        assert!(satisfy_bidi_rule(&str_chars!(L, ON, L)));
+
+        // BN in middle
+        assert!(satisfy_bidi_rule(&str_chars!(L, BN, L)));
+    }
+
+    #[test]
+    fn test_an_en_conflict_in_rtl() {
+        // Test line 100-107: AN when EN is present
+        // AN should be accepted when no EN
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, R)));
+
+        // But fail when EN already present (line 101-104)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, EN, AN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, EN, ES, AN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, EN, CS, AN, R)));
+    }
+
+    #[test]
+    fn test_en_an_conflict_in_rtl() {
+        // Test line 108-115: EN when AN is present
+        // EN should be accepted when no AN
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, R)));
+
+        // But fail when AN already present (line 109-112)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, AN, EN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, AN, ES, EN)));
+        assert!(!satisfy_bidi_rule(&str_chars!(R, AN, CS, EN, R)));
+    }
+
+    #[test]
+    fn test_nsm_placement_rules() {
+        // Test line 116-129: NSM must follow R/AL/EN/AN
+
+        // NSM after R (valid)
+        assert!(satisfy_bidi_rule(&str_chars!(R, NSM)));
+
+        // NSM after AL (valid)
+        assert!(satisfy_bidi_rule(&str_chars!(AL, NSM)));
+
+        // NSM after EN (valid)
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, NSM)));
+
+        // NSM after AN (valid)
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, NSM)));
+
+        // NSM after ES (invalid - line 121-126)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ES, NSM)));
+
+        // NSM after CS (invalid)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, CS, NSM)));
+
+        // NSM after ET (invalid)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ET, NSM)));
+
+        // NSM after ON (invalid)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ON, NSM)));
+    }
+
+    #[test]
+    fn test_ltr_nsm_placement() {
+        // Test line 179-189: NSM must follow L or EN in LTR
+
+        // NSM after L (valid)
+        assert!(satisfy_bidi_rule(&str_chars!(L, NSM)));
+
+        // NSM after EN (valid)
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, NSM)));
+
+        // NSM after ES (invalid - line 184-186)
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ES, NSM)));
+
+        // NSM after CS (invalid)
+        assert!(!satisfy_bidi_rule(&str_chars!(L, CS, NSM)));
+
+        // NSM after ET (invalid)
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ET, NSM)));
+
+        // NSM after ON (invalid)
+        assert!(!satisfy_bidi_rule(&str_chars!(L, ON, NSM)));
+
+        // NSM after BN (invalid)
+        assert!(!satisfy_bidi_rule(&str_chars!(L, BN, NSM)));
+    }
+
+    #[test]
+    fn test_ending_with_nsm() {
+        // RTL must end with R/AL/EN/AN (line 145-148)
+        assert!(satisfy_bidi_rule(&str_chars!(R, NSM))); // ends with R via NSM
+        assert!(satisfy_bidi_rule(&str_chars!(AL, NSM))); // ends with AL via NSM
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, NSM))); // ends with EN via NSM
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, NSM))); // ends with AN via NSM
+
+        // LTR must end with L or EN (line 195)
+        assert!(satisfy_bidi_rule(&str_chars!(L, NSM))); // ends with L via NSM
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, NSM))); // ends with EN via NSM
     }
 }

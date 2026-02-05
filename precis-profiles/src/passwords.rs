@@ -47,8 +47,7 @@ impl Profile for OpaqueString {
     where
         S: Into<Cow<'a, str>>,
     {
-        let s = s.into();
-        let s = (!s.is_empty()).then_some(s).ok_or(Error::Invalid)?;
+        let s = common::ensure_not_empty(s)?;
         self.0.allows(&s)?;
         Ok(s)
     }
@@ -60,7 +59,7 @@ impl Profile for OpaqueString {
         let s = self.prepare(s)?;
         let s = self.additional_mapping_rule(s)?;
         let s = self.normalization_rule(s)?;
-        (!s.is_empty()).then_some(s).ok_or(Error::Invalid)
+        common::ensure_not_empty(s)
     }
 
     fn compare<A, B>(&self, s1: A, s2: B) -> Result<bool, Error>
@@ -77,22 +76,13 @@ impl Rules for OpaqueString {
     where
         T: Into<Cow<'a, str>>,
     {
-        let s = s.into();
-        match s.find(common::is_non_ascii_space) {
-            None => Ok(s),
-            Some(pos) => {
-                let mut res = String::from(&s[..pos]);
-                res.reserve(s.len() - res.len());
-                for c in s[pos..].chars() {
-                    if common::is_non_ascii_space(c) {
-                        res.push(common::SPACE);
-                    } else {
-                        res.push(c);
-                    }
-                }
-                Ok(res.into())
+        common::transform_from_first_match(s, common::is_non_ascii_space, |c, res| {
+            if common::is_non_ascii_space(c) {
+                res.push(common::SPACE);
+            } else {
+                res.push(c);
             }
-        }
+        })
     }
 
     fn normalization_rule<'a, T>(&self, s: T) -> Result<Cow<'a, str>, Error>

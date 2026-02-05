@@ -456,4 +456,119 @@ mod test_string_classes {
             ))
         );
     }
+
+    #[test]
+    fn test_identifier_class_get_methods() {
+        let id = IdentifierClass::default();
+
+        // Test get_value_from_char
+        assert_eq!(id.get_value_from_char('a'), DerivedPropertyValue::PValid);
+
+        // Test get_value_from_codepoint directly
+        assert_eq!(
+            id.get_value_from_codepoint(0x0061), // 'a'
+            DerivedPropertyValue::PValid
+        );
+
+        // Test space (should be SpecClassDis for IdentifierClass)
+        assert_eq!(
+            id.get_value_from_codepoint(0x0020), // SPACE
+            DerivedPropertyValue::SpecClassDis
+        );
+    }
+
+    #[test]
+    fn test_freeform_class_get_methods() {
+        let ff = FreeformClass::default();
+
+        // Test get_value_from_char
+        assert_eq!(ff.get_value_from_char('a'), DerivedPropertyValue::PValid);
+
+        // Test get_value_from_codepoint directly
+        assert_eq!(
+            ff.get_value_from_codepoint(0x0061), // 'a'
+            DerivedPropertyValue::PValid
+        );
+
+        // Test space (should be SpecClassPval for FreeformClass)
+        assert_eq!(
+            ff.get_value_from_codepoint(0x0020), // SPACE
+            DerivedPropertyValue::SpecClassPval
+        );
+
+        // Test that FreeformClass accepts more characters than IdentifierClass
+        // Both should accept basic letters
+        let id = IdentifierClass::default();
+        assert_eq!(id.get_value_from_char('a'), ff.get_value_from_char('a'));
+    }
+
+    #[test]
+    fn test_allows_disallowed_characters() {
+        let id = IdentifierClass::default();
+
+        // Test control character (Disallowed)
+        let result = id.allows("\u{0000}");
+        assert!(result.is_err());
+
+        // Test unassigned codepoint
+        let result = id.allows("\u{0378}");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_allows_spec_class_dis() {
+        let id = IdentifierClass::default();
+
+        // Space is SpecClassDis for IdentifierClass
+        let result = id.allows(" ");
+        assert!(result.is_err());
+        match result {
+            Err(Error::BadCodepoint(info)) => {
+                assert_eq!(info.property, DerivedPropertyValue::SpecClassDis);
+            }
+            _ => panic!("Expected BadCodepoint error"),
+        }
+    }
+
+    #[test]
+    fn test_backward_compatible_characters() {
+        // Test characters in backward compatible table
+        // These have specific mappings defined in the exceptions table
+        let id = IdentifierClass::default();
+        let ff = FreeformClass::default();
+
+        // Most ASCII punctuation and symbols are in exception or backward compatible tables
+        // Test that they work correctly
+        let _ = id.get_value_from_codepoint(0x00DF); // LATIN SMALL LETTER SHARP S
+        let _ = ff.get_value_from_codepoint(0x00DF);
+    }
+
+    #[test]
+    fn test_allows_unassigned_character() {
+        let id_class = IdentifierClass::default();
+        // U+0378 is unassigned in Unicode 6.3.0
+        let result = id_class.allows("\u{0378}");
+        assert!(result.is_err());
+        if let Err(Error::BadCodepoint(info)) = result {
+            assert_eq!(info.cp, 0x0378);
+            assert_eq!(info.property, DerivedPropertyValue::Unassigned);
+        }
+    }
+
+    #[test]
+    fn test_allows_context_j_in_string() {
+        let id_class = IdentifierClass::default();
+        // U+200D (ZWJ) is ContextJ - test it with proper context
+        // Devanagari Virama (U+094D) + ZWJ is allowed
+        let result = id_class.allows("क\u{094d}\u{200d}त");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_allows_context_o_in_string() {
+        let id_class = IdentifierClass::default();
+        // U+00B7 (Middle Dot) is ContextO - test with l·l pattern
+        let result = id_class.allows("l\u{00b7}l");
+        assert!(result.is_ok());
+    }
 }

@@ -231,4 +231,43 @@ mod profiles {
             Err(Error::Unexpected(UnexpectedError::ProfileRuleNotApplicable))
         );
     }
+
+    #[test]
+    fn test_stabilize_success() {
+        // Test that stabilizes in one iteration
+        let result = stabilize("test", |s| Ok(Cow::Borrowed(s)));
+        assert_eq!(result, Ok(Cow::Borrowed("test")));
+    }
+
+    #[test]
+    fn test_stabilize_multiple_iterations() {
+        // Test that stabilizes after transformations
+        // Simulates a string that changes twice then stabilizes
+        let result = stabilize("AAA", |s| {
+            if s == "AAA" {
+                Ok(Cow::Owned("BBB".to_string()))
+            } else if s == "BBB" {
+                Ok(Cow::Owned("CCC".to_string()))
+            } else {
+                Ok(Cow::Borrowed(s))
+            }
+        });
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "CCC");
+    }
+
+    #[test]
+    fn test_stabilize_fails_after_max_iterations() {
+        // Test that fails when string doesn't stabilize after 3 iterations
+        // Each iteration adds a character, so it never stabilizes
+        let result = stabilize("X", |s| Ok(Cow::Owned(format!("{}X", s))));
+        assert_eq!(result, Err(Error::Invalid));
+    }
+
+    #[test]
+    fn test_stabilize_error_propagation() {
+        // Test that errors are propagated correctly
+        let result = stabilize("test", |_s| Err(Error::Invalid));
+        assert_eq!(result, Err(Error::Invalid));
+    }
 }

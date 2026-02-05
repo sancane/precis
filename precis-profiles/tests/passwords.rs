@@ -94,3 +94,56 @@ fn compare() {
     let res = OpaqueString::compare("Secret", "secret");
     assert_eq!(res, Ok(false));
 }
+
+#[test]
+fn test_single_character_passwords() {
+    // Single ASCII character password
+    let res = OpaqueString::prepare("a");
+    assert_eq!(res, Ok(Cow::from("a")));
+
+    let res = OpaqueString::enforce("a");
+    assert_eq!(res, Ok(Cow::from("a")));
+
+    // Single uppercase ASCII
+    let res = OpaqueString::enforce("A");
+    assert_eq!(res, Ok(Cow::from("A")));
+
+    // Single digit
+    let res = OpaqueString::prepare("5");
+    assert_eq!(res, Ok(Cow::from("5")));
+
+    // Single Unicode character
+    let res = OpaqueString::prepare("π");
+    assert_eq!(res, Ok(Cow::from("π")));
+
+    // Single emoji
+    let res = OpaqueString::prepare("😀");
+    assert_eq!(res, Ok(Cow::from("😀")));
+
+    // Single CJK character
+    let res = OpaqueString::prepare("密");
+    assert_eq!(res, Ok(Cow::from("密")));
+
+    // Single symbol
+    let res = OpaqueString::prepare("♦");
+    assert_eq!(res, Ok(Cow::from("♦")));
+}
+
+#[test]
+fn test_multibyte_passwords() {
+    // UTF-8 multibyte sequences
+    let res = OpaqueString::prepare("café");
+    assert_eq!(res, Ok(Cow::from("café")));
+
+    // Mix of multibyte characters
+    let res = OpaqueString::enforce("πßå123");
+    assert_eq!(res, Ok(Cow::from("πßå123")));
+
+    // Full multibyte password
+    let res = OpaqueString::enforce("密碼😀");
+    assert_eq!(res, Ok(Cow::from("密碼😀")));
+
+    // Arabic password
+    let res = OpaqueString::prepare("كلمةالسر");
+    assert_eq!(res, Ok(Cow::from("كلمةالسر")));
+}

@@ -47,24 +47,30 @@ pub fn get_codepoints_vector(codepoints: &HashSet<u32>) -> Vec<Codepoints> {
     let mut range: Option<CodepointRange> = None;
 
     for cp in vec.iter() {
+        // Skip invalid codepoints (values > 0x10FFFF)
+        let Ok(codepoint) = Codepoint::from_u32(**cp) else {
+            eprintln!("Warning: Skipping invalid codepoint: {:#06x}", cp);
+            continue;
+        };
+
         match range.as_mut() {
             Some(r) => {
                 if **cp - r.end.value() == 1 {
-                    r.end = Codepoint::from_u32(**cp).unwrap();
+                    r.end = codepoint;
                 } else {
                     // there is a gap, non-consecutive numbers
                     add_range(&range, &mut out);
                     // Start a new range
                     range = Some(CodepointRange {
-                        start: Codepoint::from_u32(**cp).unwrap(),
-                        end: Codepoint::from_u32(**cp).unwrap(),
+                        start: codepoint,
+                        end: codepoint,
                     });
                 }
             }
             None => {
                 range = Some(CodepointRange {
-                    start: Codepoint::from_u32(**cp).unwrap(),
-                    end: Codepoint::from_u32(**cp).unwrap(),
+                    start: codepoint,
+                    end: codepoint,
                 });
             }
         }
