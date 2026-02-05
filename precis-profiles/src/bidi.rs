@@ -2,6 +2,7 @@ include!(concat!(env!("OUT_DIR"), "/bidi_class.rs"));
 
 use precis_core::Codepoints;
 
+#[inline]
 fn bidi_class_cp(cp: u32) -> BidiClass {
     match BIDI_CLASS_TABLE.binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap()) {
         Ok(idx) => BIDI_CLASS_TABLE[idx].1,
@@ -11,12 +12,14 @@ fn bidi_class_cp(cp: u32) -> BidiClass {
     }
 }
 
+#[inline]
 fn bidi_class(c: char) -> BidiClass {
     bidi_class_cp(c as u32)
 }
 
 /// From `rfc5893` Right-to-Left Scripts for Internationalized Domain Names for Applications (`IDNA`)
 /// An `RTL` label is a label that contains at least one character of type R, AL, or AN.
+#[inline]
 pub(crate) fn has_rtl(label: &str) -> bool {
     label
         .find(|c| matches!(bidi_class(c), BidiClass::R | BidiClass::AL | BidiClass::AN))

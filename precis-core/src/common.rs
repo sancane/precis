@@ -21,14 +21,17 @@ fn binary_search_codepoints_table<T>(table: &[(Codepoints, T)], cp: u32) -> Opti
         .map(|idx| &table[idx].1)
 }
 
+#[inline]
 pub(crate) fn get_exception_val(cp: u32) -> Option<&'static DerivedPropertyValue> {
     binary_search_codepoints_table(&EXCEPTIONS, cp)
 }
 
+#[inline]
 pub(crate) fn get_backward_compatible_val(cp: u32) -> Option<&'static DerivedPropertyValue> {
     binary_search_codepoints_table(&BACKWARD_COMPATIBLE, cp)
 }
 
+#[inline]
 fn is_in_table(cp: u32, table: &[Codepoints]) -> bool {
     table
         .binary_search_by(|cps| {
@@ -40,6 +43,7 @@ fn is_in_table(cp: u32, table: &[Codepoints]) -> bool {
         .is_ok()
 }
 
+#[inline]
 pub(crate) fn is_letter_digit(cp: u32) -> bool {
     is_in_table(cp, &LOWERCASE_LETTER)
         || is_in_table(cp, &UPPERCASE_LETTER)
@@ -50,36 +54,44 @@ pub(crate) fn is_letter_digit(cp: u32) -> bool {
         || is_in_table(cp, &SPACING_MARK)
 }
 
+#[inline]
 pub(crate) fn is_join_control(cp: u32) -> bool {
     is_in_table(cp, &JOIN_CONTROL)
 }
 
+#[inline]
 pub(crate) fn is_old_hangul_jamo(cp: u32) -> bool {
     is_in_table(cp, &LEADING_JAMO)
         || is_in_table(cp, &VOWEL_JAMO)
         || is_in_table(cp, &TRAILING_JAMO)
 }
 
+#[inline]
 pub(crate) fn is_unassigned(cp: u32) -> bool {
     !is_in_table(cp, &NONCHARACTER_CODE_POINT) && is_in_table(cp, &UNASSIGNED)
 }
 
+#[inline]
 pub(crate) fn is_ascii7(cp: u32) -> bool {
     is_in_table(cp, &ASCII7)
 }
 
+#[inline]
 pub(crate) fn is_control(cp: u32) -> bool {
     is_in_table(cp, &CONTROL)
 }
 
+#[inline]
 pub(crate) fn is_precis_ignorable_property(cp: u32) -> bool {
     is_in_table(cp, &DEFAULT_IGNORABLE_CODE_POINT) || is_in_table(cp, &NONCHARACTER_CODE_POINT)
 }
 
+#[inline]
 pub(crate) fn is_space(cp: u32) -> bool {
     is_in_table(cp, &SPACE_SEPARATOR)
 }
 
+#[inline]
 pub(crate) fn is_symbol(cp: u32) -> bool {
     is_in_table(cp, &MATH_SYMBOL)
         || is_in_table(cp, &CURRENCY_SYMBOL)
@@ -87,6 +99,7 @@ pub(crate) fn is_symbol(cp: u32) -> bool {
         || is_in_table(cp, &OTHER_SYMBOL)
 }
 
+#[inline]
 pub(crate) fn is_punctuation(cp: u32) -> bool {
     is_in_table(cp, &CONNECTOR_PUNCTUATION)
         || is_in_table(cp, &DASH_PUNCTUATION)
@@ -97,6 +110,7 @@ pub(crate) fn is_punctuation(cp: u32) -> bool {
         || is_in_table(cp, &OTHER_PUNCTUATION)
 }
 
+#[inline]
 pub(crate) fn is_other_letter_digit(cp: u32) -> bool {
     is_in_table(cp, &TITLECASE_LETTER)
         || is_in_table(cp, &LETTER_NUMBER)
@@ -127,41 +141,52 @@ pub(crate) fn has_compat(cp: u32) -> bool {
     !matches!((normalized.next(), normalized.next()), (Some(nc), None) if nc == c)
 }
 
+#[inline]
 pub(crate) fn is_virama(cp: u32) -> bool {
     is_in_table(cp, &VIRAMA)
 }
 
+#[inline]
 pub(crate) fn is_greek(cp: u32) -> bool {
     is_in_table(cp, &GREEK)
 }
 
+#[inline]
 pub(crate) fn is_hebrew(cp: u32) -> bool {
     is_in_table(cp, &HEBREW)
 }
 
+#[inline]
 pub(crate) fn is_hiragana(cp: u32) -> bool {
     is_in_table(cp, &HIRAGANA)
 }
 
+#[inline]
 pub(crate) fn is_katakana(cp: u32) -> bool {
     is_in_table(cp, &KATAKANA)
 }
+
+#[inline]
 pub(crate) fn is_han(cp: u32) -> bool {
     is_in_table(cp, &HAN)
 }
 
+#[inline]
 pub(crate) fn is_dual_joining(cp: u32) -> bool {
     is_in_table(cp, &DUAL_JOINING)
 }
 
+#[inline]
 pub(crate) fn is_left_joining(cp: u32) -> bool {
     is_in_table(cp, &LEFT_JOINING)
 }
 
+#[inline]
 pub(crate) fn is_right_joining(cp: u32) -> bool {
     is_in_table(cp, &RIGHT_JOINING)
 }
 
+#[inline]
 pub(crate) fn is_transparent(cp: u32) -> bool {
     is_in_table(cp, &TRANSPARENT)
 }

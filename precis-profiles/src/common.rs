@@ -7,6 +7,7 @@ use unicode_normalization::UnicodeNormalization;
 
 pub(crate) const SPACE: char = '\u{0020}';
 
+#[inline]
 pub(crate) fn is_space_separator(c: char) -> bool {
     let cp = c as u32;
     SPACE_SEPARATOR
@@ -14,6 +15,7 @@ pub(crate) fn is_space_separator(c: char) -> bool {
         .is_ok()
 }
 
+#[inline]
 pub(crate) fn is_non_ascii_space(c: char) -> bool {
     c != SPACE && is_space_separator(c)
 }
@@ -59,6 +61,7 @@ where
 ///
 /// # Returns
 /// The input string if not empty, or Error::Invalid if empty
+#[inline]
 pub(crate) fn ensure_not_empty<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
