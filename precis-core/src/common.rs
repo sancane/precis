@@ -11,7 +11,12 @@ use unicode_normalization::UnicodeNormalization;
 #[inline]
 fn binary_search_codepoints_table<T>(table: &[(Codepoints, T)], cp: u32) -> Option<&T> {
     table
-        .binary_search_by(|(cps, _)| cps.partial_cmp(&cp).unwrap())
+        .binary_search_by(|(cps, _)| {
+            // Use PartialOrd<u32> which correctly handles range containment
+            // This always returns Some(_) for valid codepoints
+            cps.partial_cmp(&cp)
+                .expect("Codepoints::partial_cmp should always return Some")
+        })
         .ok()
         .map(|idx| &table[idx].1)
 }
@@ -26,7 +31,12 @@ pub(crate) fn get_backward_compatible_val(cp: u32) -> Option<&'static DerivedPro
 
 fn is_in_table(cp: u32, table: &[Codepoints]) -> bool {
     table
-        .binary_search_by(|cps| cps.partial_cmp(&cp).unwrap())
+        .binary_search_by(|cps| {
+            // Use PartialOrd<u32> which correctly handles range containment
+            // This always returns Some(_) for valid codepoints
+            cps.partial_cmp(&cp)
+                .expect("Codepoints::partial_cmp should always return Some")
+        })
         .is_ok()
 }
 
