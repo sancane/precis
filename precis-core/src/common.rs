@@ -6,7 +6,7 @@ use crate::DerivedPropertyValue;
 use std::char;
 use unicode_normalization::UnicodeNormalization;
 
-/// Helper function to perform binary search on a table of (Codepoints, T) tuples
+/// Helper function to perform binary search on a table of (`Codepoints`, T) tuples
 /// and return the associated value if found.
 #[inline]
 fn binary_search_codepoints_table<T>(table: &[(Codepoints, T)], cp: u32) -> Option<&T> {
