@@ -1,0 +1,22 @@
+name: Validate Workflows
+
+on:
+  push:
+    paths:
+      - '.github/workflows/*yml'
+      - '.github/*yml'
+  pull_request:
+    paths:
+      - '.github/workflows/*yml'
+      - '.github/*yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate GitHub Actions
+        uses: jazzsequence/github-action-validator@v1
