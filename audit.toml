@@ -1,0 +1,33 @@
+# Configuration for cargo-audit
+# https://docs.rs/cargo-audit/
+
+[advisories]
+# Ignore specific advisories (with justification)
+ignore = [
+    # Example: "RUSTSEC-2020-0001"
+]
+
+# Fail only on vulnerabilities (not warnings or unmaintained)
+severity-threshold = "medium"
+
+[database]
+# Advisory database URL
+url = "https://github.com/RustSec/advisory-db.git"
+# Path to local advisory database
+path = "~/.cargo/advisory-db"
+# Whether to fetch the advisory database
+fetch = true
+
+[output]
+# Deny warnings (unmaintained, unsound)
+deny = ["unmaintained", "unsound"]
+# Output format: terminal, json, or toml
+format = "terminal"
+# Show warnings even if not denied
+show-warnings = true
+
+[yanked]
+# Check for yanked crates
+enabled = true
+# Update the index before checking
+update-index = true
