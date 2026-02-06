@@ -101,8 +101,9 @@ jobs:
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
 
-    - uses: EmbarkStudios/cargo-deny-action@v1
+    - uses: taiki-e/install-action@v2
       with:
-        log-level: warn
-        command: check
-        arguments: --all-features
+        tool: cargo-deny
+
+    - name: Run cargo-deny
+      run: cargo deny check

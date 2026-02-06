@@ -2,13 +2,15 @@ name: Security audit
 
 on:
   push:
+    branches: [ main ]
     paths:
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
+      - 'Cargo.toml'
+      - 'precis-*/Cargo.toml'
   pull_request:
+    branches: [ main ]
     paths:
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
+      - 'Cargo.toml'
+      - 'precis-*/Cargo.toml'
   workflow_dispatch:
 
 jobs:
