@@ -29,3 +29,4 @@ precis-tools.workspace = true
 
 [dev-dependencies]
 hex = "0.4"
+proptest = "1.5"

@@ -28,4 +28,5 @@ ucd-parse.workspace = true
 
 [dev-dependencies]
 precis-tools.workspace = true
+proptest = "1.5"
 ucd-parse.workspace = true
