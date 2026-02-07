@@ -26,11 +26,11 @@ fn string_with_spaces() -> impl Strategy<Value = String> {
 // Strategy to generate international strings
 fn international_string() -> impl Strategy<Value = String> {
     prop_oneof![
-        "[a-zA-Z0-9]{1,50}",           // ASCII
-        "[α-ωΑ-Ω]{1,30}",              // Greek
-        "[а-яА-Я]{1,30}",              // Cyrillic
-        "[一-龯]{1,20}",                // CJK
-        "[ぁ-ん]{1,30}",                // Hiragana
+        "[a-zA-Z0-9]{1,50}", // ASCII
+        "[α-ωΑ-Ω]{1,30}",    // Greek
+        "[а-яА-Я]{1,30}",    // Cyrillic
+        "[一-龯]{1,20}",     // CJK
+        "[ぁ-ん]{1,30}",     // Hiragana
     ]
 }
 
