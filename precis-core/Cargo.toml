@@ -27,6 +27,11 @@ precis-tools.workspace = true
 ucd-parse.workspace = true
 
 [dev-dependencies]
+criterion = "0.5"
 precis-tools.workspace = true
 proptest = "1.5"
 ucd-parse.workspace = true
+
+[[bench]]
+name = "stringclass_bench"
+harness = false

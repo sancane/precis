@@ -28,5 +28,10 @@ unicode-normalization.workspace = true
 precis-tools.workspace = true
 
 [dev-dependencies]
+criterion = "0.5"
 hex = "0.4"
 proptest = "1.5"
+
+[[bench]]
+name = "profiles_bench"
+harness = false

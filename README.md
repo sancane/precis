@@ -98,8 +98,52 @@ PRECIS recommends using `toLowerCase`() operation as defined in the Unicode Stan
 [Unicode](http://www.unicode.org/versions/latest/). This implementation uses the 
 one provided by Rust standard library 
 [`to_lowercase`](https://doc.rust-lang.org/std/primitive.str.html#method.to_lowercase).
-This operation performs an unconditional mapping without tailoring. That is, the 
+This operation performs an unconditional mapping without tailoring. That is, the
 conversion is independent of context and language.
+
+# Development
+
+## Testing
+
+The project has comprehensive test coverage (96%+) with multiple testing approaches:
+
+- **Unit tests**: tests covering core functionality
+- **Property-based tests**: tests with [proptest](https://proptest-rs.github.io/proptest/) generating thousands of random inputs. See [PROPTEST_GUIDE.md](PROPTEST_GUIDE.md) for details.
+- **Integration tests**: RFC test vectors and edge cases
+- **Doc tests**: tests in documentation examples
+
+```bash
+# Run all tests
+cargo test
+
+# Run property-based tests
+cargo test proptest
+
+# Run with increased cases
+PROPTEST_CASES=10000 cargo test proptest
+```
+
+See [PROPTEST_GUIDE.md](PROPTEST_GUIDE.md) and [PROPTEST_CI.md](PROPTEST_CI.md) for complete testing documentation.
+
+## Benchmarking
+
+The project uses [Criterion.rs](https://github.com/bheisler/criterion.rs) for performance benchmarking:
+
+```bash
+# Run all benchmarks
+cargo bench
+
+# Run specific benchmark
+cargo bench --bench stringclass_bench
+cargo bench --bench profiles_bench
+
+# Compare with baseline
+cargo bench -- --save-baseline main
+# ... make changes ...
+cargo bench -- --baseline main
+```
+
+See [BENCHMARKING.md](BENCHMARKING.md) for complete benchmarking guide.
 
 # Contributing
 
