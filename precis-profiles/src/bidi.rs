@@ -818,6 +818,136 @@ mod bidi_tests {
     }
 
     #[test]
+    fn test_coverage_rtl_individual_branches() {
+        // Ensure each individual branch in the RTL match (lines 93-99) is executed
+
+        // Single R after R start (line 93)
+        assert!(satisfy_bidi_rule(&str_chars!(R, R)));
+
+        // Single AL after AL start (line 94)
+        assert!(satisfy_bidi_rule(&str_chars!(AL, AL)));
+
+        // ES in second position (line 95)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ES, R)));
+
+        // CS in second position (line 96)
+        assert!(satisfy_bidi_rule(&str_chars!(R, CS, R)));
+
+        // ET in second position (line 97)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ET, R)));
+
+        // ON in second position (line 98)
+        assert!(satisfy_bidi_rule(&str_chars!(R, ON, R)));
+
+        // BN in second position (line 99)
+        assert!(satisfy_bidi_rule(&str_chars!(R, BN, R)));
+    }
+
+    #[test]
+    fn test_coverage_an_branch() {
+        // Cover line 100: BidiClass::AN branch entry
+        // AN in RTL label (line 100)
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN)));
+
+        // Multiple AN allowed
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, AN)));
+    }
+
+    #[test]
+    fn test_coverage_en_branch() {
+        // Cover line 108: BidiClass::EN branch entry
+        // EN in RTL label (line 108)
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN)));
+
+        // Multiple EN allowed
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, EN)));
+    }
+
+    #[test]
+    fn test_coverage_nsm_branch() {
+        // Cover line 116: BidiClass::NSM branch entry
+        // NSM after valid R (line 116)
+        assert!(satisfy_bidi_rule(&str_chars!(R, NSM)));
+
+        // NSM after AL
+        assert!(satisfy_bidi_rule(&str_chars!(AL, NSM)));
+
+        // NSM after EN in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN, NSM)));
+
+        // NSM after AN in RTL
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN, NSM)));
+    }
+
+    #[test]
+    fn test_coverage_nsm_validation() {
+        // Cover line 123: Check if NSM follows valid character
+        // Invalid: NSM after ES (line 121-126)
+        assert!(!satisfy_bidi_rule(&str_chars!(R, ES, NSM)));
+
+        // Invalid: NSM after CS
+        assert!(!satisfy_bidi_rule(&str_chars!(R, CS, NSM)));
+
+        // Invalid: NSM after BN
+        assert!(!satisfy_bidi_rule(&str_chars!(R, BN, NSM)));
+    }
+
+    #[test]
+    fn test_coverage_rtl_ending() {
+        // Cover line 147: Final validation in is_valid_rtl_label
+        // Ending with R
+        assert!(satisfy_bidi_rule(&str_chars!(R)));
+
+        // Ending with AL
+        assert!(satisfy_bidi_rule(&str_chars!(AL)));
+
+        // Ending with EN
+        assert!(satisfy_bidi_rule(&str_chars!(R, EN)));
+
+        // Ending with AN
+        assert!(satisfy_bidi_rule(&str_chars!(R, AN)));
+
+        // Ending with NSM after valid char (line 145 covers nsm flag)
+        assert!(satisfy_bidi_rule(&str_chars!(R, NSM)));
+    }
+
+    #[test]
+    fn test_coverage_ltr_individual_branches() {
+        // Cover lines 164-170: Each branch in LTR match
+
+        // L in second position (line 164)
+        assert!(satisfy_bidi_rule(&str_chars!(L, L)));
+
+        // EN in second position (line 165)
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN)));
+
+        // ES in second position (line 166)
+        assert!(satisfy_bidi_rule(&str_chars!(L, ES, L)));
+
+        // CS in second position (line 167)
+        assert!(satisfy_bidi_rule(&str_chars!(L, CS, L)));
+
+        // ET in second position (line 168)
+        assert!(satisfy_bidi_rule(&str_chars!(L, ET, L)));
+
+        // ON in second position (line 169)
+        assert!(satisfy_bidi_rule(&str_chars!(L, ON, L)));
+
+        // BN in second position (line 170)
+        assert!(satisfy_bidi_rule(&str_chars!(L, BN, L)));
+    }
+
+    #[test]
+    fn test_coverage_ltr_nsm_branch() {
+        // Cover line 179: NSM branch in LTR
+        // NSM after L (line 179)
+        assert!(satisfy_bidi_rule(&str_chars!(L, NSM)));
+
+        // NSM after EN in LTR (line 179)
+        assert!(satisfy_bidi_rule(&str_chars!(L, EN, NSM)));
+    }
+
+    #[test]
     fn test_an_en_conflict_in_rtl() {
         // Test line 100-107: AN when EN is present
         // AN should be accepted when no EN
