@@ -16,6 +16,7 @@ keywords = ["precis", "profiles", "rfc8264", "rfc8265", "rfc8266"]
 license = "MIT/Apache-2.0"
 categories = ["text-processing", "internationalization"]
 edition = "2021"
+rust-version = "1.80"
 
 [features]
 networking = ["precis-core/networking", "precis-tools/networking"]

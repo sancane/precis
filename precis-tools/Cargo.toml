@@ -13,6 +13,7 @@ keywords = ["Preparation", "Enforcement", "Comparison", "Internationalized", "pr
 license = "MIT/Apache-2.0"
 categories = ["text-processing", "internationalization"]
 edition = "2021"
+rust-version = "1.80"
 
 [features]
 networking = ["reqwest"]
