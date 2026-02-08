@@ -130,7 +130,7 @@ See [PROPTEST_GUIDE.md](PROPTEST_GUIDE.md) and [PROPTEST_CI.md](PROPTEST_CI.md) 
 
 ## Fuzzing
 
-The project supports fuzzing with cargo-fuzz to discover edge cases, panics, and bugs. **19 fuzz targets** available across core classes and all profiles:
+The project supports fuzzing with cargo-fuzz to discover edge cases, panics, and bugs. Comprehensive fuzz targets available across core classes and all profiles:
 
 ```bash
 # Install cargo-fuzz (requires nightly)
@@ -141,8 +141,8 @@ cd precis-profiles
 cargo +nightly fuzz run nickname_enforce -- -max_total_time=5
 
 # List available targets
-cd precis-profiles && cargo +nightly fuzz list  # 13 profile targets
-cd precis-core && cargo +nightly fuzz list      # 6 core class targets
+cd precis-profiles && cargo +nightly fuzz list  # Profile targets
+cd precis-core && cargo +nightly fuzz list      # Core class targets
 ```
 
 **Profile targets** (prepare, enforce, compare for all profiles):
@@ -154,6 +154,12 @@ cd precis-core && cargo +nightly fuzz list      # 6 core class targets
 **Core class targets** (FreeformClass, IdentifierClass):
 - `freeform_class_allows`, `freeform_class_get_value`, `freeform_class_codepoint`
 - `identifier_class_allows`, `identifier_class_get_value`, `identifier_class_codepoint`
+
+**CI Integration:**
+- ✅ **ClusterFuzzLite** runs automatically on every PR
+- ✅ 5 minutes fuzzing per target
+- ✅ Catches bugs before merge
+- ✅ No setup required
 
 See [FUZZING.md](FUZZING.md) for complete fuzzing guide.
 

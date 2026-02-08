@@ -1,0 +1,57 @@
+name: ClusterFuzzLite PR fuzzing
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  PR:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.sanitizer }}-${{ github.ref }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer:
+          - address
+          # Uncomment to enable additional sanitizers:
+          # - undefined
+          # - memory
+    steps:
+      - name: Build Fuzzers (${{ matrix.sanitizer }})
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: rust
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          sanitizer: ${{ matrix.sanitizer }}
+          # Optional: Enable storage repo for corpus persistence
+          # storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/OWNER/STORAGE-REPO-NAME.git
+          # storage-repo-branch: main
+          # storage-repo-branch-coverage: gh-pages
+
+      - name: Run Fuzzers (${{ matrix.sanitizer }})
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fuzz-seconds: 300
+          mode: 'code-change'
+          sanitizer: ${{ matrix.sanitizer }}
+          output-sarif: true
+          parallel-fuzzing: true
+          # Optional: Enable storage repo for corpus download
+          # storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/OWNER/STORAGE-REPO-NAME.git
+          # storage-repo-branch: main
+          # storage-repo-branch-coverage: gh-pages
+
+      # Upload crashes as artifacts if fuzzing fails
+      - name: Upload Crashes
+        if: failure() && steps.run.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: clusterfuzzlite-crashes-${{ matrix.sanitizer }}
+          path: build/out/artifacts
