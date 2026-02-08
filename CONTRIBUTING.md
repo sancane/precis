@@ -355,6 +355,60 @@ cargo test -- --nocapture
 cargo tarpaulin --workspace --exclude precis-tools --timeout 120 --out Html
 ```
 
+## Fuzzing
+
+Fuzzing is an automated testing technique that generates random inputs to discover bugs, panics, and edge cases.
+
+### When to Run Fuzzing
+
+Run fuzzing when:
+- Adding new profile implementations
+- Modifying string processing logic
+- Investigating potential edge cases
+- Before major releases
+
+### Quick Start
+
+```bash
+# Install cargo-fuzz
+cargo install cargo-fuzz
+
+# Run fuzzing for 60 seconds
+cd precis-profiles
+cargo +nightly fuzz run nickname_enforce -- -max_total_time=60
+
+# List available targets
+cargo +nightly fuzz list
+```
+
+### Available Fuzz Targets
+
+The project has **19 fuzz targets** covering:
+
+**precis-core (6 targets):**
+- FreeformClass and IdentifierClass: `allows()`, `get_value_from_char()`, `get_value_from_codepoint()`
+
+**precis-profiles (13 targets):**
+- **Nickname**: enforce, prepare, compare, arbitrary (invalid UTF-8)
+- **OpaqueString**: enforce, prepare, compare
+- **UsernameCaseMapped**: enforce, prepare, compare
+- **UsernameCasePreserved**: enforce, prepare, compare
+
+### If Fuzzing Finds a Bug
+
+1. Crash artifacts are saved to `fuzz/artifacts/`
+2. Create a minimal unit test reproducing the issue
+3. Fix the bug
+4. Verify the fix with the same input
+5. Keep the corpus (it found a real bug!)
+
+See [FUZZING.md](FUZZING.md) for complete fuzzing guide including:
+- Detailed target descriptions
+- Advanced fuzzing options
+- Corpus management
+- CI/CD integration
+- Troubleshooting
+
 ## Benchmarking
 
 ### When to Add Benchmarks

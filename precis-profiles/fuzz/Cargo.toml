@@ -1,0 +1,123 @@
+[package]
+name = "precis-profiles-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.precis-core]
+path = "../../precis-core"
+
+[dependencies.precis-profiles]
+path = ".."
+
+# Fuzz target: Nickname::enforce
+[[bin]]
+name = "nickname_enforce"
+path = "fuzz_targets/nickname_enforce.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: Nickname::compare
+[[bin]]
+name = "nickname_compare"
+path = "fuzz_targets/nickname_compare.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: Nickname with arbitrary bytes (including invalid UTF-8)
+[[bin]]
+name = "nickname_arbitrary"
+path = "fuzz_targets/nickname_arbitrary.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: OpaqueString::enforce (passwords)
+[[bin]]
+name = "opaque_string_enforce"
+path = "fuzz_targets/opaque_string_enforce.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: UsernameCaseMapped::enforce
+[[bin]]
+name = "username_casemapped"
+path = "fuzz_targets/username_casemapped.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: Nickname::prepare
+[[bin]]
+name = "nickname_prepare"
+path = "fuzz_targets/nickname_prepare.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: OpaqueString::prepare
+[[bin]]
+name = "opaque_string_prepare"
+path = "fuzz_targets/opaque_string_prepare.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: OpaqueString::compare
+[[bin]]
+name = "opaque_string_compare"
+path = "fuzz_targets/opaque_string_compare.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: UsernameCaseMapped::prepare
+[[bin]]
+name = "username_casemapped_prepare"
+path = "fuzz_targets/username_casemapped_prepare.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: UsernameCaseMapped::compare
+[[bin]]
+name = "username_casemapped_compare"
+path = "fuzz_targets/username_casemapped_compare.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: UsernameCasePreserved::enforce
+[[bin]]
+name = "username_casepreserved"
+path = "fuzz_targets/username_casepreserved.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: UsernameCasePreserved::prepare
+[[bin]]
+name = "username_casepreserved_prepare"
+path = "fuzz_targets/username_casepreserved_prepare.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: UsernameCasePreserved::compare
+[[bin]]
+name = "username_casepreserved_compare"
+path = "fuzz_targets/username_casepreserved_compare.rs"
+test = false
+doc = false
+bench = false

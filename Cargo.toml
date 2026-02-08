@@ -2,6 +2,7 @@
 resolver = "2"
 
 members = ["precis-core", "precis-profiles", "precis-tools"]
+exclude = ["precis-core/fuzz", "precis-profiles/fuzz"]
 
 [workspace.dependencies]
 precis-core = { path = "precis-core" }
