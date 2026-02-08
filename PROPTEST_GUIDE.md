@@ -37,21 +37,21 @@ Proptest generates **1000 random strings** and verifies the property holds for a
 
 ### Proptest Coverage
 
-| File | Tests | Cases per test |
-|------|-------|----------------|
-| `proptest_properties.rs` (profiles) | 18 | 500-1000 |
-| `proptest_stringclass.rs` (core) | 20 | 500-5000 |
+| File | Cases per test |
+|------|----------------|
+| `proptest_properties.rs` (profiles) | 500-1000 |
+| `proptest_stringclass.rs` (core) | 500-5000 |
 
-**Total**: 38 property tests
-**Total cases**: ~30,000-40,000 automatically generated inputs
+**Coverage**: Comprehensive property tests across all profiles and core classes
+**Total cases**: Thousands of automatically generated inputs per test run
 
 ### Overall Coverage
 ```
-Unit + integration tests:  211 tests
-Property-based tests:       38 tests
-Doc tests:                   7 tests
+Unit + integration tests:  Comprehensive
+Property-based tests:       Comprehensive (profiles + core)
+Doc tests:                  All examples tested
 ─────────────────────────────────────
-TOTAL:                     256 tests
+Coverage:                   High (all critical paths)
 ```
 
 ## 🎯 Properties Tested
