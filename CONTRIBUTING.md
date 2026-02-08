@@ -383,12 +383,12 @@ cargo +nightly fuzz list
 
 ### Available Fuzz Targets
 
-The project has **19 fuzz targets** covering:
+The project has comprehensive fuzz targets covering:
 
-**precis-core (6 targets):**
+**precis-core:**
 - FreeformClass and IdentifierClass: `allows()`, `get_value_from_char()`, `get_value_from_codepoint()`
 
-**precis-profiles (13 targets):**
+**precis-profiles:**
 - **Nickname**: enforce, prepare, compare, arbitrary (invalid UTF-8)
 - **OpaqueString**: enforce, prepare, compare
 - **UsernameCaseMapped**: enforce, prepare, compare
@@ -558,8 +558,15 @@ Your PR will automatically run:
 - **Coverage** (`coverage.yml`): Verifies test coverage doesn't decrease
 - **Security Audit** (`security_audit.yml`): Checks for known vulnerabilities
 - **Benchmarks** (`benchmarks.yml`): Tracks performance changes with CodSpeed
+- **ClusterFuzzLite** (`clusterfuzzlite.yml`): Fuzzes changed code for 5 minutes per target
 
 All checks must pass before merging.
+
+**ClusterFuzzLite Note:**
+- Runs automatically when code in `precis-core/src/` or `precis-profiles/src/` changes
+- Fuzzes for 5 minutes per target to catch panics and bugs
+- If crashes are found, artifacts are uploaded and PR is blocked
+- Fix any crashes before merging
 
 ### Review Process
 

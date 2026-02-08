@@ -28,9 +28,9 @@ cargo install cargo-fuzz
 
 ## Available Fuzz Targets
 
-The project has **19 fuzz targets** across two crates:
+The project has comprehensive fuzz targets across two crates:
 
-### precis-core Targets (6 targets)
+### precis-core Targets
 
 Located in `precis-core/fuzz/fuzz_targets/`:
 
@@ -83,11 +83,11 @@ Tests codepoint-based classification for identifiers.
 - Identifier-specific codepoint restrictions
 - All codepoint ranges
 
-### precis-profiles Targets (13 targets)
+### precis-profiles Targets
 
 Located in `precis-profiles/fuzz/fuzz_targets/`:
 
-#### Nickname Profile (4 targets)
+#### Nickname Profile
 
 **nickname_enforce** - Nickname::enforce()
 - Space trimming with various Unicode spaces
@@ -110,7 +110,7 @@ Located in `precis-profiles/fuzz/fuzz_targets/`:
 - Multibyte character boundaries
 - Lossy conversion edge cases
 
-#### OpaqueString Profile (3 targets)
+#### OpaqueString Profile
 
 **opaque_string_enforce** - OpaqueString::enforce()
 - Password normalization
@@ -127,7 +127,7 @@ Located in `precis-profiles/fuzz/fuzz_targets/`:
 - Case-sensitive matching
 - Normalization equivalence
 
-#### UsernameCaseMapped Profile (3 targets)
+#### UsernameCaseMapped Profile
 
 **username_casemapped** - UsernameCaseMapped::enforce()
 - Case mapping edge cases
@@ -144,7 +144,7 @@ Located in `precis-profiles/fuzz/fuzz_targets/`:
 - Normalization equivalence
 - International character handling
 
-#### UsernameCasePreserved Profile (3 targets)
+#### UsernameCasePreserved Profile
 
 **username_casepreserved** - UsernameCasePreserved::enforce()
 - Case-sensitive username validation
@@ -184,7 +184,7 @@ cd precis-profiles
 cargo +nightly fuzz list
 ```
 
-**Output (13 targets):**
+**Example output:**
 ```
 nickname_arbitrary
 nickname_compare
@@ -198,7 +198,8 @@ username_casemapped_compare
 username_casemapped_prepare
 username_casepreserved
 username_casepreserved_compare
-username_casepreserved_prepare
+username_casepreserved_compare
+(and more...)
 ```
 
 **precis-core targets:**
@@ -207,7 +208,7 @@ cd precis-core
 cargo +nightly fuzz list
 ```
 
-**Output (6 targets):**
+**Example output:**
 ```
 freeform_class_allows
 freeform_class_codepoint
@@ -619,14 +620,303 @@ This is normal after initial fuzzing. The fuzzer has explored most code paths. C
 
 6. **Keep the corpus** - It found a real bug!
 
+## ClusterFuzzLite - CI Integration
+
+ClusterFuzzLite runs fuzzing automatically in CI to catch bugs before they're merged.
+
+### What is ClusterFuzzLite?
+
+[ClusterFuzzLite](https://google.github.io/clusterfuzzlite/) is Google's lightweight fuzzing solution that:
+- ✅ Runs in GitHub Actions (your infrastructure)
+- ✅ Fuzzes every pull request automatically
+- ✅ Finds bugs before merge
+- ✅ No configuration files needed (detects cargo-fuzz automatically)
+- ✅ No application required (unlike OSS-Fuzz)
+- ✅ Comments on PRs with results
+
+### How It Works
+
+ClusterFuzzLite automatically detects and builds your cargo-fuzz targets without any additional configuration.
+
+**Workflow:** `.github/workflows/clusterfuzzlite.yml`
+
+1. **On Pull Request** - Triggers automatically when:
+   - Code in `precis-core/src/` or `precis-profiles/src/` changes
+   - Fuzz targets are modified
+   - Or manually via workflow_dispatch
+
+2. **Build Phase** - Automatically discovers and compiles all fuzz targets
+   - Uses `cargo +nightly fuzz build` internally
+   - Builds with AddressSanitizer by default
+
+3. **Fuzzing Phase** - Runs for 5 minutes per target:
+   - **Mode: code-change** - Focuses on code that changed
+   - **Parallel execution** - Multiple targets run simultaneously
+   - **Smart scheduling** - Prioritizes likely-buggy code
+
+4. **Reporting** - Automatically:
+   - Comments on PR if crashes found
+   - Uploads crash artifacts
+   - Links to reproduction steps
+
+### Configuration
+
+ClusterFuzzLite only needs a single workflow file - no Dockerfile or build scripts required!
+
+**`.github/workflows/clusterfuzzlite.yml`:**
+
+```yaml
+name: ClusterFuzzLite PR fuzzing
+
+on:
+  pull_request:
+    paths:
+      - 'precis-core/src/**'
+      - 'precis-profiles/src/**'
+      - '**/fuzz/**'
+
+permissions: read-all
+
+jobs:
+  PR:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sanitizer: [address]
+    steps:
+      - name: Build Fuzzers
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: rust
+          sanitizer: ${{ matrix.sanitizer }}
+
+      - name: Run Fuzzers
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          fuzz-seconds: 300
+          mode: 'code-change'
+          sanitizer: ${{ matrix.sanitizer }}
+          parallel-fuzzing: true
+          output-sarif: true
+```
+
+**That's it!** ClusterFuzzLite automatically finds your fuzz targets in `precis-core/fuzz/` and `precis-profiles/fuzz/`.
+
+### Fuzzing Budget
+
+**Per PR:**
+- **5 minutes** per fuzz target
+- **All targets** run in parallel
+- **Total duration** - Typically ~10-15 minutes
+
+**Cost:** Free (runs on your GitHub Actions minutes)
+
+### What It Catches
+
+ClusterFuzzLite will find:
+- ✅ Panics in new code
+- ✅ Out-of-bounds access
+- ✅ Memory issues (with AddressSanitizer)
+- ✅ Assertion failures
+- ✅ Infinite loops (timeout detection)
+- ✅ Edge cases introduced by changes
+
+### Example PR Comment
+
+When ClusterFuzzLite finds a bug:
+
+```
+🐛 ClusterFuzzLite found crashes in your PR
+
+Target: nickname_enforce
+Crash type: panic
+Reproducer: artifacts/clusterfuzzlite-crashes/crash-abc123
+
+To reproduce locally:
+cargo +nightly fuzz run nickname_enforce artifacts/.../crash-abc123
+
+Please fix the crash before merging.
+```
+
+### Manual Testing
+
+You can test locally before pushing (no Docker needed):
+
+```bash
+# Test what ClusterFuzzLite will do - just run cargo-fuzz locally!
+cd precis-profiles
+cargo +nightly fuzz run nickname_enforce -- -max_total_time=300
+
+cd ../precis-core
+cargo +nightly fuzz run freeform_class_allows -- -max_total_time=300
+```
+
+ClusterFuzzLite uses the same cargo-fuzz targets, so local testing = CI testing.
+
+### Adjusting Fuzzing Time
+
+To change fuzzing duration, edit `.github/workflows/clusterfuzzlite.yml`:
+
+```yaml
+- name: Run Fuzzers
+  with:
+    fuzz-seconds: 600  # Change to 10 minutes per target
+```
+
+**Trade-offs:**
+- **Lower (60-120s)**: Faster PRs, may miss bugs
+- **Medium (300s)**: Good balance (recommended)
+- **Higher (600-900s)**: Thorough, slower PRs
+
+### When Fuzzing Runs
+
+ClusterFuzzLite only runs when you modify:
+- `precis-core/src/**` - Core source code
+- `precis-profiles/src/**` - Profile source code
+- `**/fuzz/**` - Fuzz target changes
+
+**Documentation-only PRs** (README.md, *.md files) don't trigger fuzzing automatically.
+
+### Corpus Persistence (Optional)
+
+By default, ClusterFuzzLite doesn't save corpus between runs. To enable persistence, you need:
+
+1. **Create a storage repository** (private recommended):
+   ```bash
+   # Create a new repo: precis-corpus
+   ```
+
+2. **Create a Personal Access Token** with `repo` scope
+
+3. **Add token as GitHub Secret**: `PERSONAL_ACCESS_TOKEN`
+
+4. **Update workflow** (uncomment storage-repo lines):
+   ```yaml
+   - name: Build Fuzzers
+     with:
+       storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/sancane/precis-corpus.git
+       storage-repo-branch: main
+
+   - name: Run Fuzzers
+     with:
+       storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/sancane/precis-corpus.git
+       storage-repo-branch: main
+   ```
+
+**Benefits of corpus persistence:**
+- ✅ Faster fuzzing (starts with known interesting inputs)
+- ✅ Regression prevention (tests old corpus against new code)
+- ✅ Cumulative coverage (builds on previous runs)
+
+**Note:** Corpus persistence is optional. ClusterFuzzLite works fine without it for initial setup.
+
+### Limitations
+
+**ClusterFuzzLite vs Local Fuzzing:**
+
+| Aspect | ClusterFuzzLite | Local cargo-fuzz |
+|--------|----------------|------------------|
+| **Duration** | 5 mins per target | Unlimited |
+| **When** | On PR | Anytime |
+| **Coverage** | Changed code | All code |
+| **Corpus** | Optional persistence | Automatic |
+| **Purpose** | Catch new bugs | Deep exploration |
+
+**Best Practice:** Use both!
+- ClusterFuzzLite: Automated safety net for PRs
+- Local fuzzing: Deep testing before releases
+
+### Troubleshooting
+
+**Workflow doesn't run:**
+- Check file paths in `on.pull_request.paths` match changed files
+- Ensure PR targets `main` branch
+- Verify workflow file syntax (YAML)
+- Check that workflow is enabled in repository settings
+
+**Build fails:**
+- Verify all fuzz targets compile locally:
+  ```bash
+  cd precis-profiles && cargo +nightly fuzz build
+  cd precis-core && cargo +nightly fuzz build
+  ```
+- Check GitHub Actions logs for specific error
+- Ensure Rust nightly is available
+
+**Timeout (workflow takes too long):**
+- Reduce `fuzz-seconds` (default: 300)
+- ClusterFuzzLite runs all targets in parallel, but with many targets it can take time
+- Consider running in batches if needed
+
+**False positives:**
+- Reproduce locally: `cargo +nightly fuzz run <target> <artifact-path>`
+- Check if crash is in test code vs production code
+- Verify the crash with the provided artifact
+
+### Advanced: Multiple Sanitizers
+
+To test with different sanitizers:
+
+```yaml
+strategy:
+  matrix:
+    sanitizer: [address, undefined, memory]
+```
+
+**Sanitizers available:**
+- `address`: Memory safety (default, recommended)
+- `undefined`: Undefined behavior detection
+- `memory`: Uninitialized memory (slower, may have false positives)
+
+### Downloading Crash Artifacts
+
+When ClusterFuzzLite finds a crash:
+
+1. **Artifacts are uploaded automatically** to GitHub Actions
+
+2. **Download from PR:**
+   - Go to the PR's "Checks" tab
+   - Find the ClusterFuzzLite job
+   - Scroll to bottom, click "Artifacts"
+   - Download `clusterfuzzlite-crashes-address.zip`
+
+3. **Reproduce locally:**
+   ```bash
+   # Extract the artifact
+   unzip clusterfuzzlite-crashes-address.zip
+
+   # Run with the crashing input
+   cd precis-profiles
+   cargo +nightly fuzz run nickname_enforce path/to/crash-file
+   ```
+
+4. **Create unit test** and fix the bug
+
+### Best Practices
+
+**For this project:**
+- ✅ Use ClusterFuzzLite on all PRs (already configured)
+- ✅ Run local fuzzing before releases (overnight)
+- ✅ Use `address` sanitizer (best coverage for Rust)
+- ✅ Keep `fuzz-seconds: 300` (good balance)
+- ✅ Enable corpus persistence after initial testing
+
+**Fuzzing workflow:**
+1. **Development**: Run `cargo +nightly fuzz` locally while developing
+2. **PR**: ClusterFuzzLite catches issues automatically
+3. **Pre-release**: Run extended local fuzzing (1+ hour per target)
+
 ## References
 
+- [ClusterFuzzLite Documentation](https://google.github.io/clusterfuzzlite/)
 - [cargo-fuzz book](https://rust-fuzz.github.io/book/cargo-fuzz.html)
 - [libFuzzer documentation](https://llvm.org/docs/LibFuzzer.html)
 - [Rust Fuzz Project](https://github.com/rust-fuzz)
+- [OSS-Fuzz (full service)](https://google.github.io/oss-fuzz/)
 
 ---
 
 **Status:** ✅ Fuzzing configured and ready to use
-**Targets:** 5 fuzz targets covering main profiles
+**Coverage:** All public APIs (core classes + all profiles)
+**CI Integration:** ClusterFuzzLite on every PR
 **Last updated:** 2026-02-08
