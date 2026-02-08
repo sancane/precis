@@ -5,3 +5,9 @@ Cargo.lock
 
 # Property-based testing regression files
 **/proptest-regressions/
+
+# Fuzzing artifacts and corpus
+**/fuzz/target/
+**/fuzz/corpus/
+**/fuzz/artifacts/
+**/fuzz/coverage/

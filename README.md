@@ -128,6 +128,35 @@ PROPTEST_CASES=10000 cargo test proptest
 
 See [PROPTEST_GUIDE.md](PROPTEST_GUIDE.md) and [PROPTEST_CI.md](PROPTEST_CI.md) for complete testing documentation.
 
+## Fuzzing
+
+The project supports fuzzing with cargo-fuzz to discover edge cases, panics, and bugs. **19 fuzz targets** available across core classes and all profiles:
+
+```bash
+# Install cargo-fuzz (requires nightly)
+cargo install cargo-fuzz
+
+# Run fuzzing (5 seconds quick test)
+cd precis-profiles
+cargo +nightly fuzz run nickname_enforce -- -max_total_time=5
+
+# List available targets
+cd precis-profiles && cargo +nightly fuzz list  # 13 profile targets
+cd precis-core && cargo +nightly fuzz list      # 6 core class targets
+```
+
+**Profile targets** (prepare, enforce, compare for all profiles):
+- **Nickname**: `nickname_enforce`, `nickname_prepare`, `nickname_compare`, `nickname_arbitrary`
+- **OpaqueString**: `opaque_string_enforce`, `opaque_string_prepare`, `opaque_string_compare`
+- **UsernameCaseMapped**: `username_casemapped`, `username_casemapped_prepare`, `username_casemapped_compare`
+- **UsernameCasePreserved**: `username_casepreserved`, `username_casepreserved_prepare`, `username_casepreserved_compare`
+
+**Core class targets** (FreeformClass, IdentifierClass):
+- `freeform_class_allows`, `freeform_class_get_value`, `freeform_class_codepoint`
+- `identifier_class_allows`, `identifier_class_get_value`, `identifier_class_codepoint`
+
+See [FUZZING.md](FUZZING.md) for complete fuzzing guide.
+
 ## Benchmarking
 
 The project uses [Criterion.rs](https://github.com/bheisler/criterion.rs) for performance benchmarking, integrated with [CodSpeed](https://codspeed.io/) for continuous performance tracking:

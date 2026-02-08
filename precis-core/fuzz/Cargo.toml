@@ -1,0 +1,64 @@
+[package]
+name = "precis-core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.precis-core]
+path = ".."
+
+# Fuzz target: FreeformClass::allows()
+[[bin]]
+name = "freeform_class_allows"
+path = "fuzz_targets/freeform_class_allows.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: FreeformClass::get_value_from_char()
+[[bin]]
+name = "freeform_class_get_value"
+path = "fuzz_targets/freeform_class_get_value.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: FreeformClass::get_value_from_codepoint()
+[[bin]]
+name = "freeform_class_codepoint"
+path = "fuzz_targets/freeform_class_codepoint.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: IdentifierClass::allows()
+[[bin]]
+name = "identifier_class_allows"
+path = "fuzz_targets/identifier_class_allows.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: IdentifierClass::get_value_from_char()
+[[bin]]
+name = "identifier_class_get_value"
+path = "fuzz_targets/identifier_class_get_value.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target: IdentifierClass::get_value_from_codepoint()
+[[bin]]
+name = "identifier_class_codepoint"
+path = "fuzz_targets/identifier_class_codepoint.rs"
+test = false
+doc = false
+bench = false
