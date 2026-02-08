@@ -478,6 +478,34 @@ mod test_string_classes {
     }
 
     #[test]
+    fn test_allows_disallowed_codepoint() {
+        // Test FreeformClass::allows() with Disallowed codepoint
+        // Ensures line 167: Disallowed match arm in allows() is covered
+        let ff = FreeformClass::default();
+
+        // U+1170 is Old Hangul Jamo (Disallowed)
+        assert!(ff.allows("\u{1170}").is_err());
+
+        // U+0000 NULL is a control character (Disallowed)
+        assert!(ff.allows("\u{0000}").is_err());
+    }
+
+    #[test]
+    fn test_allows_context_validation() {
+        // Test allows() with ContextJ/ContextO triggering context rule validation
+        // Ensures line 171: ContextJ | ContextO match arm is exercised
+        let id = IdentifierClass::default();
+
+        // U+200C ZERO WIDTH NON-JOINER (ContextJ) alone should fail
+        let result = id.allows("\u{200C}");
+        assert!(result.is_err());
+
+        // U+00B7 MIDDLE DOT (ContextO) alone should fail
+        let result = id.allows("\u{00B7}");
+        assert!(result.is_err());
+    }
+
+    #[test]
     fn test_freeform_class_get_methods() {
         let ff = FreeformClass::default();
 
