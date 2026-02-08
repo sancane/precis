@@ -25,7 +25,7 @@ Be respectful, considerate, and professional. We welcome contributions from ever
 
 ### Prerequisites
 
-- **Rust**: 1.70+ (for `LazyLock` support)
+- **Rust**: 1.80+ (for stable `LazyLock` support)
 - **Cargo**: Latest stable
 - **Git**: For version control
 
