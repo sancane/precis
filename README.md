@@ -127,7 +127,7 @@ See [PROPTEST_GUIDE.md](PROPTEST_GUIDE.md) and [PROPTEST_CI.md](PROPTEST_CI.md) 
 
 ## Benchmarking
 
-The project uses [Criterion.rs](https://github.com/bheisler/criterion.rs) for performance benchmarking:
+The project uses [Criterion.rs](https://github.com/bheisler/criterion.rs) for performance benchmarking, integrated with [CodSpeed](https://codspeed.io/) for continuous performance tracking:
 
 ```bash
 # Run all benchmarks
@@ -143,7 +143,12 @@ cargo bench -- --save-baseline main
 cargo bench -- --baseline main
 ```
 
-See [BENCHMARKING.md](BENCHMARKING.md) for complete benchmarking guide.
+**CodSpeed Integration:**
+- ✅ Automatic performance tracking on every PR
+- ✅ Regression detection
+- ✅ Historical performance trends
+
+See [BENCHMARKING.md](BENCHMARKING.md) for complete benchmarking guide and [CODSPEED.md](CODSPEED.md) for CodSpeed setup.
 
 # Contributing
 
