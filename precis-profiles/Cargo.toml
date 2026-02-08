@@ -28,7 +28,7 @@ unicode-normalization.workspace = true
 precis-tools.workspace = true
 
 [dev-dependencies]
-criterion = "0.5"
+criterion = { package = "codspeed-criterion-compat", version = "*" }
 hex = "0.4"
 proptest = "1.5"
 
