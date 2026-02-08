@@ -15,6 +15,7 @@ keywords = ["Preparation", "Enforcement", "Comparison", "precis", "rfc8264"]
 license = "MIT/Apache-2.0"
 categories = ["text-processing", "internationalization"]
 edition = "2021"
+rust-version = "1.80"
 
 [features]
 networking = ["precis-tools/networking"]
