@@ -13,7 +13,7 @@ jobs:
         uses:                   actions/checkout@v4
       - name:                   Generate code coverage
         run: |
-          cargo +nightly tarpaulin --verbose --workspace --line --timeout 120 --exclude-files "*precis-tools*" "*/tests/*" --out xml
+          cargo +nightly tarpaulin --verbose --workspace --line --timeout 120 --exclude-files "*precis-tools*" "*/tests/*" "*/benches/*" --out xml
       - name:                   Upload to codecov.io
         uses:                   codecov/codecov-action@v4
         with:
