@@ -133,3 +133,30 @@ jobs:
       working-directory: precis-profiles
       run: |
         cargo +nightly clippy --manifest-path fuzz/Cargo.toml --all-targets -- -D warnings
+
+  msrv:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install MSRV toolchain (1.80)
+      uses: dtolnay/rust-toolchain@1.80
+
+    - name: Verify MSRV in Cargo.toml files
+      run: |
+        echo "Checking that all Cargo.toml files declare rust-version = \"1.80\""
+        for toml in precis-core/Cargo.toml precis-profiles/Cargo.toml precis-tools/Cargo.toml; do
+          if ! grep -q 'rust-version = "1.80"' "$toml"; then
+            echo "ERROR: $toml does not declare rust-version = \"1.80\""
+            exit 1
+          fi
+        done
+        echo "✓ All Cargo.toml files correctly declare MSRV 1.80"
+
+    - name: Build with MSRV
+      run: cargo +1.80 build --workspace --all-features --verbose
+
+    - name: Test with MSRV
+      run: cargo +1.80 test --workspace --all-features --verbose
