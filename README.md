@@ -1,6 +1,8 @@
-![Build](https://github.com/sancane/precis/actions/workflows/rust.yml/badge.svg)
+![Build](https://github.com/sancane/precis/actions/workflows/tests.yml/badge.svg)
 [![codecov](https://codecov.io/gh/sancane/precis/branch/main/graph/badge.svg?token=EZM6KCSLZC)](https://codecov.io/gh/sancane/precis)
 [![Rust Report Card](https://rust-reportcard.xuri.me/badge/github.com/sancane/precis)](https://rust-reportcard.xuri.me/report/github.com/sancane/precis)
+[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/sancane/precis?utm_source=badge)
+
 
 # Rust PRECIS Framework library
 
@@ -75,7 +77,7 @@ of the `PrecisFastInvocation` trait.
 Profiles implementing this trait will allow you to prepare, enforce or compare
 internationalized strings without having to instantiate a specific profile.
 Profiles usually use a static instance allocated with
-[`lazy_static`](https://docs.rs/lazy_static/)
+[`LazyLock`](https://doc.rust-lang.org/std/sync/struct.LazyLock.html)
 
 ### Example
 
@@ -105,7 +107,7 @@ conversion is independent of context and language.
 
 ## Testing
 
-The project has comprehensive test coverage (96%+) with multiple testing approaches:
+The project has comprehensive test coverage with multiple testing approaches:
 
 - **Unit tests**: tests covering core functionality
 - **Property-based tests**: tests with [proptest](https://proptest-rs.github.io/proptest/) generating thousands of random inputs. See [PROPTEST_GUIDE.md](PROPTEST_GUIDE.md) for details.
