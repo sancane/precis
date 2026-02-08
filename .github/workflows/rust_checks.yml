@@ -107,3 +107,29 @@ jobs:
 
     - name: Run cargo-deny
       run: cargo deny check
+
+  fuzz_checks:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install nightly toolchain
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        components: clippy
+
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-fuzz
+
+    - name: Check precis-core fuzzers
+      working-directory: precis-core
+      run: |
+        cargo +nightly clippy --manifest-path fuzz/Cargo.toml --all-targets -- -D warnings
+
+    - name: Check precis-profiles fuzzers
+      working-directory: precis-profiles
+      run: |
+        cargo +nightly clippy --manifest-path fuzz/Cargo.toml --all-targets -- -D warnings

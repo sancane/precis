@@ -10,10 +10,10 @@ fuzz_target!(|data: &[u8]| {
     let s = String::from_utf8_lossy(data);
 
     // Try enforce - should handle invalid UTF-8 gracefully
-    let _ = Nickname::enforce(&s);
+    let _ = Nickname::enforce(s.as_ref());
 
     // If enforce succeeds, try prepare as well
-    if let Ok(enforced) = Nickname::enforce(&s) {
+    if let Ok(enforced) = Nickname::enforce(s.as_ref()) {
         let _ = Nickname::prepare(enforced.as_ref());
     }
 });
