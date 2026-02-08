@@ -1,8 +1,6 @@
 .*.swp
 target
 
-Cargo.lock
-
 # Property-based testing regression files
 **/proptest-regressions/
 
