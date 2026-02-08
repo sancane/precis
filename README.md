@@ -98,11 +98,20 @@ assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
 # Known limitations
 
 PRECIS recommends using `toLowerCase`() operation as defined in the Unicode Standard
-[Unicode](http://www.unicode.org/versions/latest/). This implementation uses the 
-one provided by Rust standard library 
+[Unicode](http://www.unicode.org/versions/latest/). This implementation uses the
+one provided by Rust standard library
 [`to_lowercase`](https://doc.rust-lang.org/std/primitive.str.html#method.to_lowercase).
 This operation performs an unconditional mapping without tailoring. That is, the
 conversion is independent of context and language.
+
+# Minimum Supported Rust Version (MSRV)
+
+This project requires **Rust 1.80 or later** for stable [`LazyLock`](https://doc.rust-lang.org/std/sync/struct.LazyLock.html) support.
+
+The MSRV is:
+- Explicitly declared in all `Cargo.toml` files via `rust-version = "1.80"`
+- Validated in CI to ensure compatibility
+- Will only be increased in a new minor version release
 
 # Development
 
