@@ -1,6 +1,7 @@
 ![Tests](https://github.com/sancane/precis/actions/workflows/rust_tests.yml/badge.svg)
 [![codecov](https://codecov.io/gh/sancane/precis/branch/main/graph/badge.svg?token=EZM6KCSLZC)](https://codecov.io/gh/sancane/precis)
 [![Rust Report Card](https://rust-reportcard.xuri.me/badge/github.com/sancane/precis)](https://rust-reportcard.xuri.me/report/github.com/sancane/precis)
+[![dependency status](https://deps.rs/repo/github/sancane/precis/status.svg)](https://deps.rs/repo/github/sancane/precis)
 [![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/sancane/precis?utm_source=badge)
 
 
