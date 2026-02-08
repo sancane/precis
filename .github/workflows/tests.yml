@@ -1,0 +1,32 @@
+name: Testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Run all tests
+      env:
+        PROPTEST_CASES: 1000
+        PROPTEST_VERBOSE: 1
+      run: |
+        echo "Running all tests with proptest configuration:"
+        echo "  PROPTEST_CASES: $PROPTEST_CASES"
+        echo "  PROPTEST_VERBOSE: $PROPTEST_VERBOSE"
+        cargo test --workspace --verbose -- --nocapture
