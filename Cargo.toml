@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 
-members = ["precis-core", "precis-profiles", "precis-tools"]
+members = ["precis-core", "precis-profiles", "precis-tools", "precis-wasm"]
 exclude = ["precis-core/fuzz", "precis-profiles/fuzz"]
 
 [workspace.dependencies]
