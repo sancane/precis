@@ -1,0 +1,29 @@
+[package]
+name = "precis-wasm"
+version = "0.1.0"
+authors = ["Santiago Carot-Nemesio <sancane@gmail.com>"]
+description = "WebAssembly bindings for PRECIS Framework (RFC 8264, 8265, 8266)"
+documentation = "https://docs.rs/precis-wasm"
+homepage = "https://github.com/sancane/precis"
+repository = "https://github.com/sancane/precis"
+readme = "README.md"
+keywords = ["precis", "rfc8266", "nickname", "wasm", "webassembly"]
+license = "MIT/Apache-2.0"
+categories = ["wasm", "text-processing", "internationalization"]
+edition = "2021"
+rust-version = "1.80"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+console_error_panic_hook = { version = "0.1", optional = true }
+precis-core = { path = "../precis-core", version = "0.1" }
+precis-profiles = { path = "../precis-profiles", version = "0.1" }
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

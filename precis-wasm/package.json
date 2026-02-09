@@ -1,0 +1,49 @@
+{
+  "name": "@precis/wasm",
+  "version": "0.1.0",
+  "description": "WebAssembly bindings for PRECIS Framework profiles (RFC 8264, 8265, 8266)",
+  "main": "precis.js",
+  "types": "precis.d.ts",
+  "files": [
+    "precis.js",
+    "precis.d.ts",
+    "precis_wasm_bg.wasm",
+    "precis_wasm.js",
+    "precis_wasm.d.ts"
+  ],
+  "scripts": {
+    "build": "./build.sh",
+    "build:raw": "wasm-pack build --target web --out-dir pkg",
+    "build:nodejs": "wasm-pack build --target nodejs --out-dir pkg-node",
+    "build:bundler": "wasm-pack build --target bundler --out-dir pkg-bundler",
+    "test": "wasm-pack test --headless --firefox"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sancane/precis.git",
+    "directory": "precis-wasm"
+  },
+  "keywords": [
+    "precis",
+    "rfc8264",
+    "rfc8265",
+    "rfc8266",
+    "nickname",
+    "username",
+    "password",
+    "unicode",
+    "normalization",
+    "internationalization",
+    "wasm",
+    "webassembly"
+  ],
+  "author": "Santiago Carot-Nemesio <sancane@gmail.com>",
+  "license": "MIT OR Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sancane/precis/issues"
+  },
+  "homepage": "https://github.com/sancane/precis/tree/main/precis-wasm#readme",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

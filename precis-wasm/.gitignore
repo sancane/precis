@@ -1,0 +1,11 @@
+# WASM build outputs
+pkg/
+pkg-node/
+pkg-bundler/
+
+# Node modules (if testing locally)
+node_modules/
+
+# NPM files
+*.tgz
+package-lock.json
