@@ -91,6 +91,42 @@ assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
   "guybrush threepwood"), Ok(true));
 ```
 
+## [precis-wasm](precis-wasm/README.md)
+
+[![npm](https://img.shields.io/npm/v/precis-wasm)](https://www.npmjs.com/package/precis-wasm)
+[![npm downloads](https://img.shields.io/npm/dm/precis-wasm)](https://www.npmjs.com/package/precis-wasm)
+
+WebAssembly bindings for the PRECIS Framework. Provides JavaScript/TypeScript-friendly
+bindings for all PRECIS profiles with zero-copy performance.
+
+**[🌐 Live Demo](https://sancane.github.io/precis/)** | **[📦 npm Package](https://www.npmjs.com/package/precis-wasm)**
+
+### Supported Profiles
+
+- **Nickname** (RFC 8266) - Display names and handles
+- **UsernameCaseMapped** (RFC 8265) - Case-insensitive usernames
+- **UsernameCasePreserved** (RFC 8265) - Case-sensitive usernames
+- **OpaqueString** (RFC 8265) - Passwords and opaque identifiers
+
+### Installation
+
+```bash
+npm install precis-wasm
+```
+
+### Quick Example
+
+```typescript
+import { nickname_enforce, nickname_compare } from 'precis-wasm';
+
+const normalized = nickname_enforce("  Alice  ");
+console.log(normalized); // "Alice"
+
+console.log(nickname_compare("Alice", "alice")); // true
+```
+
+See [precis-wasm/README.md](precis-wasm/README.md) for full documentation.
+
 # Common features
 
 * **networking** - Enables crates to download Unicode Character Database [`UCD`](https://unicode.org) files from the network. This is helpful for developing and testing new Unicode releases, but this feature can not be enabled to generate the library documentation when the crate is uploaded to [`crates.io`](https://crates.io). For security reasons, network access is not allowed to crates to avoid compromising the security of docs.rs itself.
