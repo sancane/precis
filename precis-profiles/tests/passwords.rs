@@ -147,3 +147,46 @@ fn test_multibyte_passwords() {
     let res = OpaqueString::prepare("كلمةالسر");
     assert_eq!(res, Ok(Cow::from("كلمةالسر")));
 }
+
+#[test]
+fn test_contexto_chars_with_valid_context_are_idempotent() {
+    // U+0387 (Greek Ano Teleia) normalizes to U+00B7 (Middle Dot)
+    // which requires 'l' characters before and after (per RFC 5892 A.3).
+    // When proper context is provided, idempotence should hold.
+
+    // U+0387 with valid context: l + U+0387 + l
+    let input_0387 = "l\u{0387}l";
+    let enforced1 = OpaqueString::enforce(input_0387).unwrap();
+    // Should normalize to l·l (U+00B7)
+    assert_eq!(enforced1.as_ref(), "l\u{00B7}l");
+
+    // Now enforce the result - should be idempotent because context is valid
+    let enforced2 = OpaqueString::enforce(enforced1.as_ref()).unwrap();
+    assert_eq!(enforced1.as_ref(), enforced2.as_ref());
+
+    // Direct input with U+00B7 and valid context should also work
+    let input_00b7 = "l\u{00B7}l";
+    let enforced3 = OpaqueString::enforce(input_00b7).unwrap();
+    assert_eq!(enforced3.as_ref(), "l\u{00B7}l");
+}
+
+#[test]
+fn test_contexto_chars_without_context_behavior() {
+    // U+00B7 (Middle Dot) alone requires 'l' context (per RFC 5892 A.3).
+    // U+0387 (Greek Ano Teleia) is PVALID but normalizes to U+00B7.
+    // Per RFC 8265, enforce output is conforming if prepare passed,
+    // even if normalization produces context-dependent characters.
+
+    // U+00B7 alone should fail in prepare (no context)
+    let result_00b7 = OpaqueString::enforce("\u{00B7}");
+    assert!(result_00b7.is_err());
+
+    // U+0387 alone is PVALID and passes prepare
+    // Normalizes to U+00B7, output is conforming per RFC 8265
+    let result_0387 = OpaqueString::enforce("\u{0387}");
+    assert_eq!(result_0387, Ok(Cow::from("·")));
+
+    // However, the output is not idempotent (by design per RFC):
+    // enforce(U+0387) → Ok(U+00B7), but enforce(U+00B7) → Err
+    // This is expected behavior: not all enforce outputs are valid inputs
+}
