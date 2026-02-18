@@ -97,13 +97,13 @@
         </div>
     </div>
     <script type="module">
-        import { init, password_enforce, password_prepare, password_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
+        import { init, opaquestring_enforce, opaquestring_prepare, opaquestring_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
         try {
             await init();
             document.getElementById('version').textContent = `v${version()}`;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
-            window.precis = { password_enforce, password_prepare, password_compare };
+            window.precis = { opaquestring_enforce, opaquestring_prepare, opaquestring_compare };
         } catch (error) {
             document.getElementById('loading').innerHTML = `<div class="error">Failed to load WASM module: ${error}</div>`;
         }
@@ -116,19 +116,19 @@
         }
         function testOpaqueStringEnforce() {
             try {
-                const result = window.precis.password_enforce(document.getElementById('password').value);
+                const result = window.precis.opaquestring_enforce(document.getElementById('password').value);
                 showResult('password-result', `✓ Valid password: <strong>"${result}"</strong>`, true);
             } catch (e) { showResult('password-result', `✗ Invalid: ${e}`, false); }
         }
         function testOpaqueStringPrepare() {
             try {
-                const result = window.precis.password_prepare(document.getElementById('password-prepare').value);
+                const result = window.precis.opaquestring_prepare(document.getElementById('password-prepare').value);
                 showResult('prepare-result', `✓ Prepared: <strong>"${result}"</strong>`, true);
             } catch (e) { showResult('prepare-result', `✗ Error: ${e}`, false); }
         }
         function testOpaqueStringCompare() {
             try {
-                const match = window.precis.password_compare(
+                const match = window.precis.opaquestring_compare(
                     document.getElementById('nick1').value,
                     document.getElementById('nick2').value
                 );
