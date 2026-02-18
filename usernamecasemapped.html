@@ -100,31 +100,31 @@
         import init, { username_enforce, username_prepare, username_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
         try {
             await init();
-            document.getElementById('version').textContent = \`v\${version()}\`;
+            document.getElementById('version').textContent = `v${version()}`;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             window.precis = { username_enforce, username_prepare, username_compare };
         } catch (error) {
-            document.getElementById('loading').innerHTML = \`<div class="error">Failed to load WASM module: \${error}</div>\`;
+            document.getElementById('loading').innerHTML = `<div class="error">Failed to load WASM module: ${error}</div>`;
         }
     </script>
     <script>
         function showResult(id, msg, ok) {
             const el = document.getElementById(id);
-            el.className = \`result show \${ok ? 'success' : 'error'}\`;
+            el.className = `result show ${ok ? 'success' : 'error'}`;
             el.innerHTML = msg;
         }
         function testUsernameCaseMappedEnforce() {
             try {
                 const result = window.precis.username_enforce(document.getElementById('username').value);
-                showResult('username-result', \`✓ Valid username: <strong>"\${result}"</strong>\`, true);
-            } catch (e) { showResult('username-result', \`✗ Invalid: \${e}\`, false); }
+                showResult('username-result', `✓ Valid username: <strong>"${result}"</strong>`, true);
+            } catch (e) { showResult('username-result', `✗ Invalid: ${e}`, false); }
         }
         function testUsernameCaseMappedPrepare() {
             try {
                 const result = window.precis.username_prepare(document.getElementById('username-prepare').value);
-                showResult('prepare-result', \`✓ Prepared: <strong>"\${result}"</strong>\`, true);
-            } catch (e) { showResult('prepare-result', \`✗ Error: \${e}\`, false); }
+                showResult('prepare-result', `✓ Prepared: <strong>"${result}"</strong>`, true);
+            } catch (e) { showResult('prepare-result', `✗ Error: ${e}`, false); }
         }
         function testUsernameCaseMappedCompare() {
             try {
@@ -133,7 +133,7 @@
                     document.getElementById('nick2').value
                 );
                 showResult('compare-result', match ? '✓ UsernameCaseMappeds are equivalent' : '✗ UsernameCaseMappeds are different', match);
-            } catch (e) { showResult('compare-result', \`✗ Error: \${e}\`, false); }
+            } catch (e) { showResult('compare-result', `✗ Error: ${e}`, false); }
         }
         ['username', 'username-prepare'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', e => {

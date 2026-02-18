@@ -100,31 +100,31 @@
         import init, { password_enforce, password_prepare, password_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
         try {
             await init();
-            document.getElementById('version').textContent = \`v\${version()}\`;
+            document.getElementById('version').textContent = `v${version()}`;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             window.precis = { password_enforce, password_prepare, password_compare };
         } catch (error) {
-            document.getElementById('loading').innerHTML = \`<div class="error">Failed to load WASM module: \${error}</div>\`;
+            document.getElementById('loading').innerHTML = `<div class="error">Failed to load WASM module: ${error}</div>`;
         }
     </script>
     <script>
         function showResult(id, msg, ok) {
             const el = document.getElementById(id);
-            el.className = \`result show \${ok ? 'success' : 'error'}\`;
+            el.className = `result show ${ok ? 'success' : 'error'}`;
             el.innerHTML = msg;
         }
         function testOpaqueStringEnforce() {
             try {
                 const result = window.precis.password_enforce(document.getElementById('password').value);
-                showResult('password-result', \`✓ Valid password: <strong>"\${result}"</strong>\`, true);
-            } catch (e) { showResult('password-result', \`✗ Invalid: \${e}\`, false); }
+                showResult('password-result', `✓ Valid password: <strong>"${result}"</strong>`, true);
+            } catch (e) { showResult('password-result', `✗ Invalid: ${e}`, false); }
         }
         function testOpaqueStringPrepare() {
             try {
                 const result = window.precis.password_prepare(document.getElementById('password-prepare').value);
-                showResult('prepare-result', \`✓ Prepared: <strong>"\${result}"</strong>\`, true);
-            } catch (e) { showResult('prepare-result', \`✗ Error: \${e}\`, false); }
+                showResult('prepare-result', `✓ Prepared: <strong>"${result}"</strong>`, true);
+            } catch (e) { showResult('prepare-result', `✗ Error: ${e}`, false); }
         }
         function testOpaqueStringCompare() {
             try {
@@ -133,7 +133,7 @@
                     document.getElementById('nick2').value
                 );
                 showResult('compare-result', match ? '✓ OpaqueStrings are equivalent' : '✗ OpaqueStrings are different', match);
-            } catch (e) { showResult('compare-result', \`✗ Error: \${e}\`, false); }
+            } catch (e) { showResult('compare-result', `✗ Error: ${e}`, false); }
         }
         ['password', 'password-prepare'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', e => {

@@ -100,31 +100,31 @@
         import init, { nickname_enforce, nickname_prepare, nickname_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
         try {
             await init();
-            document.getElementById('version').textContent = \`v\${version()}\`;
+            document.getElementById('version').textContent = `v${version()}`;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             window.precis = { nickname_enforce, nickname_prepare, nickname_compare };
         } catch (error) {
-            document.getElementById('loading').innerHTML = \`<div class="error">Failed to load WASM module: \${error}</div>\`;
+            document.getElementById('loading').innerHTML = `<div class="error">Failed to load WASM module: ${error}</div>`;
         }
     </script>
     <script>
         function showResult(id, msg, ok) {
             const el = document.getElementById(id);
-            el.className = \`result show \${ok ? 'success' : 'error'}\`;
+            el.className = `result show ${ok ? 'success' : 'error'}`;
             el.innerHTML = msg;
         }
         function testNicknameEnforce() {
             try {
                 const result = window.precis.nickname_enforce(document.getElementById('nickname').value);
-                showResult('nickname-result', \`✓ Valid nickname: <strong>"\${result}"</strong>\`, true);
-            } catch (e) { showResult('nickname-result', \`✗ Invalid: \${e}\`, false); }
+                showResult('nickname-result', `✓ Valid nickname: <strong>"${result}"</strong>`, true);
+            } catch (e) { showResult('nickname-result', `✗ Invalid: ${e}`, false); }
         }
         function testNicknamePrepare() {
             try {
                 const result = window.precis.nickname_prepare(document.getElementById('nickname-prepare').value);
-                showResult('prepare-result', \`✓ Prepared: <strong>"\${result}"</strong>\`, true);
-            } catch (e) { showResult('prepare-result', \`✗ Error: \${e}\`, false); }
+                showResult('prepare-result', `✓ Prepared: <strong>"${result}"</strong>`, true);
+            } catch (e) { showResult('prepare-result', `✗ Error: ${e}`, false); }
         }
         function testNicknameCompare() {
             try {
@@ -133,7 +133,7 @@
                     document.getElementById('nick2').value
                 );
                 showResult('compare-result', match ? '✓ Nicknames are equivalent' : '✗ Nicknames are different', match);
-            } catch (e) { showResult('compare-result', \`✗ Error: \${e}\`, false); }
+            } catch (e) { showResult('compare-result', `✗ Error: ${e}`, false); }
         }
         ['nickname', 'nickname-prepare'].forEach(id => {
             document.getElementById(id).addEventListener('keypress', e => {
