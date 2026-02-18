@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRECIS Framework - Interactive Demo</title>
-    <meta name="description" content="Interactive demo of the PRECIS Framework (RFC 8266) for validating and normalizing nicknames">
+    <title>PRECIS Framework - Web Demos</title>
     <style>
         * {
             box-sizing: border-box;
@@ -14,32 +13,35 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 40px auto;
             padding: 20px;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
 
         .container {
             background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
         h1 {
             color: #333;
             margin-bottom: 10px;
+            font-size: 36px;
         }
 
         .subtitle {
             color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 40px;
+            font-size: 16px;
+            line-height: 1.6;
         }
 
         .subtitle a {
-            color: #4CAF50;
+            color: #667eea;
             text-decoration: none;
             font-weight: 600;
         }
@@ -48,401 +50,148 @@
             text-decoration: underline;
         }
 
-        .links {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .link-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #333;
-            font-size: 13px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .link-badge:hover {
-            background: #e0e0e0;
-        }
-
-        .link-badge::before {
-            content: '';
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            margin-right: 6px;
-        }
-
-        .link-npm::before {
-            content: '📦';
-        }
-
-        .link-github::before {
-            content: '⚙️';
-        }
-
-        .link-docs::before {
-            content: '📖';
-        }
-
-        .version {
-            display: inline-block;
-            background: #e0e0e0;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-
-        .field {
-            margin: 25px 0;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            transition: border-color 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4CAF50;
-        }
-
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            transition: background 0.2s;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background: #45a049;
-        }
-
-        button:active {
-            transform: translateY(1px);
-        }
-
-        .result {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 6px;
-            font-size: 15px;
-            display: none;
-        }
-
-        .result.show {
-            display: block;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .result strong {
-            font-weight: 700;
-        }
-
-        .divider {
-            height: 1px;
-            background: #e0e0e0;
-            margin: 30px 0;
-        }
-
-        .examples {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 6px;
+        .profiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             margin-top: 30px;
         }
 
-        .examples h3 {
-            color: #666;
-            font-size: 14px;
+        .profile-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 30px;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .profile-card h2 {
+            font-size: 24px;
             margin-bottom: 10px;
         }
 
-        .example-item {
-            margin: 5px 0;
-            font-size: 13px;
-            color: #666;
+        .profile-card .rfc {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 15px;
         }
 
-        .example-item code {
-            background: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
+        .profile-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.95;
         }
 
-        .loading {
-            text-align: center;
+        .info-box {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
             padding: 20px;
+            margin-top: 40px;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-box p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .info-box ul {
+            margin-top: 15px;
+            margin-left: 20px;
             color: #666;
         }
 
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            text-align: center;
-            font-size: 13px;
-            color: #999;
+        .info-box li {
+            margin: 8px 0;
+            line-height: 1.5;
         }
 
-        .footer a {
-            color: #4CAF50;
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        footer a {
+            color: #667eea;
             text-decoration: none;
         }
 
-        .footer a:hover {
+        footer a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div id="loading" class="loading">
-        Loading PRECIS WASM module from CDN...
-    </div>
-
-    <div id="app" class="container" style="display: none;">
-        <h1>
-            PRECIS Framework Demo
-            <span id="version" class="version"></span>
-        </h1>
+    <div class="container">
+        <h1>PRECIS Framework</h1>
         <p class="subtitle">
-            Interactive demo of <a href="https://datatracker.ietf.org/doc/html/rfc8266" target="_blank" rel="noopener noreferrer">RFC 8266</a> -
-            Nickname Profile for PRECIS Framework
+            The PRECIS Framework provides internationalized username and password handling
+            according to <a href="https://datatracker.ietf.org/doc/html/rfc8264" target="_blank" rel="noopener">RFC 8264</a>.
+            Choose a profile below to try the interactive demos.
         </p>
 
-        <div class="links">
-            <a href="https://www.npmjs.com/package/precis-wasm" class="link-badge link-npm" target="_blank" rel="noopener noreferrer">
-                npm Package
+        <div class="profiles">
+            <a href="nickname.html" class="profile-card">
+                <h2>Nickname</h2>
+                <div class="rfc">RFC 8266</div>
+                <p>Case-insensitive comparison with Unicode normalization. Trims spaces and collapses multiple spaces.</p>
             </a>
-            <a href="https://github.com/sancane/precis" class="link-badge link-github" target="_blank" rel="noopener noreferrer">
-                GitHub Repository
+
+            <a href="opaquestring.html" class="profile-card">
+                <h2>OpaqueString</h2>
+                <div class="rfc">RFC 8265</div>
+                <p>For passwords and opaque strings. Case-sensitive, preserves case, applies Unicode normalization.</p>
             </a>
-            <a href="https://github.com/sancane/precis/tree/main/precis-wasm#readme" class="link-badge link-docs" target="_blank" rel="noopener noreferrer">
-                Documentation
+
+            <a href="usernamecasemapped.html" class="profile-card">
+                <h2>UsernameCaseMapped</h2>
+                <div class="rfc">RFC 8265</div>
+                <p>Case-insensitive usernames. Converts to lowercase for consistent comparison.</p>
+            </a>
+
+            <a href="usernamecasepreserved.html" class="profile-card">
+                <h2>UsernameCasePreserved</h2>
+                <div class="rfc">RFC 8265</div>
+                <p>Case-sensitive usernames. Preserves original case for exact matching.</p>
             </a>
         </div>
 
-        <!-- Enforce Nickname -->
-        <div class="field">
-            <label for="nickname">Nickname Enforcement</label>
-            <input
-                type="text"
-                id="nickname"
-                placeholder="Enter a nickname (e.g., '  Alice  ')"
-                value="  Alice  "
-            >
-            <button onclick="testNicknameEnforce()">Enforce Nickname</button>
-            <div id="nickname-result" class="result"></div>
+        <div class="info-box">
+            <h3>About PRECIS</h3>
+            <p>
+                The PRECIS (Preparation, Enforcement, and Comparison of Internationalized Strings)
+                Framework defines how to handle internationalized strings in application protocols,
+                with special attention to security and usability concerns.
+            </p>
+            <ul>
+                <li><strong>Preparation:</strong> Validate that input characters are allowed</li>
+                <li><strong>Enforcement:</strong> Apply normalization, mapping, and trimming rules</li>
+                <li><strong>Comparison:</strong> Determine if two strings are equivalent</li>
+            </ul>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- Prepare Nickname -->
-        <div class="field">
-            <label for="nickname-prepare">Nickname Preparation</label>
-            <input
-                type="text"
-                id="nickname-prepare"
-                placeholder="Enter a nickname to prepare (e.g., 'Alice')"
-                value="Alice"
-            >
-            <button onclick="testNicknamePrepare()">Prepare Nickname</button>
-            <div id="prepare-result" class="result"></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- Compare Nicknames -->
-        <div class="field">
-            <label>Nickname Comparison</label>
-            <input
-                type="text"
-                id="nick1"
-                placeholder="First nickname"
-                value="Alice"
-                style="margin-bottom: 10px;"
-            >
-            <input
-                type="text"
-                id="nick2"
-                placeholder="Second nickname"
-                value="alice"
-            >
-            <button onclick="testNicknameCompare()">Compare Nicknames</button>
-            <div id="compare-result" class="result"></div>
-        </div>
-
-        <div class="examples">
-            <h3>TRY THESE EXAMPLES:</h3>
-            <div class="example-item">• <strong>Enforce:</strong> <code>"  Alice  "</code> → <code>"Alice"</code> (trims spaces, preserves case)</div>
-            <div class="example-item">• <strong>Enforce:</strong> <code>"BOB"</code> → <code>"BOB"</code> (preserves case)</div>
-            <div class="example-item">• <strong>Enforce:</strong> <code>"José"</code> → <code>"José"</code> (Unicode normalization)</div>
-            <div class="example-item">• <strong>Prepare:</strong> <code>"Alice"</code> → <code>"Alice"</code> (for comparison without strict validation)</div>
-            <div class="example-item">• <strong>Compare:</strong> <code>"Alice"</code> vs <code>"alice"</code> → <code>true</code> (case-insensitive)</div>
-        </div>
-
-        <div class="footer">
-            Built with <a href="https://www.npmjs.com/package/precis-wasm" target="_blank" rel="noopener noreferrer">precis-wasm</a> •
-            <a href="https://github.com/sancane/precis" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-        </div>
+        <footer>
+            <p>
+                Built with <a href="https://github.com/sancane/precis" target="_blank" rel="noopener">precis-rs</a>
+                compiled to WebAssembly
+            </p>
+        </footer>
     </div>
-
-    <script type="module">
-        // Import from CDN (jsDelivr)
-        import { init, nickname_enforce, nickname_prepare, nickname_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@0.1.0/precis.js';
-
-        // Initialize WASM module (required for web target)
-        try {
-            await init();
-
-            // Show version
-            document.getElementById('version').textContent = `v${version()}`;
-
-            // Hide loading, show app
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-
-            // Make functions available globally
-            window.precis = { nickname_enforce, nickname_prepare, nickname_compare };
-
-            console.log('✓ PRECIS WASM module loaded successfully from CDN');
-            console.log('Version:', version());
-        } catch (error) {
-            document.getElementById('loading').innerHTML = `
-                <div class="container">
-                    <div class="error">
-                        <strong>Failed to load WASM module from CDN:</strong><br><br>
-                        ${error}<br><br>
-                        Please try refreshing the page or check the browser console for more details.
-                    </div>
-                </div>
-            `;
-            console.error('Failed to initialize WASM:', error);
-        }
-    </script>
-
-    <script>
-        function showResult(elementId, message, isSuccess) {
-            const resultDiv = document.getElementById(elementId);
-            resultDiv.className = `result show ${isSuccess ? 'success' : 'error'}`;
-            resultDiv.innerHTML = message;
-        }
-
-        function testNicknameEnforce() {
-            const input = document.getElementById('nickname').value;
-
-            try {
-                const normalized = window.precis.nickname_enforce(input);
-                showResult(
-                    'nickname-result',
-                    `✓ Valid nickname: <strong>"${normalized}"</strong>`,
-                    true
-                );
-            } catch (error) {
-                showResult(
-                    'nickname-result',
-                    `✗ Invalid nickname: ${error}`,
-                    false
-                );
-            }
-        }
-
-        function testNicknamePrepare() {
-            const input = document.getElementById('nickname-prepare').value;
-
-            try {
-                const prepared = window.precis.nickname_prepare(input);
-                showResult(
-                    'prepare-result',
-                    `✓ Prepared nickname: <strong>"${prepared}"</strong>`,
-                    true
-                );
-            } catch (error) {
-                showResult(
-                    'prepare-result',
-                    `✗ Error preparing nickname: ${error}`,
-                    false
-                );
-            }
-        }
-
-        function testNicknameCompare() {
-            const nick1 = document.getElementById('nick1').value;
-            const nick2 = document.getElementById('nick2').value;
-
-            try {
-                const match = window.precis.nickname_compare(nick1, nick2);
-                if (match) {
-                    showResult(
-                        'compare-result',
-                        `✓ Nicknames <strong>"${nick1}"</strong> and <strong>"${nick2}"</strong> are equivalent`,
-                        true
-                    );
-                } else {
-                    showResult(
-                        'compare-result',
-                        `✗ Nicknames <strong>"${nick1}"</strong> and <strong>"${nick2}"</strong> are different`,
-                        false
-                    );
-                }
-            } catch (error) {
-                showResult(
-                    'compare-result',
-                    `✗ Error: ${error}`,
-                    false
-                );
-            }
-        }
-
-        // Allow Enter key to trigger validation
-        document.getElementById('nickname').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') testNicknameEnforce();
-        });
-
-        document.getElementById('nickname-prepare').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') testNicknamePrepare();
-        });
-
-        document.getElementById('nick2').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') testNicknameCompare();
-        });
-    </script>
 </body>
 </html>

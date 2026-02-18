@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRECIS OpaqueString WASM Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px; margin: 40px auto; padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;
+        }
+        .container {
+            background: white; border-radius: 12px; padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .back-link {
+            display: inline-block; color: #667eea; text-decoration: none;
+            margin-bottom: 20px; font-size: 14px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        h1 { color: #333; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .subtitle a { color: #667eea; text-decoration: none; font-weight: 600; }
+        .subtitle a:hover { text-decoration: underline; }
+        .version {
+            display: inline-block; background: #e0e0e0; padding: 2px 8px;
+            border-radius: 4px; font-size: 12px; margin-left: 10px;
+        }
+        .field { margin: 25px 0; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
+        input {
+            width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd;
+            border-radius: 6px; transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: #667eea; }
+        button {
+            padding: 12px 24px; font-size: 16px; font-weight: 600; cursor: pointer;
+            background: #667eea; color: white; border: none; border-radius: 6px;
+            transition: background 0.2s; margin-top: 10px;
+        }
+        button:hover { background: #5a67d8; }
+        button:active { transform: translateY(1px); }
+        .result {
+            margin-top: 15px; padding: 15px; border-radius: 6px;
+            font-size: 15px; display: none;
+        }
+        .result.show { display: block; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .result strong { font-weight: 700; }
+        .divider { height: 1px; background: #e0e0e0; margin: 30px 0; }
+        .examples {
+            background: #f9f9f9; padding: 15px; border-radius: 6px; margin-top: 30px;
+        }
+        .examples h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
+        .example-item { margin: 5px 0; font-size: 13px; color: #666; }
+        .example-item code {
+            background: white; padding: 2px 6px; border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .loading { text-align: center; padding: 20px; color: #666; }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">Loading PRECIS WASM module...</div>
+    <div id="app" class="container" style="display: none;">
+        <a href="index.html" class="back-link">← Back to all profiles</a>
+        <h1>PRECIS OpaqueString Demo <span id="version" class="version"></span></h1>
+        <p class="subtitle"><a href="https://datatracker.ietf.org/doc/html/rfc8265" target="_blank">RFC 8266</a></p>
+        <div class="field">
+            <label for="password">OpaqueString Enforcement</label>
+            <input type="text" id="password" placeholder="Enter a password" value="  MyP@ssw0rd  ">
+            <button onclick="testOpaqueStringEnforce()">Enforce OpaqueString</button>
+            <div id="password-result" class="result"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+            <label for="password-prepare">OpaqueString Preparation</label>
+            <input type="text" id="password-prepare" placeholder="Enter a password" value="MyP@ssw0rd">
+            <button onclick="testOpaqueStringPrepare()">Prepare OpaqueString</button>
+            <div id="prepare-result" class="result"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+            <label>OpaqueString Comparison</label>
+            <input type="text" id="nick1" placeholder="First password" value="MyP@ssw0rd" style="margin-bottom: 10px;">
+            <input type="text" id="nick2" placeholder="Second password" value="secret123">
+            <button onclick="testOpaqueStringCompare()">Compare OpaqueStrings</button>
+            <div id="compare-result" class="result"></div>
+        </div>
+        <div class="examples">
+            <h3>TRY THESE EXAMPLES:</h3>
+            <div class="example-item">• <strong>Enforce:</strong> <code>"  MyP@ssw0rd  "</code> → <code>"MyP@ssw0rd"</code></div>
+            <div class="example-item">• <strong>Compare:</strong> <code>"MyP@ssw0rd"</code> vs <code>"secret123"</code> → <code>true</code></div>
+        </div>
+    </div>
+    <script type="module">
+        import init, { password_enforce, password_prepare, password_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
+        try {
+            await init();
+            document.getElementById('version').textContent = \`v\${version()}\`;
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            window.precis = { password_enforce, password_prepare, password_compare };
+        } catch (error) {
+            document.getElementById('loading').innerHTML = \`<div class="error">Failed to load WASM module: \${error}</div>\`;
+        }
+    </script>
+    <script>
+        function showResult(id, msg, ok) {
+            const el = document.getElementById(id);
+            el.className = \`result show \${ok ? 'success' : 'error'}\`;
+            el.innerHTML = msg;
+        }
+        function testOpaqueStringEnforce() {
+            try {
+                const result = window.precis.password_enforce(document.getElementById('password').value);
+                showResult('password-result', \`✓ Valid password: <strong>"\${result}"</strong>\`, true);
+            } catch (e) { showResult('password-result', \`✗ Invalid: \${e}\`, false); }
+        }
+        function testOpaqueStringPrepare() {
+            try {
+                const result = window.precis.password_prepare(document.getElementById('password-prepare').value);
+                showResult('prepare-result', \`✓ Prepared: <strong>"\${result}"</strong>\`, true);
+            } catch (e) { showResult('prepare-result', \`✗ Error: \${e}\`, false); }
+        }
+        function testOpaqueStringCompare() {
+            try {
+                const match = window.precis.password_compare(
+                    document.getElementById('nick1').value,
+                    document.getElementById('nick2').value
+                );
+                showResult('compare-result', match ? '✓ OpaqueStrings are equivalent' : '✗ OpaqueStrings are different', match);
+            } catch (e) { showResult('compare-result', \`✗ Error: \${e}\`, false); }
+        }
+        ['password', 'password-prepare'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', e => {
+                if (e.key === 'Enter') id === 'password' ? testOpaqueStringEnforce() : testOpaqueStringPrepare();
+            });
+        });
+        document.getElementById('nick2').addEventListener('keypress', e => {
+            if (e.key === 'Enter') testOpaqueStringCompare();
+        });
+    </script>
+</body>
+</html>
