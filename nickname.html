@@ -97,7 +97,7 @@
         </div>
     </div>
     <script type="module">
-        import init, { nickname_enforce, nickname_prepare, nickname_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
+        import { init, nickname_enforce, nickname_prepare, nickname_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
         try {
             await init();
             document.getElementById('version').textContent = `v${version()}`;

@@ -97,13 +97,13 @@
         </div>
     </div>
     <script type="module">
-        import init, { username_enforce, username_prepare, username_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
+        import { init, usernamecasepreserved_enforce, usernamecasepreserved_prepare, usernamecasepreserved_compare, version } from 'https://cdn.jsdelivr.net/npm/precis-wasm@latest/precis.js';
         try {
             await init();
             document.getElementById('version').textContent = `v${version()}`;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
-            window.precis = { username_enforce, username_prepare, username_compare };
+            window.precis = { usernamecasepreserved_enforce, usernamecasepreserved_prepare, usernamecasepreserved_compare };
         } catch (error) {
             document.getElementById('loading').innerHTML = `<div class="error">Failed to load WASM module: ${error}</div>`;
         }
@@ -116,19 +116,19 @@
         }
         function testUsernameCasePreservedEnforce() {
             try {
-                const result = window.precis.username_enforce(document.getElementById('username').value);
+                const result = window.precis.usernamecasepreserved_enforce(document.getElementById('username').value);
                 showResult('username-result', `✓ Valid username: <strong>"${result}"</strong>`, true);
             } catch (e) { showResult('username-result', `✗ Invalid: ${e}`, false); }
         }
         function testUsernameCasePreservedPrepare() {
             try {
-                const result = window.precis.username_prepare(document.getElementById('username-prepare').value);
+                const result = window.precis.usernamecasepreserved_prepare(document.getElementById('username-prepare').value);
                 showResult('prepare-result', `✓ Prepared: <strong>"${result}"</strong>`, true);
             } catch (e) { showResult('prepare-result', `✗ Error: ${e}`, false); }
         }
         function testUsernameCasePreservedCompare() {
             try {
-                const match = window.precis.username_compare(
+                const match = window.precis.usernamecasepreserved_compare(
                     document.getElementById('nick1').value,
                     document.getElementById('nick2').value
                 );
