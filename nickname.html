@@ -92,8 +92,9 @@
         </div>
         <div class="examples">
             <h3>TRY THESE EXAMPLES:</h3>
-            <div class="example-item">• <strong>Enforce:</strong> <code>"  Alice  "</code> → <code>"Alice"</code></div>
-            <div class="example-item">• <strong>Compare:</strong> <code>"Alice"</code> vs <code>"alice"</code> → <code>true</code></div>
+            <div class="example-item">• <strong>Enforce:</strong> <code>"  Alice  "</code> → <code>"alice"</code> (trims spaces, converts to lowercase)</div>
+            <div class="example-item">• <strong>Compare:</strong> <code>"Alice"</code> vs <code>"alice"</code> → <code>true</code> (case-insensitive)</div>
+            <div class="example-item">• <strong>Compare:</strong> <code>"Alice"</code> vs <code>"Bob"</code> → <code>false</code> (different names)</div>
         </div>
     </div>
     <script type="module">
