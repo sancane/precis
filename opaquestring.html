@@ -85,8 +85,8 @@
         <div class="divider"></div>
         <div class="field">
             <label>OpaqueString Comparison</label>
-            <input type="text" id="nick1" placeholder="First password" value="MyP@ssw0rd" style="margin-bottom: 10px;">
-            <input type="text" id="nick2" placeholder="Second password" value="secret123">
+            <input type="text" id="password1" placeholder="First password" value="MyP@ssw0rd" style="margin-bottom: 10px;">
+            <input type="text" id="password2" placeholder="Second password" value="MyP@ssw0rd">
             <button onclick="testOpaqueStringCompare()">Compare OpaqueStrings</button>
             <div id="compare-result" class="result"></div>
         </div>
@@ -130,8 +130,8 @@
         function testOpaqueStringCompare() {
             try {
                 const match = window.precis.opaquestring_compare(
-                    document.getElementById('nick1').value,
-                    document.getElementById('nick2').value
+                    document.getElementById('password1').value,
+                    document.getElementById('password2').value
                 );
                 showResult('compare-result', match ? '✓ OpaqueStrings are equivalent' : '✗ OpaqueStrings are different', match);
             } catch (e) { showResult('compare-result', `✗ Error: ${e}`, false); }
@@ -141,7 +141,7 @@
                 if (e.key === 'Enter') id === 'password' ? testOpaqueStringEnforce() : testOpaqueStringPrepare();
             });
         });
-        document.getElementById('nick2').addEventListener('keypress', e => {
+        document.getElementById('password2').addEventListener('keypress', e => {
             if (e.key === 'Enter') testOpaqueStringCompare();
         });
     </script>
