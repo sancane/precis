@@ -85,8 +85,8 @@
         <div class="divider"></div>
         <div class="field">
             <label>UsernameCasePreserved Comparison</label>
-            <input type="text" id="nick1" placeholder="First username" value="Alice" style="margin-bottom: 10px;">
-            <input type="text" id="nick2" placeholder="Second username" value="alice">
+            <input type="text" id="username1" placeholder="First username" value="Alice" style="margin-bottom: 10px;">
+            <input type="text" id="username2" placeholder="Second username" value="alice">
             <button onclick="testUsernameCasePreservedCompare()">Compare UsernameCasePreserveds</button>
             <div id="compare-result" class="result"></div>
         </div>
@@ -130,8 +130,8 @@
         function testUsernameCasePreservedCompare() {
             try {
                 const match = window.precis.usernamecasepreserved_compare(
-                    document.getElementById('nick1').value,
-                    document.getElementById('nick2').value
+                    document.getElementById('username1').value,
+                    document.getElementById('username2').value
                 );
                 showResult('compare-result', match ? '✓ UsernameCasePreserveds are equivalent' : '✗ UsernameCasePreserveds are different', match);
             } catch (e) { showResult('compare-result', `✗ Error: ${e}`, false); }
@@ -141,7 +141,7 @@
                 if (e.key === 'Enter') id === 'username' ? testUsernameCasePreservedEnforce() : testUsernameCasePreservedPrepare();
             });
         });
-        document.getElementById('nick2').addEventListener('keypress', e => {
+        document.getElementById('username2').addEventListener('keypress', e => {
             if (e.key === 'Enter') testUsernameCasePreservedCompare();
         });
     </script>
