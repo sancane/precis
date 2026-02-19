@@ -71,7 +71,7 @@
         <p class="subtitle"><a href="https://datatracker.ietf.org/doc/html/rfc8265#section-4.2" target="_blank">RFC 8265 Section 4.2</a></p>
         <div class="field">
             <label for="password">OpaqueString Enforcement</label>
-            <input type="text" id="password" placeholder="Enter a password" value="  MyP@ssw0rd  ">
+            <input type="text" id="password" placeholder="Enter a password" value="MyP@ssw0rd">
             <button onclick="testOpaqueStringEnforce()">Enforce OpaqueString</button>
             <div id="password-result" class="result"></div>
         </div>
@@ -92,9 +92,10 @@
         </div>
         <div class="examples">
             <h3>TRY THESE EXAMPLES:</h3>
-            <div class="example-item">• <strong>Enforce:</strong> <code>"  MyP@ssw0rd  "</code> → <code>"MyP@ssw0rd"</code> (trims spaces)</div>
-            <div class="example-item">• <strong>Compare:</strong> <code>"MyP@ssw0rd"</code> vs <code>"MyP@ssw0rd"</code> → <code>true</code> (identical)</div>
+            <div class="example-item">• <strong>Enforce:</strong> <code>"MyP@ssw0rd"</code> → <code>"MyP@ssw0rd"</code> (case preserved, spaces preserved)</div>
+            <div class="example-item">• <strong>Enforce:</strong> <code>"correct horse battery staple"</code> → valid (spaces allowed)</div>
             <div class="example-item">• <strong>Compare:</strong> <code>"Secret123"</code> vs <code>"secret123"</code> → <code>false</code> (case-sensitive!)</div>
+            <div class="example-item">• <strong>Compare:</strong> <code>"MyP@ssw0rd"</code> vs <code>"MyP@ssw0rd"</code> → <code>true</code> (identical)</div>
         </div>
     </div>
     <script type="module">
