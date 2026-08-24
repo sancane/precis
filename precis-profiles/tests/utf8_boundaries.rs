@@ -288,6 +288,46 @@ mod trim_around_multibyte {
 }
 
 #[cfg(test)]
+mod space_mapping_with_multibyte {
+    use super::*;
+
+    #[test]
+    fn test_double_space_after_multibyte() {
+        // The mapping rule has to start at a character boundary, whatever the
+        // width of the characters preceding the spaces it collapses.
+        assert_eq!(Nickname::enforce("ÜÜ  X").unwrap(), "ÜÜ X");
+        assert_eq!(Nickname::enforce("ΑΒΓΔ  Ε").unwrap(), "ΑΒΓΔ Ε");
+        assert_eq!(Nickname::enforce("文字  A").unwrap(), "文字 A");
+        assert_eq!(Nickname::enforce("😀  A").unwrap(), "😀 A");
+        assert_eq!(Nickname::enforce("  ÜÜ  X  ").unwrap(), "ÜÜ X");
+    }
+
+    #[test]
+    fn test_interior_non_ascii_space_is_mapped() {
+        // RFC 8266, section 2.1, sub-rule a maps a non-ASCII space to SPACE.
+        // An interior one is mapped, not removed.
+        assert_eq!(Nickname::enforce("Ab\u{A0}Cd").unwrap(), "Ab Cd");
+        assert_eq!(Nickname::enforce("\u{A0}Ab\u{A0}Cd").unwrap(), "Ab Cd");
+        assert_eq!(Nickname::enforce("文字\u{3000}A").unwrap(), "文字 A");
+        assert_eq!(Nickname::enforce("Ab\u{A0}\u{2000}Cd").unwrap(), "Ab Cd");
+    }
+
+    #[test]
+    fn test_space_introduced_by_normalization() {
+        // The profile applies its rules until the string is stable, and NFKC
+        // decomposes U+00A8 into SPACE followed by U+0308. The mapping rule
+        // therefore sees spaces that the input did not contain, behind
+        // characters of any width.
+        assert_eq!(Nickname::enforce("ÜÜ \u{A8}").unwrap(), "ÜÜ \u{308}");
+        assert_eq!(
+            Nickname::enforce("ÜÜ\u{A8} \u{A8}").unwrap(),
+            "ÜÜ \u{308} \u{308}"
+        );
+        assert_eq!(Nickname::enforce("\u{A8}").unwrap(), "\u{308}");
+    }
+}
+
+#[cfg(test)]
 mod password_multibyte {
     use super::*;
 

@@ -34,6 +34,20 @@ fn international_string() -> impl Strategy<Value = String> {
     ]
 }
 
+// Strategy to generate strings mixing multi-byte characters with ASCII and
+// non-ASCII spaces, including U+00A8, whose normalized form starts with a space
+fn multibyte_string_with_spaces() -> impl Strategy<Value = String> {
+    "[AbÜΑΒΓΔ文字😀\u{A0}\u{2000}\u{3000}\u{A8} ]{0,40}"
+}
+
+// Any code point with a general category of "Zs" other than SPACE
+fn is_non_ascii_space(c: char) -> bool {
+    matches!(
+        c,
+        '\u{A0}' | '\u{1680}' | '\u{2000}'..='\u{200A}' | '\u{202F}' | '\u{205F}' | '\u{3000}'
+    )
+}
+
 #[cfg(test)]
 mod nickname_properties {
     use super::*;
@@ -54,6 +68,28 @@ mod nickname_properties {
             if let Ok(enforced1) = Nickname::enforce(&s) {
                 let enforced2 = Nickname::enforce(enforced1.as_ref())?;
                 prop_assert_eq!(enforced1.as_ref(), enforced2.as_ref());
+            }
+        }
+
+        /// Property: the string returned by enforce satisfies the additional
+        /// mapping rule of RFC 8266, and enforcing it again leaves it unchanged
+        #[test]
+        fn enforce_output_is_mapped_and_stable(
+            s in prop_oneof![unicode_string(), multibyte_string_with_spaces()]
+        ) {
+            if let Ok(enforced) = Nickname::enforce(&s) {
+                let out = enforced.as_ref();
+                prop_assert!(!out.starts_with(' '), "leading space in {:?}", out);
+                prop_assert!(!out.ends_with(' '), "trailing space in {:?}", out);
+                prop_assert!(!out.contains("  "), "consecutive spaces in {:?}", out);
+                prop_assert!(
+                    !out.chars().any(is_non_ascii_space),
+                    "non-ASCII space in {:?}",
+                    out
+                );
+
+                let again = Nickname::enforce(out)?;
+                prop_assert_eq!(again.as_ref(), out);
             }
         }
 
