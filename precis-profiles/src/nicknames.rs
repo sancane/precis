@@ -21,61 +21,59 @@ use std::sync::LazyLock;
 //
 //  c. Map interior sequences of more than one ASCII space character
 //     to a single ASCII space character.
+
+// Scans `label` applying the sub-rules above. Every character the rule keeps is
+// pushed to `out` when it is given, so deciding whether a transformation is
+// needed and performing it run the very same state machine and cannot disagree
+// on where the rule starts or on what the rule does. Returns whether the rule
+// changes `label`; when `out` is `None` the scan stops as soon as that answer is
+// known.
+fn map_spaces(label: &str, mut out: Option<&mut String>) -> bool {
+    let mut changed = false;
+    // A space is held back until a later character proves it interior, since
+    // spaces at the beginning or end are removed (sub-rule b) and a run of them
+    // collapses into one (sub-rule c). Non-ASCII spaces are emitted as SPACE
+    // (sub-rule a), so they always count as a change.
+    let mut pending_space = false;
+    let mut seen_non_space = false;
+
+    for c in label.chars() {
+        if common::is_space_separator(c) {
+            changed |= c != common::SPACE || pending_space || !seen_non_space;
+            if changed && out.is_none() {
+                return true;
+            }
+            pending_space = seen_non_space;
+        } else {
+            if pending_space {
+                if let Some(res) = out.as_deref_mut() {
+                    res.push(common::SPACE);
+                }
+                pending_space = false;
+            }
+            if let Some(res) = out.as_deref_mut() {
+                res.push(c);
+            }
+            seen_non_space = true;
+        }
+    }
+
+    // A trailing run of spaces was never emitted (sub-rule b).
+    changed || pending_space
+}
+
 fn trim_spaces<'a, T>(s: T) -> Result<Cow<'a, str>, Error>
 where
     T: Into<Cow<'a, str>>,
 {
     let s = s.into();
 
-    // First pass: check if transformation is needed to avoid allocation
-    let needs_transform = {
-        let mut begin = true;
-        let mut pending_space = false;
-
-        s.chars().any(|c| {
-            if !common::is_space_separator(c) {
-                pending_space = false;
-                begin = false;
-                false
-            } else {
-                // Need transform if: space at beginning, consecutive spaces, or non-ASCII space
-                let needs = begin || pending_space || c != common::SPACE;
-                if !begin {
-                    pending_space = true;
-                }
-                begin = false;
-                needs
-            }
-        }) || pending_space // Also need transform if string ends with space
-    };
-
-    if !needs_transform {
+    if !map_spaces(&s, None) {
         return Ok(s);
     }
 
-    // Second pass: transform the string
-    let mut res = String::new();
-    res.reserve(s.len());
-    let mut begin = true;
-    let mut pending_space = false;
-
-    for c in s.chars() {
-        if !common::is_space_separator(c) {
-            // Add pending space before this character if there was one
-            if pending_space {
-                res.push(common::SPACE);
-                pending_space = false;
-            }
-            res.push(c);
-            begin = false;
-        } else if !begin {
-            // Mark that we have a space, but don't add it yet
-            // (only add it when we see a non-space character)
-            pending_space = true;
-        }
-    }
-
-    // No need to remove trailing space - it was never added
+    let mut res = String::with_capacity(s.len());
+    map_spaces(&s, Some(&mut res));
     Ok(res.into())
 }
 
