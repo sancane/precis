@@ -367,6 +367,31 @@ mod test_nicknames {
     }
 
     #[test]
+    fn test_trim_spaces_after_multibyte() {
+        // Characters before the first space to be mapped may occupy more than
+        // one byte, which must not shift where the mapping starts.
+        assert_eq!(trim_spaces("ÜÜ  X"), Ok(Cow::from("ÜÜ X")));
+        assert_eq!(trim_spaces("ΑΒΓΔ  Ε"), Ok(Cow::from("ΑΒΓΔ Ε")));
+        assert_eq!(trim_spaces("文字  A"), Ok(Cow::from("文字 A")));
+        assert_eq!(trim_spaces("😀  A"), Ok(Cow::from("😀 A")));
+        assert_eq!(trim_spaces("ÜÜ  "), Ok(Cow::from("ÜÜ")));
+        assert_eq!(trim_spaces("  ÜÜ  X  "), Ok(Cow::from("ÜÜ X")));
+    }
+
+    #[test]
+    fn test_trim_spaces_maps_interior_non_ascii_space() {
+        // Sub-rule a maps a non-ASCII space to SPACE wherever it appears, so an
+        // interior one is mapped and not removed.
+        assert_eq!(trim_spaces("Ab\u{A0}Cd"), Ok(Cow::from("Ab Cd")));
+        assert_eq!(trim_spaces("\u{A0}Ab\u{A0}Cd"), Ok(Cow::from("Ab Cd")));
+        assert_eq!(trim_spaces("文字\u{3000}A"), Ok(Cow::from("文字 A")));
+
+        // Sub-rule c then collapses interior runs, whatever they are made of.
+        assert_eq!(trim_spaces("Ab\u{A0}\u{2000}Cd"), Ok(Cow::from("Ab Cd")));
+        assert_eq!(trim_spaces("Ab \u{A0} Cd"), Ok(Cow::from("Ab Cd")));
+    }
+
+    #[test]
     fn test_trim_spaces_no_transformation_needed() {
         // Strings that don't need transformation should return Cow::Borrowed
         let result = trim_spaces("hello");
