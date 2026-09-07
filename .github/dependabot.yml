@@ -14,5 +14,3 @@ updates:
     labels:
       - "cargo"
       - "dependencies"
-    ignore:
-      - dependency-name: "regex"
