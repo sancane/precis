@@ -25,7 +25,7 @@ Be respectful, considerate, and professional. We welcome contributions from ever
 
 ### Prerequisites
 
-- **Rust**: 1.80+ (for stable `LazyLock` support)
+- **Rust**: 1.85+ (required by 2024-edition dependencies such as `reqwest` and `proptest`)
 - **Cargo**: Latest stable
 - **Git**: For version control
 

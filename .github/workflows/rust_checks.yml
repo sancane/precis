@@ -141,22 +141,22 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install MSRV toolchain (1.80)
-      uses: dtolnay/rust-toolchain@1.80
+    - name: Install MSRV toolchain (1.85)
+      uses: dtolnay/rust-toolchain@1.85
 
     - name: Verify MSRV in Cargo.toml files
       run: |
-        echo "Checking that all Cargo.toml files declare rust-version = \"1.80\""
+        echo "Checking that all Cargo.toml files declare rust-version = \"1.85\""
         for toml in precis-core/Cargo.toml precis-profiles/Cargo.toml precis-tools/Cargo.toml; do
-          if ! grep -q 'rust-version = "1.80"' "$toml"; then
-            echo "ERROR: $toml does not declare rust-version = \"1.80\""
+          if ! grep -q 'rust-version = "1.85"' "$toml"; then
+            echo "ERROR: $toml does not declare rust-version = \"1.85\""
             exit 1
           fi
         done
-        echo "✓ All Cargo.toml files correctly declare MSRV 1.80"
+        echo "✓ All Cargo.toml files correctly declare MSRV 1.85"
 
     - name: Build with MSRV
-      run: cargo +1.80 build --workspace --all-features --verbose
+      run: cargo +1.85 build --workspace --all-features --verbose
 
     - name: Test with MSRV
-      run: cargo +1.80 test --workspace --all-features --verbose
+      run: cargo +1.85 test --workspace --all-features --verbose
