@@ -15,7 +15,7 @@ keywords = ["Preparation", "Enforcement", "Comparison", "precis", "rfc8264"]
 license = "MIT/Apache-2.0"
 categories = ["text-processing", "internationalization"]
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.85"
 
 [features]
 networking = ["precis-tools/networking"]
@@ -30,7 +30,7 @@ ucd-parse.workspace = true
 [dev-dependencies]
 criterion = { package = "codspeed-criterion-compat", version = "*" }
 precis-tools.workspace = true
-proptest = "1.5"
+proptest = "1.11"
 ucd-parse.workspace = true
 
 [[bench]]
