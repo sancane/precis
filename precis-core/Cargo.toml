@@ -30,7 +30,7 @@ ucd-parse.workspace = true
 [dev-dependencies]
 criterion = { package = "codspeed-criterion-compat", version = "*" }
 precis-tools.workspace = true
-proptest = "1.11"
+proptest = "=1.5.0"
 ucd-parse.workspace = true
 
 [[bench]]

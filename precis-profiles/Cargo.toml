@@ -31,7 +31,7 @@ precis-tools.workspace = true
 [dev-dependencies]
 criterion = { package = "codspeed-criterion-compat", version = "*" }
 hex = "0.4"
-proptest = "1.11"
+proptest = "=1.5.0"
 
 [[bench]]
 name = "profiles_bench"

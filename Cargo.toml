@@ -9,6 +9,6 @@ precis-core = { path = "precis-core" }
 precis-profiles = { path = "precis-profiles" }
 precis-tools = { path = "precis-tools" }
 regex = "1"
-reqwest = { version = "0.13", features = ["blocking"] }
+reqwest = { version = "=0.13.2", features = ["blocking"] }
 ucd-parse = "0.1"
 unicode-normalization = "0.1"
