@@ -106,10 +106,10 @@ conversion is independent of context and language.
 
 # Minimum Supported Rust Version (MSRV)
 
-This project requires **Rust 1.80 or later** for stable [`LazyLock`](https://doc.rust-lang.org/std/sync/struct.LazyLock.html) support.
+This project requires **Rust 1.85 or later**, as required by dependencies that use the 2024 edition (e.g. `reqwest` and `proptest`). It also relies on stable [`LazyLock`](https://doc.rust-lang.org/std/sync/struct.LazyLock.html) support (available since 1.80).
 
 The MSRV is:
-- Explicitly declared in all `Cargo.toml` files via `rust-version = "1.80"`
+- Explicitly declared in all `Cargo.toml` files via `rust-version = "1.85"`
 - Validated in CI to ensure compatibility
 - Will only be increased in a new minor version release
 
