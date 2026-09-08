@@ -147,7 +147,7 @@ jobs:
     - name: Verify MSRV in Cargo.toml files
       run: |
         echo "Checking that all Cargo.toml files declare rust-version = \"1.85\""
-        for toml in precis-core/Cargo.toml precis-profiles/Cargo.toml precis-tools/Cargo.toml; do
+        for toml in precis-core/Cargo.toml precis-profiles/Cargo.toml precis-tools/Cargo.toml precis-wasm/Cargo.toml; do
           if ! grep -q 'rust-version = "1.85"' "$toml"; then
             echo "ERROR: $toml does not declare rust-version = \"1.85\""
             exit 1
@@ -160,3 +160,27 @@ jobs:
 
     - name: Test with MSRV
       run: cargo +1.85 test --workspace --all-features --verbose
+
+  wasm:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: wasm-pack
+
+    - name: Build precis-wasm
+      working-directory: precis-wasm
+      run: wasm-pack build --target web --out-dir pkg
+
+    - name: Test precis-wasm (headless Firefox)
+      working-directory: precis-wasm
+      run: wasm-pack test --headless --firefox

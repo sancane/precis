@@ -385,7 +385,11 @@ pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
-#[cfg(test)]
+// These tests exercise the WASM bindings through `wasm_bindgen_test` and can
+// only run on the `wasm32` target under `wasm-pack test`. Gating them keeps a
+// native `cargo test --workspace` from compiling and running them (where the
+// `JsValue` APIs panic outside a WASM host).
+#[cfg(all(test, target_arch = "wasm32"))]
 mod tests {
     use super::*;
     use wasm_bindgen_test::*;
