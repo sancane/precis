@@ -48,7 +48,7 @@ yarn add precis-wasm
 <body>
     <script type="module">
         // Import high-level wrapper with better types
-        import { init, nickname_enforce, nickname_compare, version } from './pkg/precis.js';
+        import { init, nickname_enforce, nickname_compare, version } from './pkg/precis.mjs';
 
         // Initialize WASM (required in browsers)
         await init();
@@ -172,11 +172,11 @@ console.log(opaquestring_compare("MyP@ssw0rd!", "myp@ssw0rd!")); // false
 ### Low-level API (Advanced)
 
 For performance-critical scenarios where you need manual WASM initialization
-control, you can import the raw `wasm-pack` glue directly. Use `precis_web.js`
+control, you can import the raw `wasm-pack` glue directly. Use `precis_web.mjs`
 for browsers/bundlers and `precis_node.js` for Node.js:
 
 ```typescript
-import init, { nickname_enforce, nickname_compare } from 'precis-wasm/precis_web.js';
+import init, { nickname_enforce, nickname_compare } from 'precis-wasm/precis_web.mjs';
 
 // Must call init() before using WASM functions (browser glue only)
 await init();
@@ -208,7 +208,7 @@ pub fn nickname_enforce(input: &str) -> Result<String, JsValue>
 
 ### Layer 2: TypeScript Wrapper (High-Level)
 
-Thin TypeScript wrapper (`precis.ts`) compiled to `precis.js`:
+Thin TypeScript wrapper (`precis.mts`) compiled to `precis.mjs`:
 
 ```typescript
 export function nickname_enforce(input: string): string {
@@ -268,10 +268,10 @@ npm install
 npm run build
 
 # This script:
-# 1. Compiles Rust → WASM for the web target   (precis_web.js glue)
+# 1. Compiles Rust → WASM for the web target   (precis_web.mjs glue)
 # 2. Compiles Rust → WASM for the Node.js target (precis_node.js glue)
 # 3. Merges both into a single package in pkg/
-# 4. Compiles the TypeScript wrappers (src/precis.ts → precis.js,
+# 4. Compiles the TypeScript wrappers (src/precis.mts → precis.mjs,
 #    src/precis-node.ts → precis-node.js)
 # 5. Copies the committed package.json (with conditional `exports`) into pkg/
 ```

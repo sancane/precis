@@ -3,27 +3,35 @@
   "version": "0.1.0",
   "description": "WebAssembly bindings for PRECIS Framework profiles (RFC 8264, 8265, 8266)",
   "main": "./precis-node.js",
-  "browser": "./precis.js",
-  "module": "./precis.js",
-  "types": "./precis.d.ts",
+  "browser": "./precis.mjs",
+  "module": "./precis.mjs",
+  "types": "./precis-node.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./precis.d.ts",
-      "node": "./precis-node.js",
-      "browser": "./precis.js",
-      "default": "./precis.js"
+      "node": {
+        "types": "./precis-node.d.ts",
+        "default": "./precis-node.js"
+      },
+      "browser": {
+        "types": "./precis.d.mts",
+        "default": "./precis.mjs"
+      },
+      "default": {
+        "types": "./precis.d.mts",
+        "default": "./precis.mjs"
+      }
     },
-    "./precis_web.js": "./precis_web.js",
+    "./precis_web.mjs": "./precis_web.mjs",
     "./precis_node.js": "./precis_node.js"
   },
   "files": [
-    "precis.js",
-    "precis.d.ts",
+    "precis.mjs",
+    "precis.d.mts",
     "precis-node.js",
     "precis-node.d.ts",
-    "precis_web.js",
-    "precis_web.d.ts",
+    "precis_web.mjs",
+    "precis_web.d.mts",
     "precis_web_bg.wasm",
     "precis_web_bg.wasm.d.ts",
     "precis_node.js",

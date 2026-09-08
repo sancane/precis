@@ -29,9 +29,9 @@ npm run build
 ```
 
 This generates the `pkg/` directory with the compiled WASM module and the
-TypeScript wrapper (`pkg/precis.js`). The demo imports `../../pkg/precis.js`, so
+TypeScript wrapper (`pkg/precis.mjs`). The demo imports `../../pkg/precis.mjs`, so
 **this step is required** — without it you get a `404 (Not Found)` for
-`precis.js` and the page stays stuck on "Loading PRECIS WASM module...".
+`precis.mjs` and the page stays stuck on "Loading PRECIS WASM module...".
 
 ### Step 2: Serve over HTTP from the `precis-wasm` directory
 
@@ -54,7 +54,7 @@ npx http-server -p 8000
 
 Open **http://localhost:8000/examples/web/** (adjust the port for the server you
 picked). If you started the server from inside `examples/web/` instead, the
-browser resolves `../../pkg/precis.js` to `/pkg/precis.js`, which the server
+browser resolves `../../pkg/precis.mjs` to `/pkg/precis.mjs`, which the server
 can't reach — so it 404s. Serve from `precis-wasm/`.
 
 ## How It Works
@@ -63,7 +63,7 @@ The demo uses ES modules to load the PRECIS WASM library directly in the browser
 
 ```javascript
 // Import the high-level wrapper with proper TypeScript types
-import { init, nickname_enforce, nickname_compare, version } from '../../pkg/precis.js';
+import { init, nickname_enforce, nickname_compare, version } from '../../pkg/precis.mjs';
 
 // Initialize WASM (required in browsers)
 await init();
@@ -106,9 +106,9 @@ web/
 The demo imports from:
 ```
 ../../pkg/
-├── precis.js          # TypeScript wrapper (recommended)
-├── precis.d.ts        # TypeScript definitions
-├── precis_web.js     # Low-level WASM bindings
+├── precis.mjs          # TypeScript wrapper (recommended)
+├── precis.d.mts        # TypeScript definitions
+├── precis_web.mjs     # Low-level WASM bindings
 ├── precis_web_bg.wasm # Compiled WebAssembly binary
 └── package.json       # Package metadata
 ```
@@ -119,7 +119,7 @@ The demo uses a **two-layer API**:
 
 ### Layer 1: High-Level Wrapper (Recommended)
 ```javascript
-import { init, nickname_enforce, nickname_compare } from '../../pkg/precis.js';
+import { init, nickname_enforce, nickname_compare } from '../../pkg/precis.mjs';
 ```
 
 - ✅ Correct TypeScript types (`string → string`)
@@ -129,7 +129,7 @@ import { init, nickname_enforce, nickname_compare } from '../../pkg/precis.js';
 
 ### Layer 2: Low-Level WASM Bindings (Advanced)
 ```javascript
-import init, { nickname_enforce, nickname_compare } from '../../pkg/precis_web.js';
+import init, { nickname_enforce, nickname_compare } from '../../pkg/precis_web.mjs';
 ```
 
 - ⚠️ Types are `any` (wasm-bindgen limitation)
@@ -145,7 +145,7 @@ Copy the files from `pkg/` to your project and import:
 
 ```html
 <script type="module">
-  import { init, nickname_enforce } from './pkg/precis.js';
+  import { init, nickname_enforce } from './pkg/precis.mjs';
 
   await init();
   const result = nickname_enforce("Alice");
@@ -159,7 +159,7 @@ Once published, use a CDN:
 ```html
 <script type="module">
   import { init, nickname_enforce }
-    from 'https://unpkg.com/precis-wasm@0.1.0/precis.js';
+    from 'https://unpkg.com/precis-wasm@0.1.0/precis.mjs';
 
   await init();
   const result = nickname_enforce("Alice");
@@ -193,7 +193,7 @@ Access to script at 'file://...' has been blocked by CORS policy
 ### Module Not Found
 
 ```
-GET http://localhost:8000/pkg/precis.js 404 (Not Found)
+GET http://localhost:8000/pkg/precis.mjs 404 (Not Found)
 ```
 
 **Solution**: Make sure you're serving from the `precis-wasm` directory (not from `examples/web/`), so the relative path `../../pkg/` resolves correctly.

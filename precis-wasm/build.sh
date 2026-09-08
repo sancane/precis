@@ -3,11 +3,11 @@
 #
 # Produces a single publishable package in ./pkg that works in browsers,
 # bundlers and Node.js via conditional `exports`:
-#   - browser/bundler  -> precis.js   (ESM wrapper over the --target web glue)
-#   - Node.js          -> precis-node.js (CJS wrapper over the --target nodejs glue)
+#   - browser/bundler  -> precis.mjs      (ESM wrapper over the --target web glue)
+#   - Node.js          -> precis-node.js  (CJS wrapper over the --target nodejs glue)
 #
-# The published package.json is the committed one (copied verbatim), so there is
-# no fragile post-processing of wasm-pack's generated manifest.
+# ESM files use the .mjs extension and CJS files use .js so that each module's
+# type is unambiguous regardless of the package's `type` field.
 
 set -euo pipefail
 
@@ -18,6 +18,10 @@ rm -rf "$OUT" pkg-node
 
 echo "🔨 Building WASM (web target)..."
 wasm-pack build --target web --out-dir "$OUT" --out-name precis_web
+
+echo "🔤 Marking the web (ESM) glue as .mjs..."
+mv "$OUT/precis_web.js" "$OUT/precis_web.mjs"
+mv "$OUT/precis_web.d.ts" "$OUT/precis_web.d.mts"
 
 echo "🔨 Building WASM (Node.js target)..."
 wasm-pack build --target nodejs --out-dir pkg-node --out-name precis_node
@@ -36,8 +40,8 @@ if ! [ -x "node_modules/.bin/tsc" ]; then
 fi
 
 echo "📝 Compiling TypeScript wrappers..."
-npx tsc -p tsconfig.web.json    # -> pkg/precis.js       (ESM, with async init)
-npx tsc -p tsconfig.node.json   # -> pkg/precis-node.js  (CJS, auto-initialized)
+npx tsc -p tsconfig.web.json    # src/precis.mts     -> pkg/precis.mjs      (ESM, with async init)
+npx tsc -p tsconfig.node.json   # src/precis-node.ts -> pkg/precis-node.js  (CJS, auto-initialized)
 
 echo "🔧 Writing published package manifest..."
 # Publish a clean manifest: strip the dev-only `scripts` and `devDependencies`
@@ -61,6 +65,6 @@ fi
 echo "✅ Build complete!"
 echo ""
 echo "📦 Publishable package in ./$OUT (run: npm publish ./$OUT)"
-echo "  - Browser/bundler entry : precis.js  (import { init, ... }; await init())"
+echo "  - Browser/bundler entry : precis.mjs  (import { init, ... }; await init())"
 echo "  - Node.js entry         : precis-node.js  (auto-initialized)"
-echo "  - Types                 : precis.d.ts"
+echo "  - Types                 : precis.d.mts / precis-node.d.ts"

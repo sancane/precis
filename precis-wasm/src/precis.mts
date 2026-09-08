@@ -6,7 +6,7 @@
  */
 
 // @ts-ignore - precis_web.js is the `wasm-pack --target web` glue, generated at build time
-import * as wasm from './precis_web.js';
+import * as wasm from './precis_web.mjs';
 
 /**
  * Prepare `Nickname` string.
@@ -314,4 +314,4 @@ export function version(): string {
  * ```
  */
 // @ts-ignore - precis_web.js is generated at build time; its default export is the async loader
-export { default as init } from './precis_web.js';
+export { default as init } from './precis_web.mjs';
