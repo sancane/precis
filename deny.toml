@@ -13,6 +13,11 @@ confidence-threshold = 0.8
 allow = [
     "MIT",
     "Apache-2.0",
+    # Required by `unicode-ident` (pulled in transitively through
+    # `proc-macro2`), which is dual-licensed MIT/Apache-2.0 for its code but
+    # carries the Unicode-3.0 license for its generated Unicode tables.
+    # Unicode-3.0 is an OSI-approved permissive license.
+    "Unicode-3.0",
 ]
 
 [bans]
