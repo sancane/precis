@@ -17,7 +17,7 @@
     "build:raw": "wasm-pack build --target web --out-dir pkg",
     "build:nodejs": "wasm-pack build --target nodejs --out-dir pkg-node",
     "build:bundler": "wasm-pack build --target bundler --out-dir pkg-bundler",
-    "test": "wasm-pack test --headless --firefox"
+    "test": "wasm-pack test --headless --chrome"
   },
   "repository": {
     "type": "git",

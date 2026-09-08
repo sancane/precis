@@ -181,6 +181,6 @@ jobs:
       working-directory: precis-wasm
       run: wasm-pack build --target web --out-dir pkg
 
-    - name: Test precis-wasm (headless Firefox)
+    - name: Test precis-wasm (headless Chrome)
       working-directory: precis-wasm
-      run: wasm-pack test --headless --firefox
+      run: wasm-pack test --headless --chrome
