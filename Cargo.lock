@@ -908,7 +908,7 @@ dependencies = [
 
 [[package]]
 name = "precis-core"
-version = "0.1.11"
+version = "0.2.0"
 dependencies = [
  "codspeed-criterion-compat",
  "precis-tools",
@@ -919,7 +919,7 @@ dependencies = [
 
 [[package]]
 name = "precis-profiles"
-version = "0.1.12"
+version = "0.1.14"
 dependencies = [
  "codspeed-criterion-compat",
  "hex",
@@ -931,7 +931,7 @@ dependencies = [
 
 [[package]]
 name = "precis-tools"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "regex",
  "reqwest",
