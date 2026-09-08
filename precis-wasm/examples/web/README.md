@@ -13,38 +13,14 @@ Interactive web demo for the PRECIS Nickname profile (RFC 8266) using WebAssembl
 
 ## Quick Start
 
-Since browsers don't allow loading ES modules from `file://` protocol due to CORS, you need to serve the files through HTTP.
+The demo loads the compiled package from `../../pkg/`, so there are two things
+to get right before it will work: the package must be **built**, and the server
+must be started from the **`precis-wasm/` directory** (not from `examples/web/`)
+so that `../../pkg/` is reachable.
 
-### Option 1: Python HTTP Server (Recommended)
+### Step 1: Build the WASM package
 
-```bash
-# From the precis-wasm directory
-python3 -m http.server 8000
-```
-
-Then open: http://localhost:8000/examples/web/
-
-### Option 2: Node.js - npx serve
-
-```bash
-# From the precis-wasm directory
-npx serve .
-```
-
-Then open the URL shown (usually http://localhost:3000/examples/web/)
-
-### Option 3: Node.js - http-server
-
-```bash
-# From the precis-wasm directory
-npx http-server -p 8000
-```
-
-Then open: http://localhost:8000/examples/web/
-
-## Prerequisites
-
-Make sure you've built the WASM package first:
+From the `precis-wasm` directory:
 
 ```bash
 cd precis-wasm
@@ -52,7 +28,34 @@ npm install
 npm run build
 ```
 
-This generates the `pkg/` directory with the compiled WASM module and TypeScript wrapper.
+This generates the `pkg/` directory with the compiled WASM module and the
+TypeScript wrapper (`pkg/precis.js`). The demo imports `../../pkg/precis.js`, so
+**this step is required** — without it you get a `404 (Not Found)` for
+`precis.js` and the page stays stuck on "Loading PRECIS WASM module...".
+
+### Step 2: Serve over HTTP from the `precis-wasm` directory
+
+Browsers don't allow loading ES modules from the `file://` protocol (CORS), so
+serve the files through HTTP. Run one of these **from `precis-wasm/`** (its
+parent must contain `pkg/`):
+
+```bash
+# Option 1 (recommended): Python
+python3 -m http.server 8000
+
+# Option 2: npx serve
+npx serve .
+
+# Option 3: npx http-server
+npx http-server -p 8000
+```
+
+### Step 3: Open the demo
+
+Open **http://localhost:8000/examples/web/** (adjust the port for the server you
+picked). If you started the server from inside `examples/web/` instead, the
+browser resolves `../../pkg/precis.js` to `/pkg/precis.js`, which the server
+can't reach — so it 404s. Serve from `precis-wasm/`.
 
 ## How It Works
 
