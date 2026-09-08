@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. **Rust 1.80+**: Required for PRECIS library
+1. **Rust 1.85+**: Required by the workspace (2024-edition dependencies)
 2. **wasm-pack**: WASM build tool
 
 Install wasm-pack:
@@ -49,7 +49,7 @@ Note: This will generate `any` types. Use `./build.sh` for proper TypeScript sup
 ### For Node.js
 
 ```bash
-wasm-pack build --target nodejs --out-dir pkg-node
+wasm-pack build --target nodejs --out-dir pkg-node --out-name precis_node
 ```
 
 ### For Bundlers (webpack, rollup, parcel)
@@ -63,11 +63,11 @@ wasm-pack build --target bundler --out-dir pkg-bundler
 ### Run tests in browser
 
 ```bash
-# Firefox (recommended)
-wasm-pack test --headless --firefox
-
-# Chrome
+# Chrome (recommended; this is what CI uses)
 wasm-pack test --headless --chrome
+
+# Firefox
+wasm-pack test --headless --firefox
 
 # Safari
 wasm-pack test --headless --safari
@@ -76,7 +76,7 @@ wasm-pack test --headless --safari
 ### Run specific test
 
 ```bash
-wasm-pack test --headless --firefox -- test_nickname_enforce_basic
+wasm-pack test --headless --chrome -- test_nickname_enforce_basic
 ```
 
 ## Development Workflow
@@ -161,42 +161,39 @@ wasm-pack build --target web
 wasm-pack test --headless --firefox
 ```
 
-## Bundle Size Optimization
+## Bundle Size
 
-The `Cargo.toml` is already configured for minimal size:
-
-```toml
-[profile.release]
-opt-level = "z"        # Optimize for size
-lto = true             # Link-time optimization
-codegen-units = 1      # Single codegen unit (better optimization)
-panic = "abort"        # No unwinding (smaller binary)
-strip = true           # Remove debug symbols
-```
-
-### Check bundle size
+`wasm-pack` builds in release mode and runs `wasm-opt` on the binary, which is
+the main size reduction today. The current release binary is about **280 KB**
+(~112 KB gzipped).
 
 ```bash
 ls -lh pkg/precis_web_bg.wasm
-
-# With wasm-opt (included in wasm-pack)
-# Typical sizes:
-# - Debug: ~2-3 MB
-# - Release: ~250 KB
-# - Gzipped: ~60-80 KB
+gzip -c pkg/precis_web_bg.wasm | wc -c
 ```
+
+> Note: there is **no** size-tuned `[profile.release]` (e.g. `opt-level = "z"`,
+> `lto`, `panic = "abort"`) configured. Cargo profiles only take effect at the
+> workspace root, so adding one would affect every crate — it is a workspace-wide
+> decision, not something that can be scoped to `precis-wasm` alone.
 
 ## Publishing to NPM
 
-```bash
-# Build optimized release
-wasm-pack build --target web --release
+The publishable package is assembled in `pkg/` by `build.sh` (both target
+glues, both TypeScript wrappers, and a clean `package.json` with conditional
+`exports`). Publish that directory — do not use `wasm-pack publish`, which would
+only publish a single raw target.
 
+```bash
 # Login to NPM (first time only)
 npm login
 
-# Publish
-wasm-pack publish
+# Build and publish in one step
+npm run release          # === npm run build && npm publish ./pkg
+
+# ...or do it manually
+npm run build
+npm publish ./pkg
 ```
 
 ## Troubleshooting
@@ -235,22 +232,16 @@ python3 -m http.server 8000
 
 ## CI/CD Integration
 
-Future work: Add GitHub Actions workflow to:
-- Build WASM on every PR
-- Run wasm-pack tests
-- Publish to NPM on tag
+A `wasm` job in `.github/workflows/rust_checks.yml` already runs on every push
+and pull request to `main`. It:
 
-Example workflow:
-```yaml
-- name: Install wasm-pack
-  run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+- installs the `wasm32-unknown-unknown` target, `wasm-pack` and Node.js,
+- runs the `#[wasm_bindgen_test]` suite in headless Chrome,
+- runs `npm run build` to produce the full publishable package, and
+- `npm pack`s it into a throwaway consumer and asserts that both `require()`
+  (CommonJS) and `import` + `await init()` (ESM) resolve through `exports`.
 
-- name: Build WASM
-  run: cd precis-wasm && wasm-pack build --target web
-
-- name: Test WASM
-  run: cd precis-wasm && wasm-pack test --headless --firefox
-```
+Automated publishing to NPM on tag is not yet wired up.
 
 ## Resources
 

@@ -19,7 +19,7 @@ This library provides JavaScript-friendly bindings for validating and normalizin
 - ✅ **Dual API**: High-level ergonomic wrapper + low-level raw WASM bindings
 - ✅ **TypeScript Support**: Full type safety with `string → string` signatures
 - ✅ **Easy Integration**: Simple `await init()` in browsers, automatic in Node.js
-- ✅ **Small Bundle**: ~250 KB uncompressed (~60-80 KB gzipped)
+- ✅ **Small Bundle**: ~280 KB uncompressed (~112 KB gzipped)
 
 ## Installation
 
@@ -308,7 +308,7 @@ See the [examples](examples/) directory for complete working examples:
 
 ## Performance
 
-- **Bundle Size**: ~250 KB uncompressed (~60-80 KB gzipped)
+- **Bundle Size**: ~280 KB uncompressed (~112 KB gzipped)
 - **Initialization**: < 10ms on modern browsers
 - **Operations**: ~1-5µs per operation (depends on string length)
 
