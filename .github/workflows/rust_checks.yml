@@ -177,10 +177,48 @@ jobs:
       with:
         tool: wasm-pack
 
-    - name: Build precis-wasm
-      working-directory: precis-wasm
-      run: wasm-pack build --target web --out-dir pkg
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
 
-    - name: Test precis-wasm (headless Chrome)
+    - name: Run wasm unit tests (headless Chrome)
       working-directory: precis-wasm
       run: wasm-pack test --headless --chrome
+
+    - name: Build the publishable package
+      working-directory: precis-wasm
+      run: npm run build
+
+    - name: Smoke-test the published package (Node CJS + ESM)
+      working-directory: precis-wasm
+      run: |
+        set -euo pipefail
+        # Pack the built package and install it into a throwaway consumer,
+        # exercising the conditional `exports` map the way a real dependant would.
+        TGZ="$(pwd)/$(npm pack ./pkg | tail -1)"
+        consumer="$(mktemp -d)"
+        cd "$consumer"
+        npm init -y >/dev/null
+        npm install "$TGZ" >/dev/null
+
+        echo "-> CommonJS require()"
+        node -e '
+          const p = require("precis-wasm");
+          const assert = require("assert");
+          assert.strictEqual(p.nickname_enforce("  Alice  "), "Alice");
+          assert.strictEqual(p.usernamecasemapped_enforce("Alice"), "alice");
+          assert.strictEqual(p.usernamecasepreserved_enforce("Alice"), "Alice");
+          assert.throws(() => p.opaquestring_enforce(""));
+          console.log("CJS ok");
+        '
+
+        echo "-> ESM import + await init()"
+        node --input-type=module -e '
+          import { init, nickname_enforce, nickname_compare } from "precis-wasm";
+          import assert from "node:assert";
+          await init();
+          assert.strictEqual(nickname_enforce("  Bob  "), "Bob");
+          assert.strictEqual(nickname_compare("Alice", "alice"), true);
+          console.log("ESM ok");
+        '
