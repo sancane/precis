@@ -186,6 +186,10 @@ jobs:
       working-directory: precis-wasm
       run: wasm-pack test --headless --chrome
 
+    - name: Run wasm unit tests (headless Firefox)
+      working-directory: precis-wasm
+      run: wasm-pack test --headless --firefox
+
     - name: Build the publishable package
       working-directory: precis-wasm
       run: npm run build
