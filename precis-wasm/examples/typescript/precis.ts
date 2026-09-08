@@ -5,7 +5,7 @@
  */
 
 // Dynamic import to handle CommonJS/ESM interop with pkg-node
-const precis = await import('../../pkg-node/precis.js');
+const precis = await import('../../pkg/precis-node.js');
 
 const {
     nickname_enforce,

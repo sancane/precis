@@ -26,13 +26,13 @@ This library provides JavaScript-friendly bindings for validating and normalizin
 ### NPM
 
 ```bash
-npm install @precis/wasm
+npm install precis-wasm
 ```
 
 ### Yarn
 
 ```bash
-yarn add @precis/wasm
+yarn add precis-wasm
 ```
 
 ## Usage
@@ -75,7 +75,7 @@ yarn add @precis/wasm
 
 ```javascript
 // Recommended: Use the high-level wrapper API
-import { nickname_enforce, nickname_compare, nickname_prepare } from '@precis/wasm';
+import { nickname_enforce, nickname_compare, nickname_prepare } from 'precis-wasm';
 
 // Enforce nickname
 try {
@@ -94,7 +94,7 @@ console.log('Match:', match); // true
 
 ```javascript
 // For CommonJS, require the wrapper
-const { nickname_enforce, nickname_compare } = require('@precis/wasm');
+const { nickname_enforce, nickname_compare } = require('precis-wasm');
 
 const normalized = nickname_enforce("  Alice  ");
 console.log(normalized); // "Alice" (case preserved)
@@ -104,7 +104,7 @@ console.log(normalized); // "Alice" (case preserved)
 
 ```typescript
 // Recommended: Use the high-level wrapper with proper types
-import { nickname_enforce, nickname_compare, nickname_prepare } from '@precis/wasm';
+import { nickname_enforce, nickname_compare, nickname_prepare } from 'precis-wasm';
 
 // Type-safe API - string → string (no 'any' types!)
 const normalized: string = nickname_enforce("Alice");
@@ -119,7 +119,7 @@ const prepared: string = nickname_prepare("Bob");
 #### Nicknames (RFC 8266)
 
 ```typescript
-import { nickname_enforce, nickname_compare } from '@precis/wasm';
+import { nickname_enforce, nickname_compare } from 'precis-wasm';
 
 // Trims/collapses spaces, case-preserving enforcement
 const nick = nickname_enforce("  Alice  ");
@@ -132,7 +132,7 @@ console.log(nickname_compare("Alice", "alice")); // true
 #### Usernames - Case Mapped (RFC 8265)
 
 ```typescript
-import { usernamecasemapped_enforce, usernamecasemapped_compare } from '@precis/wasm';
+import { usernamecasemapped_enforce, usernamecasemapped_compare } from 'precis-wasm';
 
 // Case-insensitive username
 const username = usernamecasemapped_enforce("Alice");
@@ -145,7 +145,7 @@ console.log(usernamecasemapped_compare("Alice", "alice")); // true
 #### Usernames - Case Preserved (RFC 8265)
 
 ```typescript
-import { usernamecasepreserved_enforce, usernamecasepreserved_compare } from '@precis/wasm';
+import { usernamecasepreserved_enforce, usernamecasepreserved_compare } from 'precis-wasm';
 
 // Case-sensitive username
 const username = usernamecasepreserved_enforce("Alice");
@@ -158,7 +158,7 @@ console.log(usernamecasepreserved_compare("Alice", "alice")); // false
 #### Passwords / OpaqueString (RFC 8265)
 
 ```typescript
-import { opaquestring_enforce, opaquestring_compare } from '@precis/wasm';
+import { opaquestring_enforce, opaquestring_compare } from 'precis-wasm';
 
 // Case-sensitive, preserves special characters
 const password = opaquestring_enforce("MyP@ssw0rd!");
@@ -171,12 +171,14 @@ console.log(opaquestring_compare("MyP@ssw0rd!", "myp@ssw0rd!")); // false
 
 ### Low-level API (Advanced)
 
-For performance-critical scenarios where you need manual WASM initialization control:
+For performance-critical scenarios where you need manual WASM initialization
+control, you can import the raw `wasm-pack` glue directly. Use `precis_web.js`
+for browsers/bundlers and `precis_node.js` for Node.js:
 
 ```typescript
-import init, { nickname_enforce, nickname_compare } from '@precis/wasm/precis_wasm.js';
+import init, { nickname_enforce, nickname_compare } from 'precis-wasm/precis_web.js';
 
-// Must call init() before using WASM functions
+// Must call init() before using WASM functions (browser glue only)
 await init();
 
 // Direct WASM bindings - faster but requires manual initialization
@@ -266,23 +268,25 @@ npm install
 npm run build
 
 # This script:
-# 1. Compiles Rust → WASM for web target (pkg/)
-# 2. Compiles Rust → WASM for Node.js target (pkg-node/)
-# 3. Compiles TypeScript wrapper (src/precis.ts → precis.js)
-# 4. Updates package.json entry points to use the wrapper
+# 1. Compiles Rust → WASM for the web target   (precis_web.js glue)
+# 2. Compiles Rust → WASM for the Node.js target (precis_node.js glue)
+# 3. Merges both into a single package in pkg/
+# 4. Compiles the TypeScript wrappers (src/precis.ts → precis.js,
+#    src/precis-node.ts → precis-node.js)
+# 5. Copies the committed package.json (with conditional `exports`) into pkg/
 ```
 
 **Manual builds** (if you need specific targets):
 
 ```bash
 # Build only raw WASM for web
-npm run build:raw
+wasm-pack build --target web --out-dir pkg --out-name precis_web
 
 # Build only raw WASM for Node.js
-npm run build:nodejs
+wasm-pack build --target nodejs --out-dir pkg-node --out-name precis_node
 
 # Build for bundlers (webpack, rollup, etc.)
-npm run build:bundler
+wasm-pack build --target bundler --out-dir pkg-bundler
 ```
 
 ### Test
@@ -347,4 +351,4 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
 
 - [GitHub Repository](https://github.com/sancane/precis)
 - [Documentation](https://docs.rs/precis-wasm)
-- [NPM Package](https://www.npmjs.com/package/@precis/wasm)
+- [NPM Package](https://www.npmjs.com/package/precis-wasm)

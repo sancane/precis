@@ -1,55 +1,51 @@
 #!/bin/bash
-# Build script for precis-wasm with TypeScript wrapper
+# Build script for precis-wasm.
+#
+# Produces a single publishable package in ./pkg that works in browsers,
+# bundlers and Node.js via conditional `exports`:
+#   - browser/bundler  -> precis.js   (ESM wrapper over the --target web glue)
+#   - Node.js          -> precis-node.js (CJS wrapper over the --target nodejs glue)
+#
+# The published package.json is the committed one (copied verbatim), so there is
+# no fragile post-processing of wasm-pack's generated manifest.
 
-set -e
+set -euo pipefail
 
-echo "🔨 Building WASM for web target..."
-wasm-pack build --target web --out-dir pkg
+OUT=pkg
 
-echo "🔨 Building WASM for Node.js target..."
-wasm-pack build --target nodejs --out-dir pkg-node
+echo "🧹 Cleaning previous build..."
+rm -rf "$OUT" pkg-node
 
-echo "📝 Compiling TypeScript wrapper..."
-npx tsc
+echo "🔨 Building WASM (web target)..."
+wasm-pack build --target web --out-dir "$OUT" --out-name precis_web
 
-echo "📋 Copying wrapper to pkg-node..."
-cp pkg/precis.js pkg-node/
-cp pkg/precis.d.ts pkg-node/
+echo "🔨 Building WASM (Node.js target)..."
+wasm-pack build --target nodejs --out-dir pkg-node --out-name precis_node
 
-echo "🔧 Updating package.json entry points..."
-# Update pkg/package.json (web target)
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS
-    sed -i '' 's/"main": "precis_wasm.js"/"main": "precis.js"/' pkg/package.json
-    sed -i '' 's/"types": "precis_wasm.d.ts"/"types": "precis.d.ts"/' pkg/package.json
-    sed -i '' 's/"precis_wasm_bg.wasm",/"precis_wasm_bg.wasm",\n    "precis.js",\n    "precis.d.ts",/' pkg/package.json
+echo "📋 Merging Node.js target artifacts into $OUT..."
+cp pkg-node/precis_node.js \
+   pkg-node/precis_node.d.ts \
+   pkg-node/precis_node_bg.wasm \
+   pkg-node/precis_node_bg.wasm.d.ts \
+   "$OUT"/
+rm -rf pkg-node
 
-    # Update pkg-node/package.json (nodejs target)
-    sed -i '' 's/"main": "precis_wasm.js"/"main": "precis.js"/' pkg-node/package.json
-    sed -i '' 's/"types": "precis_wasm.d.ts"/"types": "precis.d.ts"/' pkg-node/package.json
-    sed -i '' 's/"precis_wasm_bg.wasm",/"precis_wasm_bg.wasm",\n    "precis.js",\n    "precis.d.ts",/' pkg-node/package.json
-else
-    # Linux
-    sed -i 's/"main": "precis_wasm.js"/"main": "precis.js"/' pkg/package.json
-    sed -i 's/"types": "precis_wasm.d.ts"/"types": "precis.d.ts"/' pkg/package.json
-    sed -i 's/"precis_wasm_bg.wasm",/"precis_wasm_bg.wasm",\n    "precis.js",\n    "precis.d.ts",/' pkg/package.json
-
-    # Update pkg-node/package.json (nodejs target)
-    sed -i 's/"main": "precis_wasm.js"/"main": "precis.js"/' pkg-node/package.json
-    sed -i 's/"types": "precis_wasm.d.ts"/"types": "precis.d.ts"/' pkg-node/package.json
-    sed -i 's/"precis_wasm_bg.wasm",/"precis_wasm_bg.wasm",\n    "precis.js",\n    "precis.d.ts",/' pkg-node/package.json
+echo "📦 Installing TypeScript (if needed)..."
+if ! [ -x "node_modules/.bin/tsc" ]; then
+    npm install --silent
 fi
+
+echo "📝 Compiling TypeScript wrappers..."
+npx tsc -p tsconfig.web.json    # -> pkg/precis.js       (ESM, with async init)
+npx tsc -p tsconfig.node.json   # -> pkg/precis-node.js  (CJS, auto-initialized)
+
+echo "🔧 Writing published package manifest..."
+cp package.json "$OUT"/package.json
+[ -f README.md ] && cp README.md "$OUT"/README.md
 
 echo "✅ Build complete!"
 echo ""
-echo "📦 Web target (pkg/):"
-echo "  - JavaScript: pkg/precis.js (wrapper with correct types)"
-echo "  - TypeScript: pkg/precis.d.ts (string → string)"
-echo ""
-echo "📦 Node.js target (pkg-node/):"
-echo "  - JavaScript: pkg-node/precis.js (wrapper with correct types)"
-echo "  - TypeScript: pkg-node/precis.d.ts (string → string)"
-echo ""
-echo "Low-level WASM bindings (advanced use):"
-echo "  - pkg/precis_wasm.js & pkg-node/precis_wasm.js"
-echo "  - Binary: pkg/precis_wasm_bg.wasm"
+echo "📦 Publishable package in ./$OUT (run: npm publish ./$OUT)"
+echo "  - Browser/bundler entry : precis.js  (import { init, ... }; await init())"
+echo "  - Node.js entry         : precis-node.js  (auto-initialized)"
+echo "  - Types                 : precis.d.ts"

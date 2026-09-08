@@ -5,8 +5,8 @@
  * It wraps the auto-generated `WASM` bindings with proper type signatures.
  */
 
-// @ts-ignore - precis_wasm.js is generated at build time
-import * as wasm from './precis_wasm.js';
+// @ts-ignore - precis_web.js is the `wasm-pack --target web` glue, generated at build time
+import * as wasm from './precis_web.js';
 
 /**
  * Prepare `Nickname` string.
@@ -42,7 +42,7 @@ export function nickname_prepare(input: string): string {
  *
  * @example
  * ```typescript
- * import { nickname_enforce } from '@precis/wasm';
+ * import { nickname_enforce } from 'precis-wasm';
  *
  * const nick = nickname_enforce("  Alice  ");
  * console.log(nick); // "Alice"
@@ -307,11 +307,11 @@ export function version(): string {
  * @example
  * ```typescript
  * // Browser usage
- * import { init, nickname_enforce } from '@precis/wasm';
+ * import { init, nickname_enforce } from 'precis-wasm';
  *
  * await init();
  * const result = nickname_enforce("Alice");
  * ```
  */
-// @ts-ignore - precis_wasm.js is generated at build time
-export { default as init } from './precis_wasm.js';
+// @ts-ignore - precis_web.js is generated at build time; its default export is the async loader
+export { default as init } from './precis_web.js';

@@ -1,22 +1,38 @@
 {
-  "name": "@precis/wasm",
+  "name": "precis-wasm",
   "version": "0.1.0",
   "description": "WebAssembly bindings for PRECIS Framework profiles (RFC 8264, 8265, 8266)",
-  "main": "precis.js",
-  "types": "precis.d.ts",
+  "main": "./precis-node.js",
+  "browser": "./precis.js",
+  "module": "./precis.js",
+  "types": "./precis.d.ts",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./precis.d.ts",
+      "node": "./precis-node.js",
+      "browser": "./precis.js",
+      "default": "./precis.js"
+    },
+    "./precis_web.js": "./precis_web.js",
+    "./precis_node.js": "./precis_node.js"
+  },
   "files": [
     "precis.js",
     "precis.d.ts",
-    "precis_wasm_bg.wasm",
-    "precis_wasm.js",
-    "precis_wasm.d.ts"
+    "precis-node.js",
+    "precis-node.d.ts",
+    "precis_web.js",
+    "precis_web.d.ts",
+    "precis_web_bg.wasm",
+    "precis_web_bg.wasm.d.ts",
+    "precis_node.js",
+    "precis_node.d.ts",
+    "precis_node_bg.wasm",
+    "precis_node_bg.wasm.d.ts"
   ],
   "scripts": {
     "build": "./build.sh",
-    "build:raw": "wasm-pack build --target web --out-dir pkg",
-    "build:nodejs": "wasm-pack build --target nodejs --out-dir pkg-node",
-    "build:bundler": "wasm-pack build --target bundler --out-dir pkg-bundler",
     "test": "wasm-pack test --headless --chrome"
   },
   "repository": {

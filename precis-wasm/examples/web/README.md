@@ -105,8 +105,8 @@ The demo imports from:
 ../../pkg/
 ├── precis.js          # TypeScript wrapper (recommended)
 ├── precis.d.ts        # TypeScript definitions
-├── precis_wasm.js     # Low-level WASM bindings
-├── precis_wasm_bg.wasm # Compiled WebAssembly binary
+├── precis_web.js     # Low-level WASM bindings
+├── precis_web_bg.wasm # Compiled WebAssembly binary
 └── package.json       # Package metadata
 ```
 
@@ -126,7 +126,7 @@ import { init, nickname_enforce, nickname_compare } from '../../pkg/precis.js';
 
 ### Layer 2: Low-Level WASM Bindings (Advanced)
 ```javascript
-import init, { nickname_enforce, nickname_compare } from '../../pkg/precis_wasm.js';
+import init, { nickname_enforce, nickname_compare } from '../../pkg/precis_web.js';
 ```
 
 - ⚠️ Types are `any` (wasm-bindgen limitation)
@@ -156,7 +156,7 @@ Once published, use a CDN:
 ```html
 <script type="module">
   import { init, nickname_enforce }
-    from 'https://unpkg.com/@precis/wasm@0.1.0/precis.js';
+    from 'https://unpkg.com/precis-wasm@0.1.0/precis.js';
 
   await init();
   const result = nickname_enforce("Alice");

@@ -1,6 +1,6 @@
 # TypeScript Example
 
-This example demonstrates how to use `@precis/wasm` in a TypeScript project with full type safety.
+This example demonstrates how to use `precis-wasm` in a TypeScript project with full type safety.
 
 ## Features Demonstrated
 
@@ -104,13 +104,13 @@ Compiled files (`precis.js`, `precis.d.ts`, `*.map`) are ignored by git.
 To use precis-wasm in your TypeScript project:
 
 ```bash
-npm install @precis/wasm
+npm install precis-wasm
 ```
 
 Then import and use (after publishing to npm):
 
 ```typescript
-import { nickname_enforce, nickname_compare } from '@precis/wasm';
+import { nickname_enforce, nickname_compare } from 'precis-wasm';
 
 // Full type safety - TypeScript knows these are string → string
 const normalized: string = nickname_enforce("  Alice  ");
