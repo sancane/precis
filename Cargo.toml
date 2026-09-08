@@ -9,7 +9,7 @@ exclude = ["precis-core/fuzz", "precis-profiles/fuzz"]
 # corresponding crate's `[package] version` when bumping.
 [workspace.dependencies]
 precis-core = { path = "precis-core", version = "0.1.11" }
-precis-profiles = { path = "precis-profiles", version = "0.1.12" }
+precis-profiles = { path = "precis-profiles", version = "0.1.13" }
 precis-tools = { path = "precis-tools", version = "0.1.9" }
 regex = "1"
 reqwest = { version = "0.13", features = ["blocking"] }
