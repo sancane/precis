@@ -29,11 +29,16 @@
     "precis_node.js",
     "precis_node.d.ts",
     "precis_node_bg.wasm",
-    "precis_node_bg.wasm.d.ts"
+    "precis_node_bg.wasm.d.ts",
+    "LICENSE"
   ],
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "build": "./build.sh",
-    "test": "wasm-pack test --headless --chrome"
+    "test": "wasm-pack test --headless --chrome",
+    "release": "npm run build && npm publish ./pkg"
   },
   "repository": {
     "type": "git",

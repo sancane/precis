@@ -40,8 +40,23 @@ npx tsc -p tsconfig.web.json    # -> pkg/precis.js       (ESM, with async init)
 npx tsc -p tsconfig.node.json   # -> pkg/precis-node.js  (CJS, auto-initialized)
 
 echo "🔧 Writing published package manifest..."
-cp package.json "$OUT"/package.json
+# Publish a clean manifest: strip the dev-only `scripts` and `devDependencies`
+# (they have no meaning for consumers and would make `npm publish ./pkg` try to
+# run a `prepublishOnly` whose build script is not shipped).
+node -e '
+  const p = require("./package.json");
+  delete p.scripts;
+  delete p.devDependencies;
+  require("fs").writeFileSync("'"$OUT"'/package.json", JSON.stringify(p, null, 2) + "\n");
+'
 [ -f README.md ] && cp README.md "$OUT"/README.md
+# Ship the license text inside the package (the crate itself has none, so
+# fall back to the workspace-root LICENSE).
+if [ -f LICENSE ]; then
+    cp LICENSE "$OUT"/LICENSE
+elif [ -f ../LICENSE ]; then
+    cp ../LICENSE "$OUT"/LICENSE
+fi
 
 echo "✅ Build complete!"
 echo ""
