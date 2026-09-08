@@ -1,0 +1,80 @@
+name: Release-plz
+
+# Releases for the workspace crates with release-plz (https://release-plz.dev).
+#
+# The standard release-plz flow. On every push to `main`:
+#
+#   - `release-pr` opens/updates a single "release" pull request that bumps the
+#     versions (both each crate's `[package] version` and the matching entry in
+#     the root `[workspace.dependencies]`) and updates the CHANGELOGs from the
+#     commits since the last release. While that PR is open, nothing is
+#     published — it is a live preview of the next release.
+#   - `release` publishes to crates.io (in dependency order) and creates the git
+#     tags / GitHub releases for any crate whose version on `main` is ahead of
+#     crates.io. In practice that happens right after you MERGE the release PR:
+#     merging it lands the version bumps on `main`, which triggers publishing.
+#
+# So the single human action that releases is merging the bot's release PR.
+# Merging ordinary code PRs never publishes — it only updates the release PR.
+#
+# Requirements:
+#   - `CARGO_REGISTRY_TOKEN` secret (crates.io API token) — already configured.
+#   - Settings -> Actions -> General -> Workflow permissions:
+#       "Allow GitHub Actions to create and approve pull requests" must be ON
+#       (for the release-pr job to open its PR).
+#   - Optional but recommended: a Personal Access Token or GitHub App token in
+#     a `RELEASE_PLZ_TOKEN` secret. Without it the release PR is created with
+#     the default GITHUB_TOKEN, and GitHub will NOT run the other CI workflows
+#     on that PR. The workflow uses RELEASE_PLZ_TOKEN automatically if present.
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # Publishes crates whose version on main is ahead of crates.io (i.e. right
+  # after the release PR is merged).
+  release-plz-release:
+    name: Release-plz release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run release-plz release
+        uses: release-plz/action@v0.5
+        with:
+          command: release
+          github_token: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+  # Opens/updates the release PR with version bumps + changelogs. Never publishes.
+  release-plz-pr:
+    name: Release-plz PR
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release-plz-pr
+      cancel-in-progress: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run release-plz release-pr
+        uses: release-plz/action@v0.5
+        with:
+          command: release-pr
+          github_token: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
