@@ -10,7 +10,7 @@ jobs:
       options:                  --security-opt seccomp=unconfined
     steps:
       - name:                   Checkout repository
-        uses:                   actions/checkout@v4
+        uses:                   actions/checkout@v5
       - name:                   Generate code coverage
         run: |
           cargo +nightly tarpaulin --verbose --workspace --line --timeout 120 --exclude-files "*precis-tools*" "*/tests/*" "*/benches/*" --out xml

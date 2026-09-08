@@ -9,7 +9,7 @@ jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Updating latest unicode version in precis-profiles
         run: |
           file=precis-profiles/build.rs
