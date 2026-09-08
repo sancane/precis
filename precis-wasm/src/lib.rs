@@ -12,9 +12,9 @@
 //! ```js
 //! import { nickname_enforce, usernamecasemapped_enforce } from './precis.js';
 //!
-//! // Enforce nickname
+//! // Enforce nickname (trims spaces, preserves case)
 //! const nick = nickname_enforce("  Alice  ");
-//! console.log(nick); // "alice"
+//! console.log(nick); // "Alice"
 //!
 //! // Enforce username (case-insensitive)
 //! const username = usernamecasemapped_enforce("Alice");
@@ -480,5 +480,117 @@ mod tests {
         let ver = version();
         assert!(!ver.is_empty());
         assert!(ver.contains('.'));
+    }
+
+    // ------------------------------------------------------------------
+    // OpaqueString (passwords): case preserved, no trimming
+    // ------------------------------------------------------------------
+
+    #[wasm_bindgen_test]
+    fn test_opaquestring_enforce_preserves_case_and_spaces() {
+        assert_eq!(
+            opaquestring_enforce(JsValue::from_str("MyP@ssw0rd!"))
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "MyP@ssw0rd!"
+        );
+        // Interior spaces are kept (not collapsed) for opaque strings.
+        assert_eq!(
+            opaquestring_enforce(JsValue::from_str("a b  c"))
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "a b  c"
+        );
+    }
+
+    #[wasm_bindgen_test]
+    fn test_opaquestring_compare() {
+        assert!(opaquestring_compare(
+            JsValue::from_str("password"),
+            JsValue::from_str("password")
+        )
+        .unwrap());
+        // Case matters for opaque strings.
+        assert!(!opaquestring_compare(
+            JsValue::from_str("Password"),
+            JsValue::from_str("password")
+        )
+        .unwrap());
+    }
+
+    // ------------------------------------------------------------------
+    // UsernameCaseMapped: lower-cased, case-insensitive
+    // ------------------------------------------------------------------
+
+    #[wasm_bindgen_test]
+    fn test_usernamecasemapped_enforce_lowercases() {
+        assert_eq!(
+            usernamecasemapped_enforce(JsValue::from_str("Alice"))
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "alice"
+        );
+    }
+
+    #[wasm_bindgen_test]
+    fn test_usernamecasemapped_compare_is_case_insensitive() {
+        assert!(usernamecasemapped_compare(
+            JsValue::from_str("Alice"),
+            JsValue::from_str("alice")
+        )
+        .unwrap());
+    }
+
+    // ------------------------------------------------------------------
+    // UsernameCasePreserved: case kept, case-sensitive
+    // ------------------------------------------------------------------
+
+    #[wasm_bindgen_test]
+    fn test_usernamecasepreserved_enforce_preserves_case() {
+        assert_eq!(
+            usernamecasepreserved_enforce(JsValue::from_str("Alice"))
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "Alice"
+        );
+    }
+
+    #[wasm_bindgen_test]
+    fn test_usernamecasepreserved_compare_is_case_sensitive() {
+        assert!(!usernamecasepreserved_compare(
+            JsValue::from_str("Alice"),
+            JsValue::from_str("alice")
+        )
+        .unwrap());
+    }
+
+    // ------------------------------------------------------------------
+    // Error paths
+    // ------------------------------------------------------------------
+
+    #[wasm_bindgen_test]
+    fn test_enforce_rejects_empty_string() {
+        // The empty string is not a valid username or opaque string.
+        assert!(usernamecasemapped_enforce(JsValue::from_str("")).is_err());
+        assert!(usernamecasepreserved_enforce(JsValue::from_str("")).is_err());
+        assert!(opaquestring_enforce(JsValue::from_str("")).is_err());
+    }
+
+    #[wasm_bindgen_test]
+    fn test_username_rejects_space() {
+        // Usernames (IdentifierClass) disallow spaces.
+        assert!(usernamecasemapped_enforce(JsValue::from_str("a b")).is_err());
+    }
+
+    #[wasm_bindgen_test]
+    fn test_non_string_input_is_rejected() {
+        assert!(nickname_enforce(JsValue::from_f64(42.0)).is_err());
+        assert!(nickname_prepare(JsValue::NULL).is_err());
+        assert!(opaquestring_enforce(JsValue::UNDEFINED).is_err());
+        assert!(nickname_compare(JsValue::from_str("Alice"), JsValue::from_f64(1.0)).is_err());
     }
 }

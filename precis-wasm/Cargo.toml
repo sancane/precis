@@ -17,7 +17,10 @@ rust-version = "1.85"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["console_error_panic_hook"]
+# `console_error_panic_hook` is opt-in: it improves panic messages in the
+# browser console during development but adds to the release `.wasm` size.
+# Enable it with `--features console_error_panic_hook` for debug builds.
+default = []
 
 [dependencies]
 console_error_panic_hook = { version = "0.1", optional = true }

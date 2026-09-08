@@ -4,6 +4,7 @@
   "description": "WebAssembly bindings for PRECIS Framework profiles (RFC 8264, 8265, 8266)",
   "main": "precis.js",
   "types": "precis.d.ts",
+  "sideEffects": false,
   "files": [
     "precis.js",
     "precis.d.ts",
