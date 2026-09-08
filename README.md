@@ -97,7 +97,8 @@ assert_eq!(Nickname::compare("Guybrush   Threepwood  ",
 [![npm downloads](https://img.shields.io/npm/dm/precis-wasm)](https://www.npmjs.com/package/precis-wasm)
 
 WebAssembly bindings for the PRECIS Framework. Provides JavaScript/TypeScript-friendly
-bindings for all PRECIS profiles with zero-copy performance.
+bindings for all PRECIS profiles. When the input already conforms, `enforce`
+and `prepare` return it unchanged without allocating a new string.
 
 **[🌐 Live Demo](https://sancane.github.io/precis/)** | **[📦 npm Package](https://www.npmjs.com/package/precis-wasm)**
 

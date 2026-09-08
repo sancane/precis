@@ -16,7 +16,7 @@ This library provides JavaScript-friendly bindings for validating and normalizin
 - ✅ **Multiple PRECIS Profiles**: Nickname, Username (mapped/preserved), and OpaqueString
 - ✅ **RFC Compliant**: Full implementation of RFC 8264, 8265, and 8266
 - ✅ **Unicode Normalization**: NFC normalization with proper case mapping
-- ✅ **Dual API**: High-level ergonomic wrapper + low-level zero-copy WASM bindings
+- ✅ **Dual API**: High-level ergonomic wrapper + low-level raw WASM bindings
 - ✅ **TypeScript Support**: Full type safety with `string → string` signatures
 - ✅ **Easy Integration**: Simple `await init()` in browsers, automatic in Node.js
 - ✅ **Small Bundle**: ~250 KB uncompressed (~60-80 KB gzipped)
@@ -200,8 +200,8 @@ pub fn nickname_enforce(input: &str) -> Result<String, JsValue>
 ```
 
 **Characteristics:**
-- **Zero-copy semantics** - Direct Rust ↔ JavaScript string passing
-- **Maximum performance** - No intermediate wrapper overhead
+- **Direct bindings** - No wrapper layer between JavaScript and the WASM glue
+- **Slightly lower overhead** - Skips the thin wrapper function call
 - **Manual initialization** - Requires `await init()` before use
 - **TypeScript types are `any`** - wasm-bindgen doesn't preserve string types through `Result<T, E>`
 - **Naming convention** - Rust snake_case: `nickname_enforce`, `nickname_compare`
@@ -226,7 +226,7 @@ export function nickname_enforce(input: string): string {
 ### Design Philosophy
 
 **Why preserve the raw WASM API?**
-- Zero-copy performance for advanced users who need it
+- Lets advanced users skip the wrapper layer entirely
 - Allows manual control over WASM initialization timing
 - Maintains compatibility with wasm-bindgen conventions
 - Some edge cases may benefit from direct access

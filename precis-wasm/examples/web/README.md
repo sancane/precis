@@ -78,7 +78,7 @@ console.log(normalized); // "Alice"
 1. **`init()` is required**: In browsers, you must call `await init()` before using any functions
 2. **ES Modules**: Uses `<script type="module">` for native ES module support
 3. **High-level API**: Uses the TypeScript wrapper for better ergonomics and correct types
-4. **Zero-copy**: The WASM bindings use zero-copy string passing for performance
+4. **No wasteful allocation**: When the input already conforms, `enforce`/`prepare` return it unchanged without allocating a new string
 
 ## Features Demonstrated
 
@@ -134,7 +134,7 @@ import init, { nickname_enforce, nickname_compare } from '../../pkg/precis_web.j
 
 - ⚠️ Types are `any` (wasm-bindgen limitation)
 - ⚠️ Requires manual `await init()`
-- ✅ Zero-copy performance
+- ✅ No wrapper overhead
 - ✅ Direct WASM access
 
 ## Example Usage in Your Project

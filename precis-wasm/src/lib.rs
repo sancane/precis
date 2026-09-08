@@ -45,7 +45,7 @@ where
     if let Some(s) = input.as_string() {
         let result = operation(&s).map_err(|e| JsError::new(&format!("{}", e)))?;
         match result {
-            Cow::Borrowed(_) => Ok(input), // Zero-copy when unchanged
+            Cow::Borrowed(_) => Ok(input), // Reuse the input JsValue; no new allocation when unchanged
             Cow::Owned(new_str) => Ok(JsValue::from_str(&new_str)),
         }
     } else {
