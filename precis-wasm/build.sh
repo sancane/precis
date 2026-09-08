@@ -48,12 +48,18 @@ echo "🔧 Writing published package manifest..."
 # (they have no meaning for consumers and would make `npm publish ./pkg` try to
 # run a `prepublishOnly` whose build script is not shipped).
 node -e '
+  const fs = require("fs");
   const p = require("./package.json");
+  // Keep the published version in lock-step with the crate: Cargo.toml is the
+  // single source of truth, so the npm version can never silently drift.
+  const m = fs.readFileSync("Cargo.toml", "utf8").match(/^version\s*=\s*"([^"]+)"/m);
+  if (m) p.version = m[1];
   delete p.scripts;
   delete p.devDependencies;
-  require("fs").writeFileSync("'"$OUT"'/package.json", JSON.stringify(p, null, 2) + "\n");
+  fs.writeFileSync("'"$OUT"'/package.json", JSON.stringify(p, null, 2) + "\n");
 '
 [ -f README.md ] && cp README.md "$OUT"/README.md
+[ -f CHANGELOG.md ] && cp CHANGELOG.md "$OUT"/CHANGELOG.md
 # Ship the license text inside the package (the crate itself has none, so
 # fall back to the workspace-root LICENSE).
 if [ -f LICENSE ]; then

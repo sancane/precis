@@ -190,6 +190,12 @@ jobs:
       working-directory: precis-wasm
       run: npm run build
 
+    - name: Type-check the TypeScript example against the built types
+      working-directory: precis-wasm/examples/typescript
+      run: |
+        npm install
+        npx tsc --noEmit
+
     - name: Smoke-test the published package (Node CJS + ESM)
       working-directory: precis-wasm
       run: |

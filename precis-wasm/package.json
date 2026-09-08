@@ -38,7 +38,8 @@
     "precis_node.d.ts",
     "precis_node_bg.wasm",
     "precis_node_bg.wasm.d.ts",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=16"
