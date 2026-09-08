@@ -177,7 +177,7 @@ pub fn nickname_compare(a: JsValue, b: JsValue) -> Result<bool, JsError> {
 /// * `Err(string)` - Error message if preparation fails
 ///
 /// # Specification
-/// [RFC 8265, Section 4.2.1: OpaqueString Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-4.2.1)
+/// [RFC 8265, Section 4.2.1: `OpaqueString` Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-4.2.1)
 #[wasm_bindgen]
 pub fn opaquestring_prepare(input: JsValue) -> Result<JsValue, JsError> {
     apply_string_operation(input, |s| OpaqueString::prepare(s))
@@ -242,11 +242,11 @@ pub fn opaquestring_compare(a: JsValue, b: JsValue) -> Result<bool, JsError> {
 /// * `input` - String to prepare
 ///
 /// # Returns
-/// * `Ok(string)` - Prepared username
+/// * `Ok(string)` - Prepared `username`
 /// * `Err(string)` - Error message if preparation fails
 ///
 /// # Specification
-/// [RFC 8265, Section 3.3.2: UsernameCaseMapped Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3.2)
+/// [RFC 8265, Section 3.3.2: `UsernameCaseMapped` Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.3.2)
 #[wasm_bindgen]
 pub fn usernamecasemapped_prepare(input: JsValue) -> Result<JsValue, JsError> {
     apply_string_operation(input, |s| UsernameCaseMapped::prepare(s))
@@ -255,19 +255,19 @@ pub fn usernamecasemapped_prepare(input: JsValue) -> Result<JsValue, JsError> {
 /// Enforce `UsernameCaseMapped` profile on input string.
 ///
 /// Applies all rules specified for the `UsernameCaseMapped` profile. This profile
-/// applies case mapping (lower-casing) to usernames for case-insensitive comparison.
+/// applies case mapping (lower-casing) to `usernames` for case-insensitive comparison.
 ///
 /// # Arguments
 /// * `input` - String to validate and normalize
 ///
 /// # Returns
-/// * `Ok(string)` - Normalized username (lowercase)
+/// * `Ok(string)` - Normalized `username` (lowercase)
 /// * `Err(string)` - Error message describing validation failure
 ///
 /// # Example (JavaScript)
 /// ```js
-/// const username = usernamecasemapped_enforce("Alice");
-/// console.log(username); // "alice"
+/// const `username` = usernamecasemapped_enforce("Alice");
+/// console.log(`username`); // "alice"
 /// ```
 ///
 /// # Specification
@@ -277,18 +277,18 @@ pub fn usernamecasemapped_enforce(input: JsValue) -> Result<JsValue, JsError> {
     apply_string_operation(input, |s| UsernameCaseMapped::enforce(s))
 }
 
-/// Compare two usernames for equality (case-insensitive).
+/// Compare two `usernames` for equality (case-insensitive).
 ///
 /// Applies all rules specified for the `UsernameCaseMapped` profile to two separate
 /// input strings and compares them.
 ///
 /// # Arguments
-/// * `a` - First username
-/// * `b` - Second username
+/// * `a` - First `username`
+/// * `b` - Second `username`
 ///
 /// # Returns
-/// * `Ok(true)` - Usernames are equivalent
-/// * `Ok(false)` - Usernames are different
+/// * `Ok(true)` - `Usernames` are equivalent
+/// * `Ok(false)` - `Usernames` are different
 /// * `Err(string)` - Validation error
 ///
 /// # Specification
@@ -311,11 +311,11 @@ pub fn usernamecasemapped_compare(a: JsValue, b: JsValue) -> Result<bool, JsErro
 /// * `input` - String to prepare
 ///
 /// # Returns
-/// * `Ok(string)` - Prepared username
+/// * `Ok(string)` - Prepared `username`
 /// * `Err(string)` - Error message if preparation fails
 ///
 /// # Specification
-/// [RFC 8265, Section 3.4.2: UsernameCasePreserved Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4.2)
+/// [RFC 8265, Section 3.4.2: `UsernameCasePreserved` Profile](https://datatracker.ietf.org/doc/html/rfc8265#section-3.4.2)
 #[wasm_bindgen]
 pub fn usernamecasepreserved_prepare(input: JsValue) -> Result<JsValue, JsError> {
     apply_string_operation(input, |s| UsernameCasePreserved::prepare(s))
@@ -324,19 +324,19 @@ pub fn usernamecasepreserved_prepare(input: JsValue) -> Result<JsValue, JsError>
 /// Enforce `UsernameCasePreserved` profile on input string.
 ///
 /// Applies all rules specified for the `UsernameCasePreserved` profile. This profile
-/// preserves case in usernames for case-sensitive comparison.
+/// preserves case in `usernames` for case-sensitive comparison.
 ///
 /// # Arguments
 /// * `input` - String to validate and normalize
 ///
 /// # Returns
-/// * `Ok(string)` - Normalized username (case preserved)
+/// * `Ok(string)` - Normalized `username` (case preserved)
 /// * `Err(string)` - Error message describing validation failure
 ///
 /// # Example (JavaScript)
 /// ```js
-/// const username = usernamecasepreserved_enforce("Alice");
-/// console.log(username); // "Alice"
+/// const `username` = usernamecasepreserved_enforce("Alice");
+/// console.log(`username`); // "Alice"
 /// ```
 ///
 /// # Specification
@@ -346,18 +346,18 @@ pub fn usernamecasepreserved_enforce(input: JsValue) -> Result<JsValue, JsError>
     apply_string_operation(input, |s| UsernameCasePreserved::enforce(s))
 }
 
-/// Compare two usernames for equality (case-sensitive).
+/// Compare two `usernames` for equality (case-sensitive).
 ///
 /// Applies all rules specified for the `UsernameCasePreserved` profile to two
 /// separate input strings and compares them. Comparison is case-sensitive.
 ///
 /// # Arguments
-/// * `a` - First username
-/// * `b` - Second username
+/// * `a` - First `username`
+/// * `b` - Second `username`
 ///
 /// # Returns
-/// * `Ok(true)` - Usernames are equivalent
-/// * `Ok(false)` - Usernames are different
+/// * `Ok(true)` - `Usernames` are equivalent
+/// * `Ok(false)` - `Usernames` are different
 /// * `Err(string)` - Validation error
 ///
 /// # Specification
