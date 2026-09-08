@@ -1,0 +1,7 @@
+node_modules/
+*.log
+.DS_Store
+precis.js
+precis.d.ts
+precis.js.map
+precis.d.ts.map

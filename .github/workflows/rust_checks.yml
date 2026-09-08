@@ -147,7 +147,7 @@ jobs:
     - name: Verify MSRV in Cargo.toml files
       run: |
         echo "Checking that all Cargo.toml files declare rust-version = \"1.85\""
-        for toml in precis-core/Cargo.toml precis-profiles/Cargo.toml precis-tools/Cargo.toml; do
+        for toml in precis-core/Cargo.toml precis-profiles/Cargo.toml precis-tools/Cargo.toml precis-wasm/Cargo.toml; do
           if ! grep -q 'rust-version = "1.85"' "$toml"; then
             echo "ERROR: $toml does not declare rust-version = \"1.85\""
             exit 1
@@ -160,3 +160,75 @@ jobs:
 
     - name: Test with MSRV
       run: cargo +1.85 test --workspace --all-features --verbose
+
+  wasm:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: wasm-pack
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Run wasm unit tests (headless Chrome)
+      working-directory: precis-wasm
+      run: wasm-pack test --headless --chrome
+
+    - name: Run wasm unit tests (headless Firefox)
+      working-directory: precis-wasm
+      run: wasm-pack test --headless --firefox
+
+    - name: Build the publishable package
+      working-directory: precis-wasm
+      run: npm run build
+
+    - name: Type-check the TypeScript example against the built types
+      working-directory: precis-wasm/examples/typescript
+      run: |
+        npm install
+        npx tsc --noEmit
+
+    - name: Smoke-test the published package (Node CJS + ESM)
+      working-directory: precis-wasm
+      run: |
+        set -euo pipefail
+        # Pack the built package and install it into a throwaway consumer,
+        # exercising the conditional `exports` map the way a real dependant would.
+        TGZ="$(pwd)/$(npm pack ./pkg | tail -1)"
+        consumer="$(mktemp -d)"
+        cd "$consumer"
+        npm init -y >/dev/null
+        npm install "$TGZ" >/dev/null
+
+        echo "-> CommonJS require()"
+        node -e '
+          const p = require("precis-wasm");
+          const assert = require("assert");
+          assert.strictEqual(p.nickname_enforce("  Alice  "), "Alice");
+          assert.strictEqual(p.usernamecasemapped_enforce("Alice"), "alice");
+          assert.strictEqual(p.usernamecasepreserved_enforce("Alice"), "Alice");
+          assert.throws(() => p.opaquestring_enforce(""));
+          console.log("CJS ok");
+        '
+
+        echo "-> ESM import + await init()"
+        node --input-type=module -e '
+          import { init, nickname_enforce, nickname_compare } from "precis-wasm";
+          import assert from "node:assert";
+          await init();
+          assert.strictEqual(nickname_enforce("  Bob  "), "Bob");
+          assert.strictEqual(nickname_compare("Alice", "alice"), true);
+          console.log("ESM ok");
+        '
