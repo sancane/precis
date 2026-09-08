@@ -28,7 +28,7 @@ precis-tools.workspace = true
 ucd-parse.workspace = true
 
 [dev-dependencies]
-criterion = { package = "codspeed-criterion-compat", version = "*" }
+criterion = { package = "codspeed-criterion-compat", version = "4" }
 precis-tools.workspace = true
 proptest = "1.11"
 ucd-parse.workspace = true
