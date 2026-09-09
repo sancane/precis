@@ -36,3 +36,9 @@ proptest = "1.11"
 [[bench]]
 name = "profiles_bench"
 harness = false
+
+[lints.rust]
+# cargo-llvm-cov sets these cfgs during coverage runs (see the proptest test
+# files gated with `#![cfg(not(coverage))]`). Declare them so normal builds
+# don't warn about unexpected cfg names.
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)', 'cfg(coverage_nightly)'] }
