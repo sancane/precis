@@ -251,7 +251,7 @@ For typical web applications, the high-level API is recommended. The performance
 
 ### Prerequisites
 
-- Rust 1.80+
+- Rust 1.85+
 - [wasm-pack](https://rustwasm.github.io/wasm-pack/)
 - Node.js (for TypeScript compilation)
 
@@ -318,7 +318,7 @@ See the [examples](examples/) directory for complete working examples:
 - ✅ Firefox 52+
 - ✅ Safari 11+
 - ✅ Edge 16+
-- ✅ Node.js 12+
+- ✅ Node.js 16+
 
 All modern browsers with WebAssembly support.
 
@@ -350,5 +350,5 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
 ## Links
 
 - [GitHub Repository](https://github.com/sancane/precis)
-- [Documentation](https://docs.rs/precis-wasm)
+- [Documentation](https://github.com/sancane/precis/tree/main/precis-wasm#readme)
 - [NPM Package](https://www.npmjs.com/package/precis-wasm)
