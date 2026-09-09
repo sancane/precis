@@ -1,3 +1,9 @@
+// Excluded from coverage runs: these are randomized property tests, so the
+// lines they touch vary run to run. cargo-llvm-cov sets `cfg(coverage)`, so
+// this whole test binary compiles away under coverage. They still run in the
+// normal `cargo test` (the "Tests" workflow).
+#![cfg(not(coverage))]
+
 //! Property-based tests using proptest
 //!
 //! These tests verify invariants that should hold for all valid inputs,

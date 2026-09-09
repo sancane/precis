@@ -7,10 +7,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  # Pin the proptest configuration so the coverage numbers are reproducible
-  # run to run. Property tests otherwise exercise random inputs on every run,
-  # which makes line coverage fluctuate regardless of the coverage tool.
-  PROPTEST_CASES: 256
 
 jobs:
   coverage:
