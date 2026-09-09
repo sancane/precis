@@ -13,6 +13,11 @@ on:
       - 'precis-*/Cargo.toml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+  checks: write
+
 jobs:
   security_audit:
     runs-on: ubuntu-latest
