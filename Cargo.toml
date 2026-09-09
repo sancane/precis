@@ -8,8 +8,8 @@ exclude = ["precis-core/fuzz", "precis-profiles/fuzz"]
 # (required by crates.io when publishing). Keep each `version` in sync with the
 # corresponding crate's `[package] version` when bumping.
 [workspace.dependencies]
-precis-core = { path = "precis-core", version = "0.2.0" }
-precis-profiles = { path = "precis-profiles", version = "0.1.14" }
+precis-core = { path = "precis-core", version = "0.2.1" }
+precis-profiles = { path = "precis-profiles", version = "0.1.15" }
 precis-tools = { path = "precis-tools", version = "0.1.10" }
 regex = "1"
 reqwest = { version = "0.13", features = ["blocking"] }

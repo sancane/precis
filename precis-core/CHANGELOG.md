@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1](https://github.com/sancane/precis/compare/precis-core-v0.2.0...precis-core-v0.2.1) - 2026-09-09
+
+### Other
+
+- exclude proptest property tests from coverage
+
 ## [0.2.0](https://github.com/sancane/precis/compare/precis-core-v0.1.11...precis-core-v0.2.0) - 2026-09-08
 
 ### Fixed
