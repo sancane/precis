@@ -1,0 +1,18 @@
+{
+  "name": "precis-wasm-typescript-example",
+  "version": "1.0.0",
+  "description": "TypeScript example for precis-wasm",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node precis.js",
+    "dev": "tsx precis.ts",
+    "clean": "rm -f precis.js precis.d.ts precis.js.map precis.d.ts.map"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.9.3"
+  }
+}
