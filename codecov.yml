@@ -4,14 +4,13 @@ coverage:
     project:
       default:
         target: auto
-        # Allow the total coverage to drop by up to 1% versus the base
-        # without failing the check, to absorb the residual noise from
-        # proptest's randomized inputs.
-        threshold: 1%
+        # Coverage is deterministic (property tests are excluded from the
+        # coverage run), so require no drop at all versus the base.
+        threshold: 0%
     patch:
       default:
         target: auto
-        threshold: 1%
+        threshold: 0%
 
 # Keep the PR comment concise.
 comment:
