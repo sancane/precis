@@ -947,7 +947,7 @@ dependencies = [
 
 [[package]]
 name = "precis-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "codspeed-criterion-compat",
  "precis-tools",
@@ -958,7 +958,7 @@ dependencies = [
 
 [[package]]
 name = "precis-profiles"
-version = "0.1.14"
+version = "0.1.15"
 dependencies = [
  "codspeed-criterion-compat",
  "hex",
@@ -996,7 +996,7 @@ dependencies = [
  "bit-vec",
  "bitflags",
  "num-traits",
- "rand 0.9.2",
+ "rand 0.9.5",
  "rand_chacha",
  "rand_xorshift",
  "regex-syntax",
