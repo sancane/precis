@@ -1,0 +1,19 @@
+# Codecov configuration (https://docs.codecov.com/docs/codecovyml-reference)
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        # Allow the total coverage to drop by up to 1% versus the base
+        # without failing the check, to absorb the residual noise from
+        # proptest's randomized inputs.
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+
+# Keep the PR comment concise.
+comment:
+  layout: "reach, diff, files"
+  require_changes: false

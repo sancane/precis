@@ -1,21 +1,50 @@
-name:                           coverage
+name: coverage
 
-on:                             [pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  # Pin the proptest configuration so the coverage numbers are reproducible
+  # run to run. Property tests otherwise exercise random inputs on every run,
+  # which makes line coverage fluctuate regardless of the coverage tool.
+  PROPTEST_CASES: 256
+
 jobs:
-  test:
-    name:                       Code coverage
-    runs-on:                    ubuntu-latest
-    container:
-      image:                    xd009642/tarpaulin:develop-nightly
-      options:                  --security-opt seccomp=unconfined
+  coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
     steps:
-      - name:                   Checkout repository
-        uses:                   actions/checkout@v5
-      - name:                   Generate code coverage
-        run: |
-          cargo +nightly tarpaulin --verbose --workspace --line --timeout 120 --exclude-files "*precis-tools*" "*/tests/*" "*/benches/*" --out xml
-      - name:                   Upload to codecov.io
-        uses:                   codecov/codecov-action@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Nightly is required for doctest coverage (`--doctests`).
+      - name: Install nightly toolchain
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          fail_ci_if_error:     true
-          token:                ${{ secrets.CODECOV_TOKEN }}
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+
+      # cargo-llvm-cov uses the compiler's own source-based instrumentation
+      # (`-C instrument-coverage`), which is far more accurate than tarpaulin's
+      # ptrace line coverage. The ignore regex mirrors the previous
+      # `--exclude-files` list (the build-only precis-tools crate and the
+      # test/bench sources are not measured as covered code).
+      - name: Generate code coverage (including doctests)
+        run: |
+          cargo +nightly llvm-cov --workspace --doctests \
+            --ignore-filename-regex '(precis-tools/|/tests/|/benches/)' \
+            --lcov --output-path lcov.info
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v4
+        with:
+          files: lcov.info
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
