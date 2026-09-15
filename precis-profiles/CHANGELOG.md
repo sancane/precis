@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1](https://github.com/sancane/precis/compare/precis-profiles-v0.2.0...precis-profiles-v0.2.1) - 2026-09-15
+
+### Other
+
+- updated the following local packages: precis-core
+
 ## [0.2.0](https://github.com/sancane/precis/compare/precis-profiles-v0.1.14...precis-profiles-v0.2.0) - 2026-09-14
 
 ### Changed
