@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/sancane/precis/compare/precis-profiles-v0.1.14...precis-profiles-v0.2.0) - 2026-09-14
+
+### Changed
+
+- **BREAKING**: raise the `precis-core` dependency from 0.1 to 0.2. Because
+  `precis-profiles` re-exports `precis_core` (`pub use precis_core;`) and its
+  profile types expose the core `Profile` trait, this is a public-dependency
+  change and therefore a semver-incompatible release. It supersedes 0.1.14,
+  which shipped the same core-0.2 dependency as a patch by mistake and caused
+  duplicate `precis_core` versions in downstream graphs (e.g. stun-rs).
+
 ## [0.1.14](https://github.com/sancane/precis/compare/precis-profiles-v0.1.13...precis-profiles-v0.1.14) - 2026-09-08
 
 ### Fixed
