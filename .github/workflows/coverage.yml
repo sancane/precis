@@ -38,7 +38,7 @@ jobs:
       - name: Generate code coverage (including doctests)
         run: |
           cargo +nightly llvm-cov --workspace --doctests \
-            --ignore-filename-regex '(precis-tools/|/tests/|/benches/)' \
+            --ignore-filename-regex '(precis-tools/|precis-wasm/|/tests/|/benches/)' \
             --lcov --output-path lcov.info
 
       - name: Upload to codecov.io
