@@ -964,7 +964,7 @@ dependencies = [
 
 [[package]]
 name = "precis-profiles"
-version = "0.1.14"
+version = "0.2.0"
 dependencies = [
  "codspeed-criterion-compat",
  "hex",
@@ -1736,9 +1736,9 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "ucd-parse"
-version = "0.1.13"
+version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c06ff81122fcbf4df4c1660b15f7e3336058e7aec14437c9f85c6b31a0f279b9"
+checksum = "4ce84be817ae77653b0f919d43f11ddc5bf0ca17b5bf4d80f128d80c2958b5e0"
 dependencies = [
  "regex-lite",
 ]
